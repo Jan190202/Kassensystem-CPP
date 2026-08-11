@@ -1,15 +1,15 @@
-﻿# VS-Generiert
+﻿# Qt-Integration
+set(CMAKE_AUTOMOC ON)
+set(CMAKE_AUTORCC ON)
+
+# VS-Generiert
 add_executable(KassensystemCPP "Kassensystem.cpp" "Kassensystem.h" "main.cpp")
 
 if (CMAKE_VERSION VERSION_GREATER 3.12)
   set_property(TARGET KassensystemCPP PROPERTY CXX_STANDARD 20)
 endif()
 
-
 # Qt-Integration
-set(CMAKE_AUTOMOC ON)
-set(CMAKE_AUTORCC ON)
-
 find_package(Qt6 REQUIRED COMPONENTS Widgets)
 
 target_link_libraries(KassensystemCPP PRIVATE Qt6::Widgets)

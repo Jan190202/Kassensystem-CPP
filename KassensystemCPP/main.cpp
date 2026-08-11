@@ -5,8 +5,8 @@ int main(int argc, char* argv[])
 {
 	QApplication app(argc, argv);
 
-	// Window w;
-	// w.show();
+	CashRegisterSystem uiApp;
+	uiApp.show();
 
 	return app.exec();
 }
