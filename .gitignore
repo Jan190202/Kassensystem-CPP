@@ -1,0 +1,48 @@
+out/
+build/
+Build/
+bin/
+lib/
+
+# Falls CMake direkt im Root ausgeführt wurde (In-Source Build Protection)
+CMakeCache.txt
+CMakeFiles/
+CMakeScripts/
+Makefile
+cmake_install.cmake
+install_manifest.txt
+
+# ====================================================================
+# Microsoft Visual Studio / VS Code
+# ====================================================================
+# Ignoriert das von dir erwähnte ".vs"-Verzeichnis (enthält IntelliSense, Cache etc.)
+.vs/
+
+# Visual Studio Build-Artefakte
+*.obj
+*.exe
+*.pdb
+*.ilk
+*.lib
+*.dll
+*.sln
+*.vcxproj
+*.vcxproj.filters
+*.vcxproj.user
+
+# VS Code Einstellungen und Caches
+.vscode/
+.cmake/
+
+# ====================================================================
+# Compiler- & Betriebssystem-Spezifisches
+# ====================================================================
+# Kompilierte Objektdateien und Bibliotheken (GCC/Clang)
+*.o
+*.a
+*.so
+*.dylib
+
+# Betriebssystem-Dateien
+.DS_Store
+Thumbs.db
