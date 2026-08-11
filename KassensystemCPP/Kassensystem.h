@@ -1,13 +1,20 @@
 ﻿#pragma once
-#include <QWidget>
+#include <QMainWindow>
+#include <array>
 
-class CashRegisterSystem : public QWidget
+class CashRegisterSystem : public QMainWindow
 {
 	Q_OBJECT
 public:
-	CashRegisterSystem(QWidget* parent = nullptr);
-//private slots:
-//	void tabChanged();
-//private:
-//	enum activeTab {activeTabAdd = 0, activeTabPay, activeTabBalance};
+	CashRegisterSystem(QMainWindow* parent = nullptr);
+private slots:
+	
+private:
+	enum activeTab {activeTabAdd = 0, activeTabPay, activeTabBalance};
+	int activeTab = 0;
+	int nTabs = 3;
+	std::array<bool, 3> loadedTabs = {false};
+	void initUi();
+	void initializeTab(QTabWidget* tabs, int tabNum);
+	//QTabWidget* tabs;
 };

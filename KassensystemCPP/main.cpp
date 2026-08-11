@@ -1,12 +1,13 @@
-# include "Kassensystem.h"
-# include <qapplication.h>
+#include "Kassensystem.h"
+#include <QApplication.h>
 
 int main(int argc, char* argv[])
 {
 	QApplication app(argc, argv);
 
-	CashRegisterSystem uiApp;
-	uiApp.show();
+	CashRegisterSystem rSys;
+	rSys.show();
+	
 
 	return app.exec();
 }
