@@ -1,4 +1,4 @@
-#include "Kassensystem.h"
+#include "gui/Kassensystem.h"
 #include <QApplication.h>
 
 int main(int argc, char* argv[])

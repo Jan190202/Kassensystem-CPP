@@ -48,8 +48,8 @@ void CashRegisterSystem::initUi()
 
 	connect(tabs, &QTabWidget::currentChanged, this, [tabs, this]()
 		{
-			this->activeTab = tabs->currentIndex();
-			this->initializeTab(tabs, this->activeTab);
+			activeTab = tabs->currentIndex();
+			initializeTab(tabs, activeTab);
 		});
 }
 
