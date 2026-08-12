@@ -8,4 +8,4 @@ public:
 	AddTabEntry(QWidget* parent = nullptr);
 private:
 	// dropdown, labels, textfields, buttons, etc.
-}
+};

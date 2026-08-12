@@ -2,6 +2,7 @@
 #include <QMainWindow>
 #include <QPushButton>
 #include <array>
+#include "BaseTab.h"
 
 class CashRegisterSystem : public QMainWindow
 {
@@ -9,15 +10,15 @@ class CashRegisterSystem : public QMainWindow
 public:
 	CashRegisterSystem(QMainWindow* parent = nullptr);	
 private:
-	std::array<QWidget*,3> tabs;
+	std::array<BaseTab*,3> tabs;
 	QPushButton* btnCancel;
 	QPushButton* btnApply;
 	QPushButton* btnSave;
 
-	enum activeTab {activeTabAdd = 0, activeTabPay, activeTabBalance};
+	enum class tabIndex {add = 0, pay, balance};
 	int activeTab = 0;
 	std::array<bool, 3> loadedTabs = {false};
 
 	void initUi();
-	void initializeTab(QTabWidget* tabs, int tabNum);
+	void initializeTab(int tabNum);
 };
