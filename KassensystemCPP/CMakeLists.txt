@@ -9,7 +9,7 @@ set(CMAKE_AUTORCC ON)
 #  src/main.cpp
 #)
 
-file(GLOB_RECURSE SOURCES CONFIGURE_DEPENDS src/*.cpp) # alle cpp dateien im src ordner und allen unterordnern finden
+file(GLOB_RECURSE SOURCES CONFIGURE_DEPENDS src/*.cpp) # alle cpp dateien im src ordner und allen Unterordnern finden
 add_executable(KassensystemCPP ${SOURCES})
 
 target_include_directories(KassensystemCPP PRIVATE src) 
