@@ -1,14 +1,13 @@
 #pragma once
-#include "BaseTab.h"
+#include <QWidget>
 #include <vector>
-#include "AddTabEntry.h"
 
-class AddTab : public BaseTab
+class AddTab : public QWidget
 {
 	Q_OBJECT
 public:
 	AddTab(QWidget* parent = nullptr);
-	void initialize() override;
+
 private:
 	std::vector<AddTabEntry*> entries;
-};
+}

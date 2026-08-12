@@ -1,7 +1,4 @@
 ﻿#include "Kassensystem.h"
-#include "AddTab.h"
-#include "PayTab.h"
-#include "BalanceTab.h"
 
 #include <QHBoxLayout>
 #include <QVBoxLayout>
@@ -25,9 +22,9 @@ void CashRegisterSystem::initUi()
 
 	// lower buttons
 	QHBoxLayout* buttonBar = new QHBoxLayout();
-	btnCancel	= new QPushButton("Cancel", this);
-	btnApply	= new QPushButton("Apply", this);
-	btnSave		= new QPushButton("Save", this);
+	QPushButton* btnCancel	= new QPushButton("Cancel", this);
+	QPushButton* btnApply	= new QPushButton("Apply", this);
+	QPushButton* btnSave	= new QPushButton("Save", this);
 	buttonBar->addWidget(btnCancel);
 	buttonBar->addWidget(btnApply);
 	buttonBar->addWidget(btnSave);
@@ -35,31 +32,57 @@ void CashRegisterSystem::initUi()
 	rootLayout->addLayout(buttonBar);           
 
 	// tabs
-	QTabWidget* tabSelector = new QTabWidget(central);
-	rootLayout->insertWidget(0, tabSelector);
+	QTabWidget* tabs = new QTabWidget(central);
+	rootLayout->insertWidget(0, tabs);
 
-	tabs = { new AddTab(), new PayTab(), new BalanceTab() };
+	QWidget* tabAdd = new QWidget();
+	QWidget* tabPay = new QWidget();
+	QWidget* tabBal = new QWidget();
 
-	tabSelector->addTab(tabs.at(0), tr("Einträge hinzufügen"));
-	tabSelector->addTab(tabs.at(1), tr("Schulden begleichen"));
-	tabSelector->addTab(tabs.at(2), tr("Abteilungsbilanz bearbeiten"));
+	tabs->addTab(tabAdd, tr("Einträge hinzufügen"));
+	tabs->addTab(tabPay, tr("Schulden begleichen"));
+	tabs->addTab(tabBal, tr("Abteilungsbilanz bearbeiten"));
 
-	activeTab = static_cast<int>(tabIndex::add); // initialize first tab
-	initializeTab(activeTab);
+	activeTab = activeTab::activeTabAdd;
+	initializeTab(tabs, activeTab);
 
-	connect(tabSelector, &QTabWidget::currentChanged, this, [tabSelector, this]()
+	connect(tabs, &QTabWidget::currentChanged, this, [tabs, this]()
 		{
-			activeTab = tabSelector->currentIndex();
-			initializeTab(activeTab);
+			activeTab = tabs->currentIndex();
+			initializeTab(tabs, activeTab);
 		});
 }
 
-void CashRegisterSystem::initializeTab(int tabNum)
+void CashRegisterSystem::initializeTab(QTabWidget* tabs, int tabNum)
 {
 	// demanded tab already created
 	if (loadedTabs.at(tabNum)) return;
 
 	// demanded tab not yet created
-	tabs.at(tabNum)->initialize();
+	QWidget* tab = tabs->currentWidget();
+	switch(tabNum)
+	{
+		case activeTab::activeTabAdd:
+		{
+			//...
+			break;
+
+			//QHBoxLayout* entryLayout = new QHBoxLayout(page1);
+			//QPushButton* btnTest = new QPushButton("Test", page1);
+			//entryLayout->addWidget(btnTest);
+			//entryLayout->addStretch();
+
+		}
+		case activeTab::activeTabPay:
+		{
+			//...
+			break;
+		}		
+		case activeTab::activeTabBalance:
+		{
+			//...
+			break;
+		}
+	}
 	loadedTabs.at(tabNum) = true;
 }
