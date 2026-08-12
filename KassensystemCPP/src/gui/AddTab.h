@@ -10,4 +10,7 @@ public:
 
 private:
 	std::vector<AddTabEntry*> entries;
+	void addEntry();
+	void removeEntry(AddTabEntry* entry);
+	void clearEntries();
 }
