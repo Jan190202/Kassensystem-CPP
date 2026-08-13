@@ -9,6 +9,9 @@
 #include <QLabel>
 #include <algorithm>
 #include <string> 
+#include <QList>
+
+#include "Utils.h"
 
 AddTab::AddTab(QWidget* parent) : BaseTab(parent) {}
 
@@ -22,13 +25,13 @@ void AddTab::initialize()
 	entriesGrid = new QGridLayout(); 
 
 	std::string eurSymbol = "\u20AC";
-	entriesGrid->addWidget(new QLabel(tr("Name")), 0, 0);
-	entriesGrid->addWidget(new QLabel(QString::fromUtf8("Bier 0,5l (3,0 " + eurSymbol + ")")), 0, 1);
-	entriesGrid->addWidget(new QLabel(QString::fromUtf8("Bier 0,4l (2,5 " + eurSymbol + ")")), 0, 2);
-	entriesGrid->addWidget(new QLabel(QString::fromUtf8("Softdrinks (3,0 " + eurSymbol + ")")), 0, 3);
-	entriesGrid->addWidget(new QLabel(QString::fromUtf8("Wasser (2,5 " + eurSymbol + ")")), 0, 4);
-	entriesGrid->addWidget(new QLabel(QString::fromUtf8("Sonstiges (X "+eurSymbol+")")), 0, 5);
-	entriesGrid->addWidget(new QLabel(QString::fromUtf8("Kosten")), 0, 6);
+	entriesGrid->addWidget(new QLabel(tr("Name")), 0, 0, Qt::AlignCenter);
+	entriesGrid->addWidget(new QLabel(QString::fromUtf8("Bier 0,5l")), 0, 1, Qt::AlignCenter);
+	entriesGrid->addWidget(new QLabel(QString::fromUtf8("Bier 0,4l")), 0, 2, Qt::AlignCenter);
+	entriesGrid->addWidget(new QLabel(QString::fromUtf8("Softdrinks")), 0, 3, Qt::AlignCenter);
+	entriesGrid->addWidget(new QLabel(QString::fromUtf8("Wasser")), 0, 4, Qt::AlignCenter);
+	entriesGrid->addWidget(new QLabel(QString::fromUtf8("Sonstiges ("+eurSymbol+")")), 0, 5, Qt::AlignCenter);
+	entriesGrid->addWidget(new QLabel(QString::fromUtf8("Kosten")), 0, 6, Qt::AlignCenter);
 
 	
 
@@ -43,7 +46,10 @@ void AddTab::initialize()
 
 void AddTab::addEntry()
 {
-	AddTabEntry* newEntry = new AddTabEntry({ tr("") }, this);
+	std::vector<std::string> nameList = {"Jane Doe", "John Doe"};
+	QList<QString> nameListQ = Utils::strVecToQStrList(nameList);
+
+	AddTabEntry* newEntry = new AddTabEntry(nameListQ, this);
 	int row = entriesGrid->rowCount(); 
 	newEntry->addToGrid(entriesGrid, row);
 

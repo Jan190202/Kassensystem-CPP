@@ -61,7 +61,7 @@ void AddTabEntry::addToGrid(QGridLayout* grid, int row)
 	grid->addWidget(spinboxSoftdrinks, row, 3);
 	grid->addWidget(spinboxWater, row, 4);
 	grid->addWidget(spinboxCustom, row, 5);
-	grid->addWidget(labelCost, row, 6);
+	grid->addWidget(labelCost, row, 6, Qt::AlignCenter);
 	grid->addWidget(btnRemove, row, 7);
 }
 
