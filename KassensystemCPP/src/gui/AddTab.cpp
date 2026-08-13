@@ -10,6 +10,7 @@
 #include <algorithm>
 #include <string> 
 #include <QList>
+#include <QFrame>
 
 #include "Utils.h"
 
@@ -24,6 +25,9 @@ void AddTab::initialize()
 
 	entriesGrid = new QGridLayout(); 
 
+	QFrame* hLine = new QFrame();
+	hLine->setFrameShape(QFrame::HLine);
+
 	std::string eurSymbol = "\u20AC";
 	entriesGrid->addWidget(new QLabel(tr("Name")), 0, 0, Qt::AlignCenter);
 	entriesGrid->addWidget(new QLabel(QString::fromUtf8("Bier 0,5l")), 0, 1, Qt::AlignCenter);
@@ -32,7 +36,7 @@ void AddTab::initialize()
 	entriesGrid->addWidget(new QLabel(QString::fromUtf8("Wasser")), 0, 4, Qt::AlignCenter);
 	entriesGrid->addWidget(new QLabel(QString::fromUtf8("Sonstiges ("+eurSymbol+")")), 0, 5, Qt::AlignCenter);
 	entriesGrid->addWidget(new QLabel(QString::fromUtf8("Kosten")), 0, 6, Qt::AlignCenter);
-
+	entriesGrid->addWidget(hLine, 1, 0, 1, 7);
 	
 
 	AddTabMainLayout = new QVBoxLayout(this);
