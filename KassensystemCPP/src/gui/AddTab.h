@@ -5,6 +5,7 @@ class AddTabEntry;
 class QDateEdit;
 class QPushButton;
 class QVBoxLayout;
+class QGridLayout;
 
 class AddTab : public BaseTab
 {
@@ -19,8 +20,7 @@ private:
 	std::vector<AddTabEntry*> entries;
 	QPushButton* btnAddEntry;
 	QVBoxLayout* AddTabMainLayout;
-	int entryCounter = 0;
-
+	QGridLayout* entriesGrid;
 
 	void removeEntry(AddTabEntry* entry);
 	void clearEntries();

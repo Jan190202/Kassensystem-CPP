@@ -1,45 +1,35 @@
 #pragma once
-#include <QWidget>
-#include <vector>
-#include <string>
+#include <QObject>
+#include <QList>
+#include <QString>
 
 class QComboBox;
 class QLabel;
 class QSpinBox;
 class QDoubleSpinBox;
 class QPushButton;
-class QHBoxLayout;
+class QGridLayout;
+class QWidget;
 
-class AddTabEntry : public QWidget
+class AddTabEntry : public QObject
 {
 	Q_OBJECT
 signals:
 	void remove(AddTabEntry* removedEntry);
 public:
-	AddTabEntry(QList<QString> nameList = { tr("") }, QWidget* parent = nullptr);
+	AddTabEntry(QList<QString> nameList = { QString() }, QWidget* parent = nullptr);
 	~AddTabEntry();
-	QHBoxLayout* entryLayout;
+
+	void addToGrid(QGridLayout* grid, int row);
+	void removeFromGrid(QGridLayout* grid);
+
 private:
-	
-
 	QComboBox* nameSelect;
-
-	QLabel* labelBeer05;
 	QSpinBox* spinboxBeer05;
-
-	QLabel* labelBeer04;
 	QSpinBox* spinboxBeer04;
-
-	QLabel* labelSoftdrinks;
 	QSpinBox* spinboxSoftdrinks;
-
-	QLabel* labelWater;
 	QSpinBox* spinboxWater;
-
-	QLabel* labelCustom;
 	QDoubleSpinBox* spinboxCustom;
-
 	QLabel* labelCost;
-
 	QPushButton* btnRemove;
 };

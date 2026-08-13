@@ -5,20 +5,36 @@
 #include <QPushButton>
 #include <QDate>
 #include <QVBoxLayout>
+#include <QGridLayout>
+#include <QLabel>
+#include <algorithm>
+#include <string> 
 
 AddTab::AddTab(QWidget* parent) : BaseTab(parent) {}
 
 void AddTab::initialize()
 {
-	// set last month to initial selection
-	QDate today = QDate();
-	monthSelection = new QDateEdit(today.currentDate().addMonths(-1));
+	monthSelection = new QDateEdit(QDate::currentDate().addMonths(-1));
 	monthSelection->setDisplayFormat("MMMM yy");
 
 	btnAddEntry = new QPushButton("+");
 
+	entriesGrid = new QGridLayout(); 
+
+	std::string eurSymbol = "\u20AC";
+	entriesGrid->addWidget(new QLabel(tr("Name")), 0, 0);
+	entriesGrid->addWidget(new QLabel(QString::fromUtf8("Bier 0,5l (3,0 " + eurSymbol + ")")), 0, 1);
+	entriesGrid->addWidget(new QLabel(QString::fromUtf8("Bier 0,4l (2,5 " + eurSymbol + ")")), 0, 2);
+	entriesGrid->addWidget(new QLabel(QString::fromUtf8("Softdrinks (3,0 " + eurSymbol + ")")), 0, 3);
+	entriesGrid->addWidget(new QLabel(QString::fromUtf8("Wasser (2,5 " + eurSymbol + ")")), 0, 4);
+	entriesGrid->addWidget(new QLabel(QString::fromUtf8("Sonstiges (X "+eurSymbol+")")), 0, 5);
+	entriesGrid->addWidget(new QLabel(QString::fromUtf8("Kosten")), 0, 6);
+
+	
+
 	AddTabMainLayout = new QVBoxLayout(this);
 	AddTabMainLayout->addWidget(monthSelection);
+	AddTabMainLayout->addLayout(entriesGrid);
 	AddTabMainLayout->addWidget(btnAddEntry);
 	AddTabMainLayout->addStretch();
 
@@ -27,25 +43,44 @@ void AddTab::initialize()
 
 void AddTab::addEntry()
 {
-	entryCounter++;
 	AddTabEntry* newEntry = new AddTabEntry({ tr("") }, this);
-	entries.push_back(newEntry);
-	AddTabMainLayout->insertLayout(entryCounter, newEntry->entryLayout);
+	int row = entriesGrid->rowCount(); 
+	newEntry->addToGrid(entriesGrid, row);
 
+	entries.push_back(newEntry);
 	connect(newEntry, &AddTabEntry::remove, this, &AddTab::removeEntry);
 }
 
 void AddTab::removeEntry(AddTabEntry* entryRemoved)
 {
-	AddTabMainLayout->removeWidget(entryRemoved);
+	auto it = std::find(entries.begin(), entries.end(), entryRemoved);
+	if (it == entries.end())
+		return;
+
+	int removedIndex = static_cast<int>(std::distance(entries.begin(), it));
+	int removedRow = removedIndex + 1; 
+
+	entries.erase(it);
 	delete entryRemoved;
-	entryCounter--;
+
+	int rowCount = entriesGrid->rowCount();
+	int columnCount = entriesGrid->columnCount();
+	for (int row = removedRow + 1; row < rowCount; ++row)
+	{
+		for (int col = 0; col < columnCount; ++col)
+		{
+			QLayoutItem* item = entriesGrid->itemAtPosition(row, col);
+			if (!item) continue;
+			entriesGrid->removeItem(item);
+			entriesGrid->addItem(item, row - 1, col);
+		}
+	}
 }
 
 void AddTab::clearEntries()
 {
-	for (AddTabEntry* entry : entries)
+	while (!entries.empty())
 	{
-		removeEntry(entry);
+		removeEntry(entries.back());
 	}
 }

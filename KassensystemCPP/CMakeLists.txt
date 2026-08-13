@@ -1519,10 +1519,6 @@ add_custom_command(TARGET KassensystemCPP POST_BUILD
 
 
 
-
-
-
-
 # Qt-Integration
 find_package(Qt6 REQUIRED COMPONENTS Widgets)
 
