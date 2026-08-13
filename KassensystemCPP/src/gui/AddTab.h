@@ -16,11 +16,11 @@ public:
 private slots:
 	void addEntry();
 private:
-	QDateEdit* monthSelection;
-	std::vector<AddTabEntry*> entries;
-	QPushButton* btnAddEntry;
-	QVBoxLayout* AddTabMainLayout;
-	QGridLayout* entriesGrid;
+	QDateEdit* monthSelection = nullptr;
+	std::vector<AddTabEntry*> entries = {};
+	QPushButton* btnAddEntry = nullptr;
+	QVBoxLayout* AddTabMainLayout = nullptr;
+	QGridLayout* entriesGrid = nullptr;
 
 	void removeEntry(AddTabEntry* entry);
 	void clearEntries();
