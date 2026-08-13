@@ -1,19 +1,26 @@
 #pragma once
 #include <QWidget>
+#include <vector>
+#include <string>
 
 class QComboBox;
 class QLabel;
 class QSpinBox;
 class QDoubleSpinBox;
 class QPushButton;
+class QHBoxLayout;
 
 class AddTabEntry : public QWidget
 {
 	Q_OBJECT
+signals:
+	void remove(AddTabEntry* removedEntry);
 public:
-	AddTabEntry(int num, QWidget* parent = nullptr) : QWidget(parent), entryNum(num) {};
+	AddTabEntry(QList<QString> nameList = { tr("") }, QWidget* parent = nullptr);
+	~AddTabEntry();
+	QHBoxLayout* entryLayout;
 private:
-	int entryNum;
+	
 
 	QComboBox* nameSelect;
 
@@ -31,6 +38,8 @@ private:
 
 	QLabel* labelCustom;
 	QDoubleSpinBox* spinboxCustom;
+
+	QLabel* labelCost;
 
 	QPushButton* btnRemove;
 };

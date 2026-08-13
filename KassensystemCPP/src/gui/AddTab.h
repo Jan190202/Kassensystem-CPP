@@ -1,6 +1,10 @@
 #pragma once
 #include "BaseTab.h"
 #include <vector>
+class AddTabEntry;
+class QDateEdit;
+class QPushButton;
+class QVBoxLayout;
 
 class AddTab : public BaseTab
 {
@@ -8,9 +12,16 @@ class AddTab : public BaseTab
 public:
 	AddTab(QWidget* parent = nullptr);
 	virtual void initialize() override;
+private slots:
+	void addEntry();
 private:
-	//std::vector<AddTabEntry*> entries;
-	//void addEntry();
-	//void removeEntry(AddTabEntry* entry);
-	//void clearEntries();
+	QDateEdit* monthSelection;
+	std::vector<AddTabEntry*> entries;
+	QPushButton* btnAddEntry;
+	QVBoxLayout* AddTabMainLayout;
+	int entryCounter = 0;
+
+
+	void removeEntry(AddTabEntry* entry);
+	void clearEntries();
 };
