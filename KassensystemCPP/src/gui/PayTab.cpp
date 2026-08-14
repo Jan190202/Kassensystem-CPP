@@ -72,8 +72,8 @@ void PayTab::initialize()
 	surplusGroup->addButton(btnSurplusToTip);
 
 	// Rechte Seite / Tabelle
-	consumptionTable = new QTableWidget(10, 3, this);
-	consumptionTable->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+	tblConsumption = new QTableView();
+	tblConsumption->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
 
 	// Linke Seite
 	auto* leftLayout = new QVBoxLayout();
@@ -141,5 +141,5 @@ void PayTab::initialize()
 
 	mainLayout->addLayout(leftLayout, 1);
 	mainLayout->addWidget(vLine);
-	mainLayout->addWidget(consumptionTable, 3);
+	mainLayout->addWidget(tblConsumption, 3);
 }

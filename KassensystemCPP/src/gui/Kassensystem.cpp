@@ -45,8 +45,9 @@ void CashRegisterSystem::initUi()
 	tabSelector->addTab(tabs.at(2), tr("Abteilungsbilanz bearbeiten"));
 	
 
-	activeTab = static_cast<int>(tabIndex::pay); // initialize first tab
+	activeTab = static_cast<int>(tabIndex::balance); // initialize first tab
 	initializeTab(activeTab);
+	tabSelector->setCurrentIndex(activeTab);
 
 
 	connect(tabSelector, &QTabWidget::currentChanged, this, [tabSelector, this]()

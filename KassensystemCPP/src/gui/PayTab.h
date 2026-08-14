@@ -3,7 +3,7 @@
 
 class QComboBox;
 class QLabel;
-class QTableWidget;
+class QTableView;
 class QCheckBox;
 class QDoubleSpinBox;
 class QPushButton;
@@ -26,5 +26,5 @@ private:
 	QCheckBox*		fullPaymentCheckBox = nullptr;
 	QRadioButton*	btnSurplusToCredit	= nullptr;
 	QRadioButton*	btnSurplusToTip		= nullptr;
-	QTableWidget*	consumptionTable	= nullptr; //prototype, will be replaced by QTableView and database in the future
+	QTableView*		tblConsumption		= nullptr; 
 };
