@@ -25,4 +25,11 @@ private:
 
 	QDate dateBefore;
 	QDate dateAfter				= QDate::currentDate();
+
+	enum btnIndex 
+	{
+		addEarning, addSpending
+	};
+
+	void addEntry(int index);
 };

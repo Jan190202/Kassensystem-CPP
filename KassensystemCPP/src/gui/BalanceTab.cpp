@@ -1,4 +1,5 @@
 #include "BalanceTab.h"
+#include "BalanceTabDialog.h"
 
 #include <QDate>
 #include <QFormLayout>
@@ -9,6 +10,7 @@
 #include <QSizePolicy>
 #include <QTableView>
 #include <QVBoxLayout>
+#include <string>
 
 BalanceTab::BalanceTab(QWidget* parent) : BaseTab(parent) {}
 
@@ -140,4 +142,24 @@ void BalanceTab::initialize()
 	mainLayout->setSpacing(14);
 	mainLayout->addLayout(tableLayout, 1);
 	mainLayout->addLayout(summaryLayout);
+
+	connect(btnAddEarning,  &QPushButton::clicked, this, [=]() {BalanceTab::addEntry(btnIndex::addEarning); });
+	connect(btnAddSpending, &QPushButton::clicked, this, [=]() {BalanceTab::addEntry(btnIndex::addSpending); });
+}
+
+void BalanceTab::addEntry(int entryType)
+{
+	std::string dlgName;
+	
+	switch (entryType)
+	{
+		case btnIndex::addEarning:
+			dlgName = "Einnahme hinzufügen";
+			break;
+		case btnIndex::addSpending:
+			dlgName = "Ausgabe hinzufügen";
+			break;
+	}
+	
+	auto* inputDialog = new BalanceTabDialog(dlgName, this);
 }
