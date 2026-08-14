@@ -1,44 +1,54 @@
 #include "AddTabEntry.h"
 
 #include <QComboBox>
-#include <QLabel>
-#include <QSpinBox>
 #include <QDoubleSpinBox>
-#include <QPushButton>
 #include <QGridLayout>
+#include <QLabel>
+#include <QPushButton>
+#include <QSizePolicy>
+#include <QSpinBox>
 #include <QWidget>
 
-AddTabEntry::AddTabEntry(QList<QString> nameList, QWidget* parent)
+AddTabEntry::AddTabEntry(const QList<QString>& nameList, QWidget* parent)
 {
 	nameSelect = new QComboBox(parent);
-	nameSelect->insertItems(0, nameList);
+	nameSelect->addItems(nameList);
+	nameSelect->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
 
 	spinboxBeer05 = new QSpinBox(parent);
-	spinboxBeer05->setMinimum(0);
-	spinboxBeer05->setValue(0);
-
 	spinboxBeer04 = new QSpinBox(parent);
-	spinboxBeer04->setMinimum(0);
-	spinboxBeer04->setValue(0);
-
 	spinboxSoftdrinks = new QSpinBox(parent);
-	spinboxSoftdrinks->setMinimum(0);
-	spinboxSoftdrinks->setValue(0);
-
 	spinboxWater = new QSpinBox(parent);
-	spinboxWater->setMinimum(0);
-	spinboxWater->setValue(0);
+
+	const auto configureCountSpinBox = [](QSpinBox* spinBox)
+		{
+			spinBox->setMinimum(0);
+			spinBox->setMaximum(99);
+			spinBox->setValue(0);
+			spinBox->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
+		};
+
+	configureCountSpinBox(spinboxBeer05);
+	configureCountSpinBox(spinboxBeer04);
+	configureCountSpinBox(spinboxSoftdrinks);
+	configureCountSpinBox(spinboxWater);
 
 	spinboxCustom = new QDoubleSpinBox(parent);
 	spinboxCustom->setMinimum(0.00);
-	spinboxCustom->setValue(0);
+	spinboxCustom->setMaximum(999.99);
 	spinboxCustom->setDecimals(2);
+	spinboxCustom->setPrefix(QStringLiteral("€ "));
+	spinboxCustom->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
 
-	labelCost = new QLabel(parent);
-	labelCost->setText("0€");
+	labelCost = new QLabel(QStringLiteral("0,00 €"), parent);
+	labelCost->setAlignment(Qt::AlignCenter);
+	labelCost->setMinimumWidth(70);
 
-	btnRemove = new QPushButton("-", parent);
-	connect(btnRemove, &QPushButton::clicked, this, [this]() { remove(this); });
+	btnRemove = new QPushButton(QStringLiteral("−"), parent);
+	btnRemove->setToolTip(tr("Eintrag entfernen"));
+	btnRemove->setFixedWidth(36);
+
+	connect(btnRemove, &QPushButton::clicked, this, [this]() { emit remove(this); });
 }
 
 AddTabEntry::~AddTabEntry()
@@ -61,7 +71,7 @@ void AddTabEntry::addToGrid(QGridLayout* grid, int row)
 	grid->addWidget(spinboxSoftdrinks, row, 3);
 	grid->addWidget(spinboxWater, row, 4);
 	grid->addWidget(spinboxCustom, row, 5);
-	grid->addWidget(labelCost, row, 6, Qt::AlignCenter);
+	grid->addWidget(labelCost, row, 6);
 	grid->addWidget(btnRemove, row, 7);
 }
 

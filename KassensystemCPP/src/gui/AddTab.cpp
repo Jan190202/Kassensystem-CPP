@@ -1,96 +1,140 @@
 #include "AddTab.h"
 
 #include "AddTabEntry.h"
-#include <QDateEdit>
-#include <QPushButton>
-#include <QDate>
-#include <QVBoxLayout>
-#include <QGridLayout>
-#include <QLabel>
-#include <algorithm>
-#include <string> 
-#include <QList>
-#include <QFrame>
-
 #include "Utils.h"
+
+#include <QDate>
+#include <QDateEdit>
+#include <QGridLayout>
+#include <QHBoxLayout>
+#include <QLabel>
+#include <QList>
+#include <QPushButton>
+#include <QSizePolicy>
+#include <QVBoxLayout>
+#include <QSpacerItem>
+
+#include <algorithm>
+#include <string>
 
 AddTab::AddTab(QWidget* parent) : BaseTab(parent) {}
 
 void AddTab::initialize()
 {
-	monthSelection = new QDateEdit(QDate::currentDate().addMonths(-1));
-	monthSelection->setDisplayFormat("MMMM yy");
+	monthSelection = new QDateEdit(QDate::currentDate().addMonths(-1), this);
+	monthSelection->setDisplayFormat(QStringLiteral("MMMM yy"));
+	monthSelection->setCalendarPopup(true);
+	monthSelection->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
 
-	btnAddEntry = new QPushButton("+");
+	btnAddEntry = new QPushButton(tr("+ Eintrag hinzufügen"), this);
+	btnAddEntry->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
 
-	entriesGrid = new QGridLayout(); 
+	entriesGrid = new QGridLayout();
+	entriesGrid->setContentsMargins(6, 0, 6, 0);
+	entriesGrid->setHorizontalSpacing(12);
+	entriesGrid->setVerticalSpacing(10);
 
-	QFrame* hLine = new QFrame();
-	hLine->setFrameShape(QFrame::HLine);
+	const QStringList headers = {
+		tr("Name"),
+		tr("Bier 0,5 l"),
+		tr("Bier 0,4 l"),
+		tr("Softdrinks"),
+		tr("Wasser"),
+		tr("Sonstiges"),
+		tr("Kosten"),
+		QString()
+	};
 
-	std::string eurSymbol = "\u20AC";
-	entriesGrid->addWidget(new QLabel(tr("Name")), 0, 0, Qt::AlignCenter);
-	entriesGrid->addWidget(new QLabel(QString::fromUtf8("Bier 0,5l")), 0, 1, Qt::AlignCenter);
-	entriesGrid->addWidget(new QLabel(QString::fromUtf8("Bier 0,4l")), 0, 2, Qt::AlignCenter);
-	entriesGrid->addWidget(new QLabel(QString::fromUtf8("Softdrinks")), 0, 3, Qt::AlignCenter);
-	entriesGrid->addWidget(new QLabel(QString::fromUtf8("Wasser")), 0, 4, Qt::AlignCenter);
-	entriesGrid->addWidget(new QLabel(QString::fromUtf8("Sonstiges ("+eurSymbol+")")), 0, 5, Qt::AlignCenter);
-	entriesGrid->addWidget(new QLabel(QString::fromUtf8("Kosten")), 0, 6, Qt::AlignCenter);
-	entriesGrid->addWidget(hLine, 1, 0, 1, 7);
-	
+	for (int column = 0; column < headers.size() - 1; ++column)
+	{
+		auto* headerLabel = new QLabel(headers.at(column), this);
+		headerLabel->setAlignment(Qt::AlignCenter);
 
-	AddTabMainLayout = new QVBoxLayout(this);
-	AddTabMainLayout->addWidget(monthSelection);
-	AddTabMainLayout->addLayout(entriesGrid);
-	AddTabMainLayout->addWidget(btnAddEntry);
-	AddTabMainLayout->addStretch();
+		QFont font = headerLabel->font();
+		font.setBold(true);
+		headerLabel->setFont(font);
+
+		entriesGrid->addWidget(headerLabel, 0, column);
+	}
+
+	entriesGrid->setColumnMinimumWidth(0, 140); 
+	entriesGrid->setColumnMinimumWidth(1, 105);
+	entriesGrid->setColumnMinimumWidth(2, 105);
+	entriesGrid->setColumnMinimumWidth(3, 105);
+	entriesGrid->setColumnMinimumWidth(4, 105);
+	entriesGrid->setColumnMinimumWidth(5, 125); 
+	entriesGrid->setColumnMinimumWidth(6, 75); 
+	entriesGrid->setColumnMinimumWidth(7, 36);
+
+	entriesGrid->setColumnStretch(0, 2);
+	entriesGrid->setColumnStretch(1, 1);
+	entriesGrid->setColumnStretch(2, 1);
+	entriesGrid->setColumnStretch(3, 1);
+	entriesGrid->setColumnStretch(4, 1);
+	entriesGrid->setColumnStretch(5, 1);
+	entriesGrid->setColumnStretch(6, 1);
+	entriesGrid->setColumnStretch(7, 0);
+
+	auto* columnSpacer = new QSpacerItem(36, 0, QSizePolicy::Fixed, QSizePolicy::Minimum);
+	entriesGrid->addItem(columnSpacer, 0, 7);
+
+	auto* monthLayout = new QHBoxLayout();
+	monthLayout->setContentsMargins(0, 0, 0, 0);
+	monthLayout->setSpacing(10);
+	monthLayout->addWidget(new QLabel(tr("Abrechnungsmonat"), this));
+	monthLayout->addWidget(monthSelection, 1);
+
+	addTabMainLayout = new QVBoxLayout(this);
+	addTabMainLayout->setContentsMargins(18, 18, 18, 18);
+	addTabMainLayout->setSpacing(14);
+
+	addTabMainLayout->addLayout(monthLayout);
+	addTabMainLayout->addLayout(entriesGrid);
+	addTabMainLayout->addWidget(btnAddEntry);
+	addTabMainLayout->addStretch();
 
 	connect(btnAddEntry, &QPushButton::clicked, this, &AddTab::addEntry);
 }
 
 void AddTab::addEntry()
 {
-	std::vector<std::string> nameList = {"Jane Doe", "John Doe"};
-	QList<QString> nameListQ = Utils::strVecToQStrList(nameList);
+	const std::vector<std::string> nameList = { "Jane Doe", "John Doe" };
+	const QList<QString> nameListQ = Utils::strVecToQStrList(nameList);
 
-	AddTabEntry* newEntry = new AddTabEntry(nameListQ, this);
-	int row = entriesGrid->rowCount(); 
-	newEntry->addToGrid(entriesGrid, row);
+	auto* newEntry = new AddTabEntry(nameListQ, this);
+
+	newEntry->addToGrid(entriesGrid, static_cast<int>(entries.size()) + 1);
 
 	entries.push_back(newEntry);
-	connect(newEntry, &AddTabEntry::remove, this, &AddTab::removeEntry);
+
+	connect(newEntry, &AddTabEntry::remove,
+		this, &AddTab::removeEntry);
 }
 
-void AddTab::removeEntry(AddTabEntry* entryRemoved)
+void AddTab::removeEntry(AddTabEntry* entry)
 {
-	auto it = std::find(entries.begin(), entries.end(), entryRemoved);
+	const auto it = std::find(entries.begin(), entries.end(), entry);
 	if (it == entries.end())
 		return;
 
-	int removedIndex = static_cast<int>(std::distance(entries.begin(), it));
-	int removedRow = removedIndex + 1; 
-
+	entry->removeFromGrid(entriesGrid);
 	entries.erase(it);
-	delete entryRemoved;
+	delete entry;
 
-	int rowCount = entriesGrid->rowCount();
-	int columnCount = entriesGrid->columnCount();
-	for (int row = removedRow + 1; row < rowCount; ++row)
+	shiftEntries();
+}
+
+void AddTab::shiftEntries()
+{
+	for (int index = 0; index < static_cast<int>(entries.size()); ++index)
 	{
-		for (int col = 0; col < columnCount; ++col)
-		{
-			QLayoutItem* item = entriesGrid->itemAtPosition(row, col);
-			if (!item) continue;
-			entriesGrid->removeItem(item);
-			entriesGrid->addItem(item, row - 1, col);
-		}
+		entries[index]->removeFromGrid(entriesGrid);
+		entries[index]->addToGrid(entriesGrid, index + 1);
 	}
 }
 
 void AddTab::clearEntries()
 {
 	while (!entries.empty())
-	{
 		removeEntry(entries.back());
-	}
 }
