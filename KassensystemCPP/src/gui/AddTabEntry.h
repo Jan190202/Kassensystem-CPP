@@ -26,7 +26,8 @@ public:
 
 	void addToGrid(QGridLayout* grid, int row);
 	void removeFromGrid(QGridLayout* grid);
-
+	//QWidget* getFirstWidget();
+	QWidget* getLastWidget();
 private:
 	QComboBox* nameSelect = nullptr;
 	QSpinBox* spinboxBeer05 = nullptr;

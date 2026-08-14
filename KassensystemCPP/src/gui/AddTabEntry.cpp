@@ -8,11 +8,18 @@
 #include <QSizePolicy>
 #include <QSpinBox>
 #include <QWidget>
+#include <QCompleter>
 
 AddTabEntry::AddTabEntry(const QList<QString>& nameList, QWidget* parent)
 {
 	nameSelect = new QComboBox(parent);
 	nameSelect->addItems(nameList);
+	nameSelect->setEditable(true);
+	nameSelect->setDuplicatesEnabled(false);
+	auto* dropDownCompleter = new QCompleter(nameList);
+	dropDownCompleter->setCaseSensitivity(Qt::CaseInsensitive);
+	dropDownCompleter->setCompletionMode(QCompleter::InlineCompletion);
+	nameSelect->setCompleter(dropDownCompleter);
 	nameSelect->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
 
 	spinboxBeer05 = new QSpinBox(parent);
@@ -49,6 +56,7 @@ AddTabEntry::AddTabEntry(const QList<QString>& nameList, QWidget* parent)
 	btnRemove->setFixedWidth(36);
 
 	connect(btnRemove, &QPushButton::clicked, this, [this]() { emit remove(this); });
+	//connect(nameSelect, &QComboBox::)
 }
 
 AddTabEntry::~AddTabEntry()
@@ -85,4 +93,14 @@ void AddTabEntry::removeFromGrid(QGridLayout* grid)
 	grid->removeWidget(spinboxCustom);
 	grid->removeWidget(labelCost);
 	grid->removeWidget(btnRemove);
+}
+
+//QWidget* AddTabEntry::getFirstWidget()
+//{
+//	return nameSelect;
+//}
+
+QWidget* AddTabEntry::getLastWidget()
+{
+	return btnRemove;
 }

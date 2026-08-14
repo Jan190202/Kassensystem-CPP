@@ -98,7 +98,10 @@ void AddTab::initialize()
 
 void AddTab::addEntry()
 {
-	const std::vector<std::string> nameList = { "Jane Doe", "John Doe" };
+	std::vector<std::string> nameList = { "Jane Doe", "John Doe" };
+
+	nameList.push_back("SONSTIGE");
+
 	const QList<QString> nameListQ = Utils::strVecToQStrList(nameList);
 
 	auto* newEntry = new AddTabEntry(nameListQ, this);
@@ -109,6 +112,9 @@ void AddTab::addEntry()
 
 	connect(newEntry, &AddTabEntry::remove,
 		this, &AddTab::removeEntry);
+
+	// set tabulator switch from last widget of lowest entry to addButton
+	QWidget::setTabOrder(newEntry->getLastWidget(), btnAddEntry);
 }
 
 void AddTab::removeEntry(AddTabEntry* entry)
