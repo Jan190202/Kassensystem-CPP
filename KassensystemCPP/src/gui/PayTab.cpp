@@ -1,90 +1,145 @@
 #include "PayTab.h"
 
-#include <QComboBox>
-#include <QLabel>
-#include <QTableWidget>
-#include <QFrame>
-#include <QHBoxLayout>
-#include <QGridLayout>
-#include <QDoubleSpinBox>
+#include <QButtonGroup>
 #include <QCheckBox>
+#include <QComboBox>
+#include <QDoubleSpinBox>
+#include <QFormLayout>
+#include <QFrame>
+#include <QGroupBox>
+#include <QHBoxLayout>
+#include <QLabel>
 #include <QPushButton>
 #include <QRadioButton>
-#include <QButtonGroup>
-#include <QGroupBox>
+#include <QSizePolicy>
+#include <QTableWidget>
+#include <QVBoxLayout>
 
 PayTab::PayTab(QWidget* parent) : BaseTab(parent) {}
 
 void PayTab::initialize()
 {
-	// name select
 	nameSelect = new QComboBox(this);
+	nameSelect->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
 
-	// info texts, button for using credit
-	QLabel* totalTextLabel = new QLabel("Gesamt:", this);
-	QLabel* paidTextLabel = new QLabel("Bezahlt:", this);
-	QLabel* dueTextLabel = new QLabel("Ausstehend:", this);
-	QLabel* creditTextLabel = new QLabel("Guthaben:", this);
+	// Betragsübersicht
+	auto* totalTextLabel	= new QLabel(tr("Gesamt"), this);
+	auto* paidTextLabel		= new QLabel(tr("Bezahlt"), this);
+	auto* dueTextLabel		= new QLabel(tr("Ausstehend"), this);
+	auto* creditTextLabel	= new QLabel(tr("Guthaben"), this);
 
-	totalNumLabel = new QLabel("0.00€", this);
-	paidNumLabel = new QLabel("0.00€", this);
-	dueNumLabel = new QLabel("0.00€", this);
-	creditNumLabel = new QLabel("0.00€", this);
+	totalNumLabel	= new QLabel(tr("0,00 €"), this);
+	paidNumLabel	= new QLabel(tr("0,00 €"), this);
+	dueNumLabel		= new QLabel(tr("0,00 €"), this);
+	creditNumLabel	= new QLabel(tr("0,00 €"), this);
 
-	btnUseCredit = new QPushButton("Refresh", this);
-	btnUseCredit->setDisabled(true);
+	const auto configureAmountLabel = [](QLabel* label)
+		{
+			label->setAlignment(Qt::AlignRight | Qt::AlignVCenter);
+			label->setMinimumWidth(90);
+		};
 
-	// payment
-	paymentSpinBox = new QDoubleSpinBox();
-	fullPaymentCheckBox = new QCheckBox("vollständig");
+	configureAmountLabel(totalNumLabel);
+	configureAmountLabel(paidNumLabel);
+	configureAmountLabel(dueNumLabel);
+	configureAmountLabel(creditNumLabel);
 
-	// surplus usage
-	btnSurplusToCredit = new QRadioButton("Guthaben");
+	QFont dueFont = dueNumLabel->font();
+	dueFont.setBold(true);
+	dueNumLabel->setFont(dueFont);
+
+	btnUseCredit = new QPushButton(tr("Refresh"), this);
+	btnUseCredit->setEnabled(false);
+
+	// Zahlung
+	paymentSpinBox = new QDoubleSpinBox(this);
+	paymentSpinBox->setDecimals(2);
+	paymentSpinBox->setMinimum(0.0);
+	paymentSpinBox->setMaximum(999999.99);
+	paymentSpinBox->setPrefix(tr("€ "));
+	paymentSpinBox->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
+
+	fullPaymentCheckBox = new QCheckBox(tr("Ausstand übernehmen"), this);
+
+	// Überschuss
+	btnSurplusToCredit = new QRadioButton(tr("als Guthaben"), this);
 	btnSurplusToCredit->setChecked(true);
-	btnSurplusToTip = new QRadioButton("Trinkgeld");
-	QButtonGroup* surplusGroup = new QButtonGroup();
+
+	btnSurplusToTip = new QRadioButton(tr("als Trinkgeld"), this);
+
+	auto* surplusGroup = new QButtonGroup(this);
 	surplusGroup->addButton(btnSurplusToCredit);
 	surplusGroup->addButton(btnSurplusToTip);
-	QGroupBox* surplusBox = new QGroupBox("Überschuss verwenden als");
 
-	// vertical line in middle
-	QFrame* vLine = new QFrame();
+	// Rechte Seite / Tabelle
+	consumptionTable = new QTableWidget(10, 3, this);
+	consumptionTable->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+
+	// Linke Seite
+	auto* leftLayout = new QVBoxLayout();
+	leftLayout->setContentsMargins(0, 0, 0, 0);
+	leftLayout->setSpacing(14);
+
+	auto* customerBox = new QGroupBox(tr("Person"), this);
+	auto* customerLayout = new QVBoxLayout(customerBox);
+	customerLayout->setContentsMargins(12, 14, 12, 12);
+	customerLayout->addWidget(nameSelect);
+
+	auto* summaryBox = new QGroupBox(tr("Übersicht"), this);
+	auto* summaryLayout = new QFormLayout(summaryBox);
+	summaryLayout->setContentsMargins(12, 14, 12, 12);
+	summaryLayout->setHorizontalSpacing(16);
+	summaryLayout->setVerticalSpacing(9);
+	summaryLayout->setLabelAlignment(Qt::AlignLeft | Qt::AlignVCenter);
+
+	summaryLayout->addRow(totalTextLabel, totalNumLabel);
+	summaryLayout->addRow(paidTextLabel, paidNumLabel);
+	summaryLayout->addRow(dueTextLabel, dueNumLabel);
+
+	auto* creditLayout = new QHBoxLayout();
+	creditLayout->setContentsMargins(0, 0, 0, 0);
+	creditLayout->setSpacing(8);
+	creditLayout->addWidget(creditNumLabel, 1);
+	creditLayout->addWidget(btnUseCredit);
+
+	summaryLayout->addRow(creditTextLabel, creditLayout);
+
+	auto* paymentBox = new QGroupBox(tr("Zahlung erfassen"), this);
+	auto* paymentLayout = new QVBoxLayout(paymentBox);
+	paymentLayout->setContentsMargins(12, 14, 12, 12);
+	paymentLayout->setSpacing(10);
+
+	auto* amountLayout = new QFormLayout();
+	amountLayout->setContentsMargins(0, 0, 0, 0);
+	amountLayout->setHorizontalSpacing(16);
+	amountLayout->addRow(tr("Betrag"), paymentSpinBox);
+
+	paymentLayout->addLayout(amountLayout);
+	paymentLayout->addWidget(fullPaymentCheckBox);
+
+	auto* surplusBox = new QGroupBox(tr("Überschuss behandeln"), this);
+	auto* surplusLayout = new QHBoxLayout(surplusBox);
+	surplusLayout->setContentsMargins(12, 14, 12, 12);
+	surplusLayout->setSpacing(18);
+	surplusLayout->addWidget(btnSurplusToCredit);
+	surplusLayout->addWidget(btnSurplusToTip);
+	surplusLayout->addStretch();
+
+	leftLayout->addWidget(customerBox);
+	leftLayout->addWidget(summaryBox);
+	leftLayout->addWidget(paymentBox);
+	leftLayout->addWidget(surplusBox);
+	leftLayout->addStretch();
+
+	auto* vLine = new QFrame(this);
 	vLine->setFrameShape(QFrame::VLine);
+	vLine->setFrameShadow(QFrame::Sunken);
 
-	// table
-	consumptionTable = new QTableWidget(10,3,this);
+	auto* mainLayout = new QHBoxLayout(this);
+	mainLayout->setContentsMargins(12, 12, 12, 12);
+	mainLayout->setSpacing(18);
 
-
-
-	// layouting
-	QHBoxLayout* mainLayout = new QHBoxLayout(this);
-	QGridLayout* infoLayout = new QGridLayout();
-	QVBoxLayout* surplusBtnLayout = new QVBoxLayout();
-
-	surplusBtnLayout->addWidget(btnSurplusToCredit);
-	surplusBtnLayout->addWidget(btnSurplusToTip);
-	surplusBox->setLayout(surplusBtnLayout);
-
-	mainLayout->addLayout(infoLayout, 1);
+	mainLayout->addLayout(leftLayout, 1);
 	mainLayout->addWidget(vLine);
 	mainLayout->addWidget(consumptionTable, 3);
-	
-	infoLayout->addWidget(nameSelect,			0, 0, 1, 3);
-	infoLayout->addWidget(totalTextLabel,		1, 0, 1, 1);
-	infoLayout->addWidget(totalNumLabel,		1, 1, 1, 1);
-	infoLayout->addWidget(paidTextLabel,		2, 0, 1, 1);
-	infoLayout->addWidget(paidNumLabel,			2, 1, 1, 1);
-	infoLayout->addWidget(dueTextLabel,			3, 0, 1, 1);
-	infoLayout->addWidget(dueNumLabel,			3, 1, 1, 1);
-	infoLayout->addWidget(creditTextLabel,		4, 0, 1, 1);
-	infoLayout->addWidget(creditNumLabel,		4, 1, 1, 1);
-	infoLayout->addWidget(btnUseCredit,			4, 2, 1, 1);
-
-	infoLayout->addWidget(paymentSpinBox,		5, 0, 1, 1);
-	infoLayout->addWidget(fullPaymentCheckBox,	5, 1, 1, 1);
-
-	infoLayout->addWidget(surplusBox,			6, 0, 1, 2);
-
-	//infoLayout->addWidget(btnSurplusToCredit,	6, 1, 1, 2);
-	//infoLayout->addWidget(btnSurplusToTip,		7, 1, 1, 2);
 }
