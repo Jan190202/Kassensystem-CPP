@@ -100,8 +100,6 @@ void AddTab::addEntry()
 {
 	std::vector<std::string> nameList = { "Jane Doe", "John Doe" };
 
-	nameList.push_back("SONSTIGE");
-
 	const QList<QString> nameListQ = Utils::strVecToQStrList(nameList);
 
 	auto* newEntry = new AddTabEntry(nameListQ, this);
