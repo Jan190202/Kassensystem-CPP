@@ -6,6 +6,8 @@ class QLabel;
 class QTableWidget;
 class QCheckBox;
 class QDoubleSpinBox;
+class QPushButton;
+class QRadioButton;
 
 class PayTab : public BaseTab
 {
@@ -14,14 +16,15 @@ public:
 	PayTab(QWidget* parent = nullptr);
 	virtual void initialize() override;
 private:
-	QComboBox* nameSelect = nullptr;
-	QLabel* totalLabel = nullptr;
-	QLabel* paidLabel = nullptr;
-	QLabel* dueLabel = nullptr;
-	QLabel* creditLabel = nullptr;
-	QDoubleSpinBox* paymentSpinBox = nullptr;
-	QCheckBox* fullPaymentCheckBox = nullptr;
-	QCheckBox* creditCheckBox = nullptr;
-	QCheckBox* tipCheckBox = nullptr;
-	QTableWidget* consumptionTable = nullptr; //prototype, will be replaced by QTableView and database in the future
+	QComboBox*		nameSelect			= nullptr;
+	QLabel*			totalNumLabel		= nullptr;
+	QLabel*			paidNumLabel		= nullptr;
+	QLabel*			dueNumLabel			= nullptr;
+	QLabel*			creditNumLabel		= nullptr;
+	QPushButton*	btnUseCredit		= nullptr;
+	QDoubleSpinBox* paymentSpinBox		= nullptr;
+	QCheckBox*		fullPaymentCheckBox = nullptr;
+	QRadioButton*	btnSurplusToCredit	= nullptr;
+	QRadioButton*	btnSurplusToTip		= nullptr;
+	QTableWidget*	consumptionTable	= nullptr; //prototype, will be replaced by QTableView and database in the future
 };

@@ -38,13 +38,14 @@ void CashRegisterSystem::initUi()
 	QTabWidget* tabSelector = new QTabWidget(central);
 	rootLayout->insertWidget(0, tabSelector);
 
-	tabs = { new AddTab(), new PayTab(), new BalanceTab() };
+	tabs = { new PayTab(), new AddTab(), new BalanceTab() };
 
-	tabSelector->addTab(tabs.at(0), tr("Einträge hinzufügen"));
-	tabSelector->addTab(tabs.at(1), tr("Schulden begleichen"));
+	tabSelector->addTab(tabs.at(0), tr("Schulden begleichen"));
+	tabSelector->addTab(tabs.at(1), tr("Einträge hinzufügen"));
 	tabSelector->addTab(tabs.at(2), tr("Abteilungsbilanz bearbeiten"));
+	
 
-	activeTab = static_cast<int>(tabIndex::add); // initialize first tab
+	activeTab = static_cast<int>(tabIndex::pay); // initialize first tab
 	initializeTab(activeTab);
 
 

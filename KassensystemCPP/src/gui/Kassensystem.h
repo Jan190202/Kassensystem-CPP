@@ -15,7 +15,7 @@ private:
 	QPushButton* btnApply;
 	QPushButton* btnSave;
 
-	enum class tabIndex { add = 0, pay, balance };
+	enum class tabIndex { pay=0, add, balance };
 	int activeTab = 0;
 	std::array<bool, 3> loadedTabs = {false};
 
