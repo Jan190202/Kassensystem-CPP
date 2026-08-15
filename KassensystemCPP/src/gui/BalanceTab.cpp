@@ -164,7 +164,14 @@ void BalanceTab::addEntry(int entryType)
 	}
 
 	auto* inputDialog = new BalanceTabDialog(dlgName, this);
-}
+	if (inputDialog->exec() == QDialog::Accepted)
+	{
+		// inputs given and OK pressed
+		dlgInputs inputs = inputDialog->getInputs();
+		qInfo() << inputs.name;
+	}
+	else {} // cancel pressed
+} 
 
 void BalanceTab::collectResults()
 {

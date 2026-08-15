@@ -44,7 +44,7 @@ AddTabEntry::AddTabEntry(const QList<QString>& nameList, QWidget* parent)
 	spinboxCustom->setMinimum(0.00);
 	spinboxCustom->setMaximum(999.99);
 	spinboxCustom->setDecimals(2);
-	spinboxCustom->setPrefix(QStringLiteral("€ "));
+	spinboxCustom->setSuffix(QStringLiteral(" €"));
 	spinboxCustom->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
 
 	labelCost = new QLabel(QStringLiteral("0,00 €"), parent);
