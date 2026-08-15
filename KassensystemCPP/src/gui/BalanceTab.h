@@ -32,4 +32,6 @@ private:
 	};
 
 	void addEntry(int index);
+private slots:
+	void collectResults();
 };

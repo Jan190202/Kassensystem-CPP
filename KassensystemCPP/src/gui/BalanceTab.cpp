@@ -12,6 +12,8 @@
 #include <QVBoxLayout>
 #include <string>
 
+#include <QDebug>
+
 BalanceTab::BalanceTab(QWidget* parent) : BaseTab(parent) {}
 
 void BalanceTab::initialize()
@@ -162,4 +164,9 @@ void BalanceTab::addEntry(int entryType)
 	}
 
 	auto* inputDialog = new BalanceTabDialog(dlgName, this);
+}
+
+void BalanceTab::collectResults()
+{
+	qInfo() << "CollectResults called";
 }

@@ -17,7 +17,7 @@ BalanceTabDialog::BalanceTabDialog(const std::string& dlgName, QWidget* parent) 
 {
 	QString dlgNameQ = QString::fromStdString(dlgName);
 
-	show();
+	open();
 	resize(400, 500);
 	setWindowTitle(dlgNameQ);
 	
@@ -25,8 +25,11 @@ BalanceTabDialog::BalanceTabDialog(const std::string& dlgName, QWidget* parent) 
 	// input dialogs: entry name, cost, date, comment
 	auto* edtName		= new QLineEdit();
 	auto* edtCost		= new QDoubleSpinBox();
-	auto* edtDate		= new QDateEdit();
-	auto* edtComment	= new QDateEdit();
+	auto* edtDate		= new QDateEdit(QDate::currentDate());
+	edtDate->setDisplayFormat(QStringLiteral("dd MMMM yy"));
+	edtDate->setCalendarPopup(true);
+
+	auto* edtComment	= new QLineEdit();
 
 	auto* btnOK		= new QPushButton(tr("OK"));
 	auto* btnCancel = new QPushButton(tr("Cancel"));
@@ -51,4 +54,6 @@ BalanceTabDialog::BalanceTabDialog(const std::string& dlgName, QWidget* parent) 
 	btnLayout->addWidget(btnCancel);
 	btnLayout->addWidget(btnOK);
 	
+	connect(btnOK, &QPushButton::clicked, this, &QDialog::accept);
+	connect(btnCancel, &QPushButton::clicked, this, &QDialog::reject);
 }
