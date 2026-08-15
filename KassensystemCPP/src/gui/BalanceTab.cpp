@@ -160,6 +160,6 @@ void BalanceTab::addEntry(int entryType)
 			dlgName = "Ausgabe hinzufügen";
 			break;
 	}
-	
+
 	auto* inputDialog = new BalanceTabDialog(dlgName, this);
 }
