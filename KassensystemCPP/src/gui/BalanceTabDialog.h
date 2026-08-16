@@ -1,30 +1,39 @@
 #pragma once
 
+#include "commons/CommonTypes.h"
+
 #include <QDialog>
 #include <string>
 #include <QDate>
 
 class QDateEdit;
 class QLineEdit;
+class QPlainTextEdit;
 class QDoubleSpinBox;
+class QCheckBox;
+class QComboBox;
 
 struct dlgInputs
 {
-	std::string name;
+	std::string description;
 	double cost;
 	QDate date;
 	std::string comment;
+	bool isCovered = false;
+	std::string coveringPerson;
 };
 
 class BalanceTabDialog : public QDialog
 {
 	Q_OBJECT
 public:
-	BalanceTabDialog(const std::string& dlgName, QWidget* parent);
+	BalanceTabDialog(btnIndex mode, QWidget* parent);
 	dlgInputs& getInputs() const;
 private:
-	QLineEdit* edtName;
-	QDoubleSpinBox* edtCost;
-	QDateEdit* edtDate;
-	QLineEdit* edtComment;
+	QLineEdit*		edtDescription;
+	QDoubleSpinBox*	edtCost;
+	QDateEdit*		edtDate;
+	QPlainTextEdit* edtComment;
+	QCheckBox*		edtIsCovered;
+	QComboBox*		edtCoveringPerson;
 };

@@ -1,5 +1,7 @@
 #pragma once
 #include "BaseTab.h"
+#include "commons/CommonTypes.h"
+
 #include <QDate> 
 
 class QTableView;
@@ -26,12 +28,7 @@ private:
 	QDate dateBefore;
 	QDate dateAfter				= QDate::currentDate();
 
-	enum btnIndex 
-	{
-		addEarning, addSpending
-	};
-
-	void addEntry(int index);
+	void addEntry(btnIndex mode);
 private slots:
 	void collectResults();
 };

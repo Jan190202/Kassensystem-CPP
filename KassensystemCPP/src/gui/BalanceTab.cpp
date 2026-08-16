@@ -1,5 +1,6 @@
 #include "BalanceTab.h"
 #include "BalanceTabDialog.h"
+#include "commons/CommonTypes.h";
 
 #include <QDate>
 #include <QFormLayout>
@@ -149,26 +150,17 @@ void BalanceTab::initialize()
 	connect(btnAddSpending, &QPushButton::clicked, this, [=]() {BalanceTab::addEntry(btnIndex::addSpending); });
 }
 
-void BalanceTab::addEntry(int entryType)
+void BalanceTab::addEntry(btnIndex mode)
 {
-	std::string dlgName;
-	
-	switch (entryType)
-	{
-		case btnIndex::addEarning:
-			dlgName = "Einnahme hinzufügen";
-			break;
-		case btnIndex::addSpending:
-			dlgName = "Ausgabe hinzufügen";
-			break;
-	}
-
-	auto* inputDialog = new BalanceTabDialog(dlgName, this);
+	auto* inputDialog = new BalanceTabDialog(mode, this);
 	if (inputDialog->exec() == QDialog::Accepted)
 	{
 		// inputs given and OK pressed
 		dlgInputs inputs = inputDialog->getInputs();
-		qInfo() << inputs.name;
+		qInfo() << inputs.description;
+		qInfo() << inputs.isCovered;
+		qInfo() << inputs.coveringPerson;
+		qInfo() << inputs.comment;
 	}
 	else {} // cancel pressed
 } 
