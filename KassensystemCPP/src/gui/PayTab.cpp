@@ -56,7 +56,7 @@ void PayTab::initialize()
 	paymentSpinBox->setDecimals(2);
 	paymentSpinBox->setMinimum(0.0);
 	paymentSpinBox->setMaximum(999999.99);
-	paymentSpinBox->setPrefix(tr("€ "));
+	paymentSpinBox->setSuffix(tr(" €"));
 	paymentSpinBox->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
 
 	fullPaymentCheckBox = new QCheckBox(tr("Ausstand übernehmen"), this);
