@@ -1,6 +1,6 @@
 #pragma once
 #include "BaseTab.h"
-#include "commons/CommonTypes.h"
+#include "GuiTypes.h"
 
 #include <QDate> 
 

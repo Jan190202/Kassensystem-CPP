@@ -1,6 +1,6 @@
-#include "Utils.h"
+#include "QtConversions.h"
 
-namespace Utils
+namespace QtUtils
 {
 	QList<QString> strVecToQStrList(const std::vector<std::string>& vec)
 	{

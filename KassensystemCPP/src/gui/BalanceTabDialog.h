@@ -1,6 +1,6 @@
 #pragma once
 
-#include "commons/CommonTypes.h"
+#include "GuiTypes.h"
 
 #include <QDialog>
 #include <string>

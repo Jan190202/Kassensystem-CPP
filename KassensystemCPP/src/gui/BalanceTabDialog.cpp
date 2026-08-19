@@ -1,5 +1,5 @@
 #include "BalanceTabDialog.h"
-#include "commons/Utils.h"
+#include "qtutils/QtConversions.h"
 
 #include <QDialog>
 #include <QWidget>
@@ -39,7 +39,7 @@ BalanceTabDialog::BalanceTabDialog(btnIndex mode, QWidget* parent) : QDialog(par
 
 	// --- Eingabe-Widgets: Hauptdaten ---
 	edtDescription = new QLineEdit();
-	edtDescription->setPlaceholderText(tr("z. B. Gehalt, Verkauf ..."));
+	edtDescription->setPlaceholderText(tr("z. B. Spende, Geschenk, ..."));
 
 	edtCost = new QDoubleSpinBox();
 	edtCost->setRange(0.0, 1'000'000.0);
@@ -84,7 +84,7 @@ BalanceTabDialog::BalanceTabDialog(btnIndex mode, QWidget* parent) : QDialog(par
 
 	edtCoveringPerson = new QComboBox();
 	edtCoveringPerson->setEnabled(false);
-	edtCoveringPerson->insertItems(0, Utils::strVecToQStrList({ "Jane Doe", "John Doe" }));
+	edtCoveringPerson->insertItems(0, QtUtils::strVecToQStrList({ "Jane Doe", "John Doe" }));
 
 	// Checkbox + Dropdown eng nebeneinander statt über volle Formularbreite verteilt
 	auto* statusLayout = new QHBoxLayout;

@@ -1,6 +1,6 @@
 #include "BalanceTab.h"
 #include "BalanceTabDialog.h"
-#include "commons/CommonTypes.h";
+#include "GuiTypes.h";
 
 #include <QDate>
 #include <QFormLayout>

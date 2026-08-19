@@ -1,7 +1,7 @@
 #include "AddTab.h"
 
 #include "AddTabEntry.h"
-#include "commons/Utils.h"
+#include "qtutils/QtConversions.h"
 
 #include <QDate>
 #include <QDateEdit>
@@ -100,7 +100,7 @@ void AddTab::addEntry()
 {
 	std::vector<std::string> nameList = { "Jane Doe", "John Doe" };
 
-	const QList<QString> nameListQ = Utils::strVecToQStrList(nameList);
+	const QList<QString> nameListQ = QtUtils::strVecToQStrList(nameList);
 
 	auto* newEntry = new AddTabEntry(nameListQ, this);
 
