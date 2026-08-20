@@ -2,8 +2,8 @@
 
 #include "entities/Person.h"
 #include "entities/ConsumptionEntry.h"
-#include "entities/ConsumptionSummary.h"
 #include "repoInterface/ConsumptionRepository.h"
+#include "domain/PriceList.h"
 #include <vector>
 
 ConsumptionService::ConsumptionService(ConsumptionRepository* consumptionRepo)
@@ -16,17 +16,33 @@ void ConsumptionService::addConsumption(const ConsumptionEntry& consumptionEntry
 	consumptionRepo->addEntry(consumptionEntry);
 }
 
-double ConsumptionService::getTotal(const Person& person) const
+std::vector<ConsumptionEntry> ConsumptionService::getEntries(int personID) const
 {
-	return consumptionRepo->getTotal(person);
+	return consumptionRepo->getEntries(personID);
 }
 
-std::vector<ConsumptionEntry> ConsumptionService::getEntries(const Person& person) const
+double ConsumptionService::getTotal(int personID) const
 {
-	return consumptionRepo->getEntries(person);
+	std::vector<ConsumptionEntry> entries = getEntries(personID);
+
+	ConsumptionEntry entrySum;
+
+	for (auto& entry : entries)
+	{
+		entrySum.nBeer04 += entry.nBeer04;
+		entrySum.nBeer05 += entry.nBeer05;
+		entrySum.nSoftdrinks += entry.nSoftdrinks;
+		entrySum.nWater += entry.nWater;
+	}
+
+	return calculateTotal(entrySum);
 }
 
-//ConsumptionSummary ConsumptionService::getSummary(const Person& person) const
-//{
-//    return consumptionRepo->getSummary(person);
-//}
+double ConsumptionService::calculateTotal(const ConsumptionEntry& entry) const
+{
+	return
+		PriceList::beer04		* entry.nBeer04 +
+		PriceList::beer05		* entry.nBeer05 +
+		PriceList::water		* entry.nWater  +
+		PriceList::softdrink	* entry.nSoftdrinks;
+}

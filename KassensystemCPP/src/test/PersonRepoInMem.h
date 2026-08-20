@@ -11,7 +11,7 @@ class PersonRepoInMem : public PersonRepository
 public:
 	PersonRepoInMem() = default;
 	virtual ~PersonRepoInMem() = default;
-	virtual Person addPerson(std::string name);
+	virtual Person addPerson(const std::string& name);
 private:
 	std::vector<Person> entries = {};
 	int getUniqueID();

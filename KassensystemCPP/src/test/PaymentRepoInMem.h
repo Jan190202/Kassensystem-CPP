@@ -4,8 +4,6 @@
 #include <QDate>
 #include <vector>
 
-
-
 class PaymentRepoInMem : public PaymentRepository
 {
 public:

@@ -8,5 +8,5 @@ class PersonRepository
 public:
 	PersonRepository() = default;
 	virtual ~PersonRepository() = default;
-	virtual Person addPerson(std::string name) = 0;
+	virtual Person addPerson(const std::string& name) = 0;
 };

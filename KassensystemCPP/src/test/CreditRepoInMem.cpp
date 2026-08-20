@@ -1,15 +1,15 @@
 #include "CreditRepoInMem.h"
 
-void CreditRepoInMem::addCredit(const Person& person, double amount, QDate date)
+void CreditRepoInMem::addCredit(int personID, double amount, QDate date)
 {
-	entries.emplace_back(CreditRepoRow{ person, amount, date });
+	entries.emplace_back(CreditRepoRow{ personID, amount, date });
 }
 
-double CreditRepoInMem::getCredit(const Person& person) const
+double CreditRepoInMem::getCredit(int personID) const
 {
 	for (auto& entry : entries)
 	{
-		if (entry.person.getName() == person.getName())
+		if (entry.personID == personID)
 		{
 			return entry.amount;
 		}

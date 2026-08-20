@@ -6,7 +6,7 @@
 #include <vector>
 #include <random>
 
-Person PersonRepoInMem::addPerson(std::string name)
+Person PersonRepoInMem::addPerson(const std::string& name)
 {
 	int id = getUniqueID();
 	Person person{ name, id };

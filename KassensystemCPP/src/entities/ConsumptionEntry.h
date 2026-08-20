@@ -1,12 +1,11 @@
 #pragma once
 
 #include <QDate>
-#include "Person.h"
 
 struct ConsumptionEntry
 {
-	QDate date;
-	int personID;
-	int nBeer05, nBeer04, nSoftdrinks, nWater;
-	double otherExpense;
+	QDate date = QDate();
+	int personID = 0;
+	int nBeer05 = 0, nBeer04 = 0, nSoftdrinks = 0, nWater = 0;
+	double otherExpense = 0;
 };

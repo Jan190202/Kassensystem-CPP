@@ -11,10 +11,7 @@ public:
 	virtual ~ConsumptionRepoInMem() override;
 
 	virtual void addEntry(const ConsumptionEntry&) override;
-	
-	virtual double getTotal(const Person&) const override;
-	virtual std::vector<ConsumptionEntry> getEntries(const Person&) const override;	
-	//virtual ConsumptionSummary getSummary(const Person&) const override;
+	virtual std::vector<ConsumptionEntry> getEntries(int personID) const override;
 private:
 	std::vector<ConsumptionEntry> data;
 };

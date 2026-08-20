@@ -6,7 +6,7 @@
 
 struct CreditRepoRow
 {
-	Person person;
+	int personID;
 	double amount;
 	QDate date = QDate::currentDate();
 };
@@ -17,8 +17,8 @@ public:
 	CreditRepoInMem() = default;
 	virtual ~CreditRepoInMem() = default;
 
-	virtual void addCredit(const Person& person, double amount, QDate date = QDate::currentDate()) override;
-	virtual double getCredit(const Person& person) const override;
+	virtual void addCredit(int personID, double amount, QDate date = QDate::currentDate()) override;
+	virtual double getCredit(int personID) const override;
 private:
 	std::vector<CreditRepoRow> entries = {};
 };
