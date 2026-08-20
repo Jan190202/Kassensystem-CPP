@@ -1,6 +1,6 @@
 #include "BalanceTab.h"
 #include "BalanceTabDialog.h"
-#include "GuiTypes.h";
+#include "GuiTypes.h"
 
 #include <QDate>
 #include <QFormLayout>
@@ -9,7 +9,7 @@
 #include <QLabel>
 #include <QPushButton>
 #include <QSizePolicy>
-#include <QTableView>
+#include <QTableWidget>
 #include <QVBoxLayout>
 #include <string>
 
@@ -27,8 +27,8 @@ void BalanceTab::initialize()
 	auto* btnAddSpending	= new QPushButton(tr("+ Ausgabe"), this);
 
 	// Tables
-	tblEarnings		= new QTableView(this);
-	tblSpendings	= new QTableView(this);
+	tblEarnings		= new QTableWidget(this);
+	tblSpendings	= new QTableWidget(this);
 
 	tblEarnings->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
 	tblSpendings->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);

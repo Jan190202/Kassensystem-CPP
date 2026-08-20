@@ -16,9 +16,7 @@ target_include_directories(KassensystemCPP PRIVATE src)
 	# src als root pfad für die include suche hinzufügen 
 	# -> relative pfade müsse nicht von jeder includierenden Datei definiert werden (z.B. #include "gui/Kassensystem.h" statt #include "../logic/beispiel.h")
 
-if (CMAKE_VERSION VERSION_GREATER 3.12)
-  set_property(TARGET KassensystemCPP PROPERTY CXX_STANDARD 20)
-endif()
+target_compile_features(KassensystemCPP PRIVATE cxx_std_23)
 
 # Qt-Integration
 find_package(Qt6 REQUIRED COMPONENTS Widgets)

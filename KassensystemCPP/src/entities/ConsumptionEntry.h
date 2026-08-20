@@ -6,7 +6,7 @@
 struct ConsumptionEntry
 {
 	QDate date;
-	Person person;
+	int personID;
 	int nBeer05, nBeer04, nSoftdrinks, nWater;
 	double otherExpense;
 };

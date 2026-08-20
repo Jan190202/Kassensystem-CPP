@@ -4,7 +4,7 @@
 
 #include <QDate> 
 
-class QTableView;
+class QTableWidget;
 class QLabel;
 
 class BalanceTab : public BaseTab
@@ -14,8 +14,8 @@ public:
 	BalanceTab(QWidget* parent = nullptr);
 	virtual void initialize() override;
 private:
-	QTableView* tblSpendings	= nullptr;
-	QTableView* tblEarnings		= nullptr;
+	QTableWidget* tblSpendings	= nullptr;
+	QTableWidget* tblEarnings	= nullptr;
 	QLabel* lCashBefore			= nullptr;
 	QLabel* lCashDifference		= nullptr;
 	QLabel* lCashAfter			= nullptr;

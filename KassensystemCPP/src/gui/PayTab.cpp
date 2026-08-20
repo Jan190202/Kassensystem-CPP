@@ -72,7 +72,7 @@ void PayTab::initialize()
 	surplusGroup->addButton(btnSurplusToTip);
 
 	// Rechte Seite / Tabelle
-	tblConsumption = new QTableView();
+	tblConsumption = new QTableWidget();
 	tblConsumption->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
 
 	// Linke Seite

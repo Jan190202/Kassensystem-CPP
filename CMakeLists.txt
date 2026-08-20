@@ -1,4 +1,4 @@
-﻿cmake_minimum_required (VERSION 3.10)
+﻿cmake_minimum_required (VERSION 3.30)
 
 if (POLICY CMP0141)
   cmake_policy(SET CMP0141 NEW)
@@ -6,5 +6,9 @@ if (POLICY CMP0141)
 endif()
 
 project ("KassensystemCPP")
+
+set(CMAKE_CXX_STANDARD 23)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+set(CMAKE_CXX_EXTENSIONS OFF)
 
 add_subdirectory ("KassensystemCPP")

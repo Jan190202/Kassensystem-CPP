@@ -1,0 +1,15 @@
+/*
+Aufgaben von Domain:
+Debt:
+- neue Verbrauche hinzufügen
+- Pro Person: Zusammenfassung inkl. Verbrauch-Liste über Verbrauche ausgeben
+Pay:
+- Bezahlungen entgegennehemen
+- Guthaben hinzufügen
+- Trinkgeld hinzufügen
+Balance:
+- Einträge hinzufügen
+- Zusammenfassung (Spendings/Earnings) ausgeben
+- Bilanz- und aktuellen Kassenstand ausgeben
+- Abrechnung durchführen
+*/
