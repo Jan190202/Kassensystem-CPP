@@ -3,6 +3,7 @@
 #include "PayTab.h"
 #include "BalanceTab.h"
 
+#include <QCoreApplication>
 #include <QHBoxLayout>
 #include <QVBoxLayout>
 #include <QTabWidget>
@@ -55,6 +56,7 @@ void CashRegisterSystemUI::initUi(const ServiceBundle& services)
 			activeTab = tabSelector->currentIndex();
 			initializeTab(activeTab);
 		});
+	connect(lowerButtons.btnCancel, &QPushButton::clicked, qApp, &QCoreApplication::quit);
 }
 
 void CashRegisterSystemUI::initializeTab(int tabNum)

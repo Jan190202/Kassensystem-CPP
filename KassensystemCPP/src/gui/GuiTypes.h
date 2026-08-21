@@ -1,5 +1,6 @@
 #pragma once
 
+#include <QPushButton>
 #include "domain/services/BalanceService.h"
 #include "domain/services/ConsumptionService.h"
 #include "domain/services/PaymentService.h"
