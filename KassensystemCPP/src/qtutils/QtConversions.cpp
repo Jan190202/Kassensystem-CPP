@@ -12,4 +12,9 @@ namespace QtUtils
 		}
 		return listQ;
 	}
+
+	QString toCurrencyFormat(double value)
+	{
+		return QObject::tr("%1 \u20AC").arg(QString::number(value, 'f', 2));
+	}
 }

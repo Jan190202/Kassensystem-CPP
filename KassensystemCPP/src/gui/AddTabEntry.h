@@ -4,6 +4,7 @@
 #include <QList>
 #include <QString>
 #include "GuiTypes.h"
+#include "qtutils/QtConversions.h"
 
 class QComboBox;
 class QDoubleSpinBox;
@@ -21,7 +22,7 @@ class AddTabEntry : public QObject
 
 signals:
 	void remove(AddTabEntry* removedEntry);
-	void consumptionInputChanged(ConsumptionInputs&);
+	void calcEntryCost(ConsumptionInputs&, double&);
 
 public:
 	AddTabEntry(const QList<QString>& nameList = { QString() },
@@ -39,6 +40,8 @@ private:
 	QSpinBox* spinboxSoftdrinks = nullptr;
 	QSpinBox* spinboxWater = nullptr;
 	QDoubleSpinBox* spinboxCustom = nullptr;
-	QLabel* labelCost = nullptr;
+	QLabel* lCost = nullptr;
 	QPushButton* btnRemove = nullptr;
+
+	double entryCost{};
 };

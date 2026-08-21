@@ -31,7 +31,8 @@ double ConsumptionService::calculateDebt(const ConsumptionRequest& request) cons
 		PriceList::beer04		* request.nBeer04 +
 		PriceList::beer05		* request.nBeer05 +
 		PriceList::water		* request.nWater  +
-		PriceList::softdrink	* request.nSoftdrinks;
+		PriceList::softdrink	* request.nSoftdrinks + 
+		request.otherExpense;
 }
 
 std::vector<std::string> ConsumptionService::getPersonNames() const

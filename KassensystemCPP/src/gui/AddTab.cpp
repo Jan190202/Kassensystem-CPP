@@ -18,6 +18,8 @@
 #include <algorithm>
 #include <string>
 
+#include <QDebug>
+
 AddTab::AddTab(ConsumptionService& consumptionService, QWidget* parent) : consumptionService(consumptionService), BaseTab(parent) {}
 
 void AddTab::initialize()
@@ -109,9 +111,15 @@ void AddTab::addEntry()
 
 	connect(newEntry, &AddTabEntry::remove,
 		this, &AddTab::removeEntry);
-	connect(newEntry, &AddTabEntry::consumptionInputChanged, this, [this](ConsumptionInputs& inputs)
+	connect(newEntry, &AddTabEntry::calcEntryCost, this, [this](ConsumptionInputs& inputs, double& entryCost)
 		{
-
+			ConsumptionRequest request{
+				.nBeer05 = inputs.nBeer05,
+				.nBeer04 = inputs.nBeer04,
+				.nSoftdrinks = inputs.nSoftdrinks,
+				.nWater = inputs.nWater,
+				.otherExpense = inputs.otherExpense };
+			entryCost = consumptionService.calculateDebt(request);
 		});
 
 	// set tabulator switch from last widget of lowest entry to addButton

@@ -10,6 +10,8 @@
 #include <QWidget>
 #include <QCompleter>
 
+#include <QDebug>
+
 AddTabEntry::AddTabEntry(const QList<QString>& nameList, QWidget* parent)
 {
 	nameSelect = new QComboBox(parent);
@@ -44,12 +46,13 @@ AddTabEntry::AddTabEntry(const QList<QString>& nameList, QWidget* parent)
 	spinboxCustom->setMinimum(0.00);
 	spinboxCustom->setMaximum(999.99);
 	spinboxCustom->setDecimals(2);
+	spinboxCustom->setSingleStep(0.5);
 	spinboxCustom->setSuffix(QStringLiteral(" €"));
 	spinboxCustom->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
 
-	labelCost = new QLabel(QStringLiteral("0,00 €"), parent);
-	labelCost->setAlignment(Qt::AlignCenter);
-	labelCost->setMinimumWidth(70);
+	lCost = new QLabel(QtUtils::toCurrencyFormat(entryCost), parent);
+	lCost->setAlignment(Qt::AlignCenter);
+	lCost->setMinimumWidth(70);
 
 	btnRemove = new QPushButton(QStringLiteral("−"), parent);
 	btnRemove->setToolTip(tr("Eintrag entfernen"));
@@ -57,6 +60,26 @@ AddTabEntry::AddTabEntry(const QList<QString>& nameList, QWidget* parent)
 
 	connect(btnRemove, &QPushButton::clicked, this, [this]() { emit remove(this); });
 	//connect(nameSelect, &QComboBox::)
+
+
+	auto consumptionInputChanged = [&]()
+		{
+			ConsumptionInputs inputs{
+				.nBeer05 = spinboxBeer05->value(),
+				.nBeer04 = spinboxBeer04->value(),
+				.nSoftdrinks = spinboxSoftdrinks->value(),
+				.nWater = spinboxWater->value(),
+				.otherExpense = spinboxCustom->value() };
+
+			emit calcEntryCost(inputs, entryCost); // entryCost passed by reference for result retrieval
+			lCost->setText(QtUtils::toCurrencyFormat(entryCost));
+		};
+
+	connect(spinboxBeer05, &QSpinBox::valueChanged, this, consumptionInputChanged);
+	connect(spinboxBeer04, &QSpinBox::valueChanged, this, consumptionInputChanged);
+	connect(spinboxSoftdrinks, &QSpinBox::valueChanged, this, consumptionInputChanged);
+	connect(spinboxWater, &QSpinBox::valueChanged, this, consumptionInputChanged);
+	connect(spinboxCustom, &QDoubleSpinBox::valueChanged, this, consumptionInputChanged);
 }
 
 AddTabEntry::~AddTabEntry()
@@ -67,7 +90,7 @@ AddTabEntry::~AddTabEntry()
 	delete spinboxSoftdrinks;
 	delete spinboxWater;
 	delete spinboxCustom;
-	delete labelCost;
+	delete lCost;
 	delete btnRemove;
 }
 
@@ -79,7 +102,7 @@ void AddTabEntry::addToGrid(QGridLayout* grid, int row)
 	grid->addWidget(spinboxSoftdrinks, row, 3);
 	grid->addWidget(spinboxWater, row, 4);
 	grid->addWidget(spinboxCustom, row, 5);
-	grid->addWidget(labelCost, row, 6);
+	grid->addWidget(lCost, row, 6);
 	grid->addWidget(btnRemove, row, 7);
 }
 
@@ -91,7 +114,7 @@ void AddTabEntry::removeFromGrid(QGridLayout* grid)
 	grid->removeWidget(spinboxSoftdrinks);
 	grid->removeWidget(spinboxWater);
 	grid->removeWidget(spinboxCustom);
-	grid->removeWidget(labelCost);
+	grid->removeWidget(lCost);
 	grid->removeWidget(btnRemove);
 }
 
