@@ -1,7 +1,7 @@
 #pragma once
 
 #include "domain/repoInterface/PersonRepository.h"
-#include "entities/Person.h"
+#include "domain/model/Entities.h"
 
 #include <string>
 #include <vector>
@@ -11,9 +11,10 @@ class PersonRepoInMem : public PersonRepository
 public:
 	PersonRepoInMem() = default;
 	virtual ~PersonRepoInMem() = default;
-	virtual Person addPerson(const std::string& name);
+	virtual Person findOrCreateEntry(const std::string& name) override;
 private:
+	virtual Person addEntry(const std::string& name) override;
 	std::vector<Person> entries = {};
-	int getUniqueID();
-	bool isUnique(int id);
+	int64_t getUniqueID();
+	bool isUnique(int64_t id);
 };

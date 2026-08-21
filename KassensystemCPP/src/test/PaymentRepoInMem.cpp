@@ -1,22 +1,24 @@
 #include "PaymentRepoInMem.h"
 
-void PaymentRepoInMem::addPayment(int nameID, double amount, QDate date)
+int64_t PaymentRepoInMem::addPaymentEntry(const PaymentEntry& entry)
 {
-	paymentEntries.emplace_back(PaymentEntry{ nameID, amount, date });
+	paymentEntries.emplace_back(entry);
+	return 0;
 }
 
-void PaymentRepoInMem::addPaymentAllocation(int entryID, int paymentID, double amount, QDate date)
+int64_t PaymentRepoInMem::addAllocationEntry(const PaymentAllocationEntry& entry)
 {
-	paymentAllocationEntries.emplace_back(PaymentAllocationEntry{ entryID, paymentID, amount, date });
+	paymentAllocationEntries.emplace_back(entry);
+	return 0;
 }
 
-double PaymentRepoInMem::getPaidAmount(int nameID) const
+double PaymentRepoInMem::getPaidAmount(int64_t personID) const
 {
 	double paidAmount = 0;
 	
 	for (auto& entry : paymentEntries)
 	{
-		if (entry.nameID == nameID)
+		if (entry.personID == personID)
 		{
 			paidAmount += entry.amount;
 		}

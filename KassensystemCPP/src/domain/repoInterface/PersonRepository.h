@@ -1,12 +1,14 @@
 #pragma once
 
 #include <string>
-#include "entities/Person.h"
+#include "domain/model/Entities.h"
 
 class PersonRepository
 {
 public:
 	PersonRepository() = default;
 	virtual ~PersonRepository() = default;
-	virtual Person addPerson(const std::string& name) = 0;
+	virtual Person findOrCreateEntry(const std::string& name) = 0;
+private:
+	virtual Person addEntry(const std::string& name) = 0;
 };

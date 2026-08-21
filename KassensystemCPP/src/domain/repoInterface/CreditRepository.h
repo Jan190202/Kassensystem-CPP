@@ -1,6 +1,7 @@
 #pragma once
 
-#include <QDate>;
+#include <QDate>
+#include "domain/model/Entities.h"
 
 class CreditRepository
 {
@@ -8,6 +9,6 @@ public:
 	CreditRepository() = default;
 	virtual ~CreditRepository() = default;
 
-	virtual void addCredit(int personID, double amount, QDate date = QDate::currentDate()) = 0;
-	virtual double getCredit(int personID) const = 0;
+	virtual int64_t addEntry(const CreditEntry&) = 0;
+	virtual double getCredit(int64_t personID) const = 0;
 };

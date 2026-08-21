@@ -10,9 +10,9 @@ public:
 	PaymentRepoInMem() = default;
 	virtual ~PaymentRepoInMem() = default;
 
-	virtual void addPayment(int nameID, double amount, QDate date) override;
-	virtual void addPaymentAllocation(int entryID, int paymentID, double amount, QDate date) override;
-	virtual double getPaidAmount(int nameID) const override;
+	virtual int64_t addPaymentEntry(const PaymentEntry&) override;
+	virtual int64_t addAllocationEntry(const PaymentAllocationEntry&) override;
+	virtual double getPaidAmount(int64_t personID) const override;
 
 private:
 	std::vector<PaymentEntry> paymentEntries = {};

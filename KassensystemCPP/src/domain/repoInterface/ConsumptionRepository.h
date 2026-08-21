@@ -1,6 +1,6 @@
 #pragma once
 
-#include "entities/ConsumptionEntry.h"
+#include "domain/model/Entities.h"
 #include <vector>
 
 class ConsumptionRepository
@@ -9,6 +9,6 @@ public:
 	ConsumptionRepository() = default;
 	virtual ~ConsumptionRepository() = default;
 
-	virtual void addEntry(const ConsumptionEntry&) = 0;
-	virtual std::vector<ConsumptionEntry> getEntries(int personID) const = 0;
+	virtual int64_t addEntry(const ConsumptionEntry&) = 0;
+	virtual std::vector<ConsumptionEntry> getEntries(int64_t personID) const = 0;
 };

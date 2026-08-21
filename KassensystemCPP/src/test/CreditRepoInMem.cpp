@@ -1,11 +1,12 @@
 #include "CreditRepoInMem.h"
 
-void CreditRepoInMem::addCredit(int personID, double amount, QDate date)
+int64_t CreditRepoInMem::addEntry(const CreditEntry& entry)
 {
-	entries.emplace_back(CreditRepoRow{ personID, amount, date });
+	entries.emplace_back(entry);
+	return 0;
 }
 
-double CreditRepoInMem::getCredit(int personID) const
+double CreditRepoInMem::getCredit(int64_t personID) const
 {
 	for (auto& entry : entries)
 	{

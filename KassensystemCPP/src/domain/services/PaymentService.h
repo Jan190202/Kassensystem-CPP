@@ -1,0 +1,27 @@
+#pragma once
+
+#include "domain/repoInterface/PaymentRepository.h"
+#include "domain/repoInterface/CreditRepository.h"
+#include "domain/repoInterface/DebtRepository.h"
+#include "domain/repoInterface/BalanceRepository.h"
+#include "domain/model/DomainTypes.h"
+#include "domain/model/Entities.h"
+
+class PaymentService
+{
+public:
+	PaymentService(PaymentRepository*, CreditRepository*, DebtRepository*, BalanceRepository*);
+	
+	void addPayment(const PaymentEntry& entry);
+	double getPaidAmount(int64_t personID) const;
+private:
+	int64_t addPaymentEntry(const PaymentEntry& entry);
+	double addPaymentAllocation(int64_t paymentEntryID, int64_t personID, double amount, QDate date);
+	int64_t addTip(int64_t personID, double amount, QDate date);
+	int64_t addCredit(int64_t personID, double amount, QDate date, std::string description);
+
+	PaymentRepository* paymentRepo;
+	CreditRepository* creditRepo;
+	DebtRepository* debtRepo;
+	BalanceRepository* balanceRepo;
+};

@@ -1,6 +1,6 @@
 #pragma once
 
-#include "entities/BalanceEntry.h"
+#include "domain/model/Entities.h"
 
 class BalanceRepository
 {
@@ -8,7 +8,7 @@ public:
 	BalanceRepository() = default;
 	virtual ~BalanceRepository() = default;
 
-	virtual void addBalanceEntry(const BalanceEntry&) = 0;
+	virtual int64_t addEntry(const BalanceEntry&) = 0;
 	virtual double getTotalEarnings() const = 0;
 	virtual double getTotalSpendings() const = 0;
 };

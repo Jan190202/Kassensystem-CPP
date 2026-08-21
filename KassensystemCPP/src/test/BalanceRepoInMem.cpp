@@ -1,12 +1,10 @@
 #include "BalanceRepoInMem.h"
-#include "domain/DomainTypes.h"
-#include "entities/BalanceEntry.h"
-
 #include <vector>
 
-void BalanceRepoInMem::addBalanceEntry(const BalanceEntry& entry)
+int64_t BalanceRepoInMem::addEntry(const BalanceEntry& entry)
 {
 	entries.push_back(entry);
+	return 0;
 }
 
 double BalanceRepoInMem::getTotalEarnings() const
