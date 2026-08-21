@@ -10,10 +10,13 @@ ConsumptionService::ConsumptionService(ConsumptionRepository* consumptionRepo, D
 
 void ConsumptionService::addConsumption(const ConsumptionRequest& request)
 {
+	if (request.personName == "") return; // skip entries without name
+	
 	Person person = personRepo->findOrCreateEntry(request.personName);
 	double amount = calculateDebt(request);
 	
 	if (amount < 1e-9) return; // skip zero-entries
+	
 
 	DebtEntry dEntry{ .debtEntryID = 0, .personID = person.getID(), .date = request.date, .amount = amount};
 	int dEntryID = debtRepo->addEntry(dEntry);
