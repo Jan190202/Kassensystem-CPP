@@ -7,8 +7,8 @@
 class ConsumptionRepoInMem : public ConsumptionRepository
 {
 public:
-	ConsumptionRepoInMem();
-	virtual ~ConsumptionRepoInMem() override;
+	ConsumptionRepoInMem() = default;
+	virtual ~ConsumptionRepoInMem() = default;
 
 	virtual int64_t addEntry(const ConsumptionEntry&) override;
 	virtual std::vector<ConsumptionEntry> getEntries(int64_t personID) const override;

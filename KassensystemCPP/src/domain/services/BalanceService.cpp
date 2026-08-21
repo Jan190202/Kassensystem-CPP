@@ -21,10 +21,10 @@ int64_t BalanceService::addEntry(const BalanceRequest& request)
 
 	if (entry.personID >= 0 && entry.type == BalanceType::spending)
 	{
-		return addCredit(entry.personID, entry.amount, entry.date, "Abteilungsausgabe übernommen");
+		addCredit(entry.personID, entry.amount, entry.date, "Abteilungsausgabe übernommen");
 	}
 	
-	return balanceRepo->addEntry(entry);;
+	return balanceRepo->addEntry(entry);
 }
 
 double BalanceService::getTotalEarnings() const
