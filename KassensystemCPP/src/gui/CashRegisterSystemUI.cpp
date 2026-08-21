@@ -9,14 +9,14 @@
 #include <QPushButton>
 #include <QMainWindow>
 
-CashRegisterSystemUI::CashRegisterSystemUI(QWidget* parent) : QMainWindow(parent)
+CashRegisterSystemUI::CashRegisterSystemUI(const ServiceBundle& services, QWidget* parent) : QMainWindow(parent)
 {
 	setWindowTitle(tr("Kassensystem"));
 	resize(800, 600);
-	initUi();
+	initUi(services);
 }
 
-void CashRegisterSystemUI::initUi()
+void CashRegisterSystemUI::initUi(const ServiceBundle& services)
 {
 	//main widget for all contents
 	QWidget*		central		= new QWidget(this);
@@ -38,7 +38,7 @@ void CashRegisterSystemUI::initUi()
 	QTabWidget* tabSelector = new QTabWidget(central);
 	rootLayout->insertWidget(0, tabSelector);
 
-	tabs = { new PayTab(), new AddTab(), new BalanceTab() };
+	tabs = { new PayTab(services.paymentService), new AddTab(services.consumptionService), new BalanceTab(services.balanceService) };
 
 	tabSelector->addTab(tabs.at(0), tr("Schulden begleichen"));
 	tabSelector->addTab(tabs.at(1), tr("Einträge hinzufügen"));

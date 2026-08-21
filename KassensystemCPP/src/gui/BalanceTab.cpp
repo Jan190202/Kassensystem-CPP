@@ -15,7 +15,7 @@
 
 #include <QDebug>
 
-BalanceTab::BalanceTab(QWidget* parent) : BaseTab(parent) {}
+BalanceTab::BalanceTab(BalanceService& balanceService, QWidget* parent) : balanceService(balanceService), BaseTab(parent) {}
 
 void BalanceTab::initialize()
 {

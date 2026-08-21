@@ -1,6 +1,7 @@
 #pragma once
 
 #include "BaseTab.h"
+#include "domain/services/ConsumptionService.h"
 
 #include <vector>
 
@@ -15,7 +16,7 @@ class AddTab : public BaseTab
 	Q_OBJECT
 
 public:
-	AddTab(QWidget* parent = nullptr);
+	AddTab(ConsumptionService& consumptionService, QWidget* parent = nullptr);
 	void initialize() override;
 
 private slots:
@@ -32,4 +33,6 @@ private:
 	void removeEntry(AddTabEntry* entry);
 	void clearEntries();
 	void shiftEntries();
+
+	ConsumptionService& consumptionService;
 };

@@ -1,6 +1,7 @@
 #pragma once
 #include "BaseTab.h"
 #include "GuiTypes.h"
+#include "domain/services/BalanceService.h"
 
 #include <QDate> 
 
@@ -11,7 +12,7 @@ class BalanceTab : public BaseTab
 {
 	Q_OBJECT
 public:
-	BalanceTab(QWidget* parent = nullptr);
+	BalanceTab(BalanceService& balanceService, QWidget* parent = nullptr);
 	virtual void initialize() override;
 private:
 	QTableWidget* tblSpendings	= nullptr;
@@ -29,6 +30,8 @@ private:
 	QDate dateAfter				= QDate::currentDate();
 
 	void addEntry(btnIndex mode);
+
+	BalanceService& balanceService;
 private slots:
 	void collectResults();
 };

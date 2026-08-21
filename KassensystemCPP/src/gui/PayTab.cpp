@@ -15,7 +15,7 @@
 #include <QTableWidget>
 #include <QVBoxLayout>
 
-PayTab::PayTab(QWidget* parent) : BaseTab(parent) {}
+PayTab::PayTab(PaymentService& paymentService, QWidget* parent) : paymentService(paymentService), BaseTab(parent) {}
 
 void PayTab::initialize()
 {

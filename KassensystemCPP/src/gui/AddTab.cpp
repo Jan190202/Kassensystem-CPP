@@ -17,7 +17,7 @@
 #include <algorithm>
 #include <string>
 
-AddTab::AddTab(QWidget* parent) : BaseTab(parent) {}
+AddTab::AddTab(ConsumptionService& consumptionService, QWidget* parent) : consumptionService(consumptionService), BaseTab(parent) {}
 
 void AddTab::initialize()
 {

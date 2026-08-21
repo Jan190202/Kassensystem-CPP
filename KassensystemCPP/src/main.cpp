@@ -1,4 +1,5 @@
 #include "gui/CashRegisterSystemUI.h"
+#include "gui/GuiTypes.h"
 #include <QApplication>
 
 #include "domain/model/Entities.h"
@@ -22,14 +23,6 @@
 
 int main(int argc, char* argv[])
 {
-	// GUI Testing
-	QApplication app(argc, argv);
-
-	CashRegisterSystemUI sysUI;
-	sysUI.show();
-
-
-
 	// Domain Testing
 	Person p1("Dieter",		1);
 	Person p2("Gerhardt",	2);
@@ -78,6 +71,14 @@ int main(int argc, char* argv[])
 
 
 	qInfo() << baSer.getTotalEarnings();
+
+
+
+	// GUI Testing
+	QApplication app(argc, argv);
+
+	CashRegisterSystemUI sysUI(ServiceBundle{ .paymentService = paSer, .consumptionService = coSer, .balanceService = baSer });
+	sysUI.show();
 
 
 
