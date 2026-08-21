@@ -1,4 +1,4 @@
-﻿#include "Kassensystem.h"
+﻿#include "CashRegisterSystemUI.h"
 #include "AddTab.h"
 #include "PayTab.h"
 #include "BalanceTab.h"
@@ -9,14 +9,14 @@
 #include <QPushButton>
 #include <QMainWindow>
 
-CashRegisterSystem::CashRegisterSystem(QWidget* parent) : QMainWindow(parent)
+CashRegisterSystemUI::CashRegisterSystemUI(QWidget* parent) : QMainWindow(parent)
 {
 	setWindowTitle(tr("Kassensystem"));
 	resize(800, 600);
 	initUi();
 }
 
-void CashRegisterSystem::initUi()
+void CashRegisterSystemUI::initUi()
 {
 	//main widget for all contents
 	QWidget*		central		= new QWidget(this);
@@ -45,7 +45,7 @@ void CashRegisterSystem::initUi()
 	tabSelector->addTab(tabs.at(2), tr("Abteilungsbilanz bearbeiten"));
 	
 
-	activeTab = static_cast<int>(tabIndex::balance); // initialize first tab
+	activeTab = static_cast<int>(tabIndex::pay); // initialize first tab
 	initializeTab(activeTab);
 	tabSelector->setCurrentIndex(activeTab);
 
@@ -57,7 +57,7 @@ void CashRegisterSystem::initUi()
 		});
 }
 
-void CashRegisterSystem::initializeTab(int tabNum)
+void CashRegisterSystemUI::initializeTab(int tabNum)
 {
 	// demanded tab already created
 	if (loadedTabs.at(tabNum)) return;

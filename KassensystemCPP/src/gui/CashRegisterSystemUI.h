@@ -4,11 +4,11 @@
 #include "BaseTab.h"
 class QPushButton;
 
-class CashRegisterSystem : public QMainWindow
+class CashRegisterSystemUI : public QMainWindow
 {
 	Q_OBJECT
 public:
-	CashRegisterSystem(QWidget* parent = nullptr);	
+	CashRegisterSystemUI(QWidget* parent = nullptr);
 private:
 	std::array<BaseTab*, 3> tabs;
 	QPushButton* btnCancel;
