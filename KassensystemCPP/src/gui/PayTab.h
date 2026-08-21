@@ -1,6 +1,7 @@
 #pragma once
 #include "BaseTab.h"
 #include "domain/services/PaymentService.h"
+#include "GuiTypes.h"
 
 class QComboBox;
 class QLabel;
@@ -14,7 +15,7 @@ class PayTab : public BaseTab
 {
 	Q_OBJECT
 public:
-	PayTab(PaymentService& paymentService, QWidget* parent = nullptr);
+	PayTab(const LowerButtonBundle& lowerButtons, PaymentService& paymentService, QWidget* parent = nullptr);
 	virtual void initialize() override;
 private:
 	QComboBox*		nameSelect			= nullptr;
@@ -30,4 +31,5 @@ private:
 	QTableWidget*	tblConsumption		= nullptr; 
 
 	PaymentService& paymentService;
+	const LowerButtonBundle& lowerButtons;
 };

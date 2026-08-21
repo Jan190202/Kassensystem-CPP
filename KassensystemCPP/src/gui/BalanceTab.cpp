@@ -15,7 +15,7 @@
 
 #include <QDebug>
 
-BalanceTab::BalanceTab(BalanceService& balanceService, QWidget* parent) : balanceService(balanceService), BaseTab(parent) {}
+BalanceTab::BalanceTab(const LowerButtonBundle& lowerButtons, BalanceService& balanceService, QWidget* parent) : lowerButtons(lowerButtons), balanceService(balanceService), BaseTab(parent) {}
 
 void BalanceTab::initialize()
 {

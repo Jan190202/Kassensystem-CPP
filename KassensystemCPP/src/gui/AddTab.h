@@ -2,6 +2,7 @@
 
 #include "BaseTab.h"
 #include "domain/services/ConsumptionService.h"
+#include "GuiTypes.h"
 
 #include <vector>
 
@@ -16,7 +17,7 @@ class AddTab : public BaseTab
 	Q_OBJECT
 
 public:
-	AddTab(ConsumptionService& consumptionService, QWidget* parent = nullptr);
+	AddTab(const LowerButtonBundle& lowerButtons, ConsumptionService& consumptionService, QWidget* parent = nullptr);
 	void initialize() override;
 
 private slots:
@@ -35,4 +36,5 @@ private:
 	void shiftEntries();
 
 	ConsumptionService& consumptionService;
+	const LowerButtonBundle& lowerButtons;
 };

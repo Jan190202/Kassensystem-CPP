@@ -25,12 +25,12 @@ void CashRegisterSystemUI::initUi(const ServiceBundle& services)
 
 	// lower buttons
 	QHBoxLayout* buttonBar = new QHBoxLayout();
-	btnCancel = new QPushButton("Cancel", this);
-	btnApply = new QPushButton("Apply", this);
-	btnSave = new QPushButton("Save", this);
-	buttonBar->addWidget(btnCancel);
-	buttonBar->addWidget(btnApply);
-	buttonBar->addWidget(btnSave);
+	lowerButtons.btnCancel = new QPushButton("Cancel", this);
+	lowerButtons.btnApply = new QPushButton("Apply", this);
+	lowerButtons.btnSave = new QPushButton("Save", this);
+	buttonBar->addWidget(lowerButtons.btnCancel);
+	buttonBar->addWidget(lowerButtons.btnApply);
+	buttonBar->addWidget(lowerButtons.btnSave);
 	buttonBar->insertStretch(1);			// 1==position, cancel button flushed left, others flushed right
 	rootLayout->addLayout(buttonBar);           
 
@@ -38,11 +38,11 @@ void CashRegisterSystemUI::initUi(const ServiceBundle& services)
 	QTabWidget* tabSelector = new QTabWidget(central);
 	rootLayout->insertWidget(0, tabSelector);
 
-	tabs = { new PayTab(services.paymentService), new AddTab(services.consumptionService), new BalanceTab(services.balanceService) };
+	tabs = { new PayTab(lowerButtons, services.paymentService), new AddTab(lowerButtons, services.consumptionService), new BalanceTab(lowerButtons, services.balanceService) };
 
-	tabSelector->addTab(tabs.at(0), tr("Schulden begleichen"));
-	tabSelector->addTab(tabs.at(1), tr("Einträge hinzufügen"));
-	tabSelector->addTab(tabs.at(2), tr("Abteilungsbilanz bearbeiten"));
+	tabSelector->addTab(tabs.at(static_cast<int>(tabIndex::pay)), tr("Schulden begleichen"));
+	tabSelector->addTab(tabs.at(static_cast<int>(tabIndex::add)), tr("Einträge hinzufügen"));
+	tabSelector->addTab(tabs.at(static_cast<int>(tabIndex::balance)), tr("Abteilungsbilanz bearbeiten"));
 	
 
 	activeTab = static_cast<int>(tabIndex::pay); // initialize first tab

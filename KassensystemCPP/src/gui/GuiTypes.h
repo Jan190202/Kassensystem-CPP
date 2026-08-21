@@ -16,6 +16,13 @@ struct ServiceBundle
 	BalanceService& balanceService;
 };
 
+struct LowerButtonBundle
+{
+	QPushButton* btnCancel;
+	QPushButton* btnApply;
+	QPushButton* btnSave;
+};
+
 struct ConsumptionInputs
 {
 	int nBeer05, nBeer04, nSoftdrinks, nWater;

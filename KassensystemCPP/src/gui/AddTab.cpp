@@ -20,7 +20,7 @@
 
 #include <QDebug>
 
-AddTab::AddTab(ConsumptionService& consumptionService, QWidget* parent) : consumptionService(consumptionService), BaseTab(parent) {}
+AddTab::AddTab(const LowerButtonBundle& lowerButtons, ConsumptionService& consumptionService, QWidget* parent) : lowerButtons(lowerButtons), consumptionService(consumptionService), BaseTab(parent) {}
 
 void AddTab::initialize()
 {

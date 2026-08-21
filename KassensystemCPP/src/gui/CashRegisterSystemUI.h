@@ -13,9 +13,7 @@ public:
 	CashRegisterSystemUI(const ServiceBundle& services, QWidget* parent = nullptr);
 private:
 	std::array<BaseTab*, 3> tabs;
-	QPushButton* btnCancel;
-	QPushButton* btnApply;
-	QPushButton* btnSave;
+	LowerButtonBundle lowerButtons;
 
 	enum class tabIndex { pay=0, add, balance };
 	int activeTab = 0;
