@@ -97,6 +97,7 @@ void AddTab::initialize()
 	addTabMainLayout->addStretch();
 
 	connect(btnAddEntry, &QPushButton::clicked, this, &AddTab::addEntry);
+	connect(lowerButtons.btnApply, &QPushButton::clicked, this, &AddTab::apply);
 }
 
 void AddTab::addEntry()
@@ -148,8 +149,30 @@ void AddTab::shiftEntries()
 	}
 }
 
-void AddTab::clearEntries()
+void AddTab::apply()
 {
 	while (!entries.empty())
-		removeEntry(entries.back());
+	{
+		AddTabEntry* entry = entries.back();
+		ConsumptionInputs inputs = entry->getEntryInputs();
+		removeEntry(entry);
+
+		ConsumptionRequest request{
+			.personName = inputs.personName,
+			.date = monthSelection->date(),
+			.nBeer05 = inputs.nBeer05,
+			.nBeer04 = inputs.nBeer04,
+			.nSoftdrinks = inputs.nSoftdrinks,
+			.nWater = inputs.nWater,
+			.otherExpense = inputs.otherExpense };
+
+		consumptionService.addConsumption(request);
+	}
+}
+
+void AddTab::save()
+{
+	apply();
+	//consumptionService->save();
+	//consumptionService->sync();
 }

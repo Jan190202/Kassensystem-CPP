@@ -31,6 +31,7 @@ public:
 
 	void addToGrid(QGridLayout* grid, int row);
 	void removeFromGrid(QGridLayout* grid);
+	ConsumptionInputs getEntryInputs() const;
 	//QWidget* getFirstWidget();
 	QWidget* getLastWidget();
 private:

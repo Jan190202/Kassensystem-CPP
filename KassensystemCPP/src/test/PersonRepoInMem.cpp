@@ -26,6 +26,15 @@ Person PersonRepoInMem::addEntry(const std::string& name)
 	int64_t id = getUniqueID();
 	Person person{ name, id };
 	entries.push_back(person);
+
+	qInfo() << "PersonEntry added! Entries: ";
+	for (auto& entry : entries)
+	{
+		qInfo()
+			<< " ID:" << entry.getID()
+			<< " name:" << entry.getName();
+	}
+
 	return person;
 }
 

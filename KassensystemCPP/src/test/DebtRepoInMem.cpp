@@ -1,8 +1,21 @@
 #include "DebtRepoInMem.h"
 
+#include <QDebug>
+
 int64_t DebtRepoInMem::addEntry(const DebtEntry& entry)
 {
 	entries.push_back(entry);
+
+	qInfo() << "DebtEntry added! Entries: ";
+	for (auto& entry : entries)
+	{
+		qInfo()
+			<< " amount:" << entry.amount
+			<< " date:" << entry.date
+			<< " debtID:" << entry.debtEntryID
+			<< " personID:" << entry.personID;
+	}
+
 	return 0;
 }
 

@@ -56,6 +56,7 @@ void CashRegisterSystemUI::initUi(const ServiceBundle& services)
 			activeTab = tabSelector->currentIndex();
 			initializeTab(activeTab);
 		});
+
 	connect(lowerButtons.btnCancel, &QPushButton::clicked, qApp, &QCoreApplication::quit);
 }
 

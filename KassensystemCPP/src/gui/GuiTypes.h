@@ -4,6 +4,7 @@
 #include "domain/services/BalanceService.h"
 #include "domain/services/ConsumptionService.h"
 #include "domain/services/PaymentService.h"
+#include <string>
 
 enum class btnIndex
 {
@@ -26,6 +27,7 @@ struct LowerButtonBundle
 
 struct ConsumptionInputs
 {
+	std::string personName;
 	int nBeer05, nBeer04, nSoftdrinks, nWater;
 	double otherExpense;
 };

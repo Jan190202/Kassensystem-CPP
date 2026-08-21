@@ -1,9 +1,24 @@
 #include "BalanceRepoInMem.h"
 #include <vector>
 
+#include <QDebug>
+
 int64_t BalanceRepoInMem::addEntry(const BalanceEntry& entry)
 {
 	entries.push_back(entry);
+
+	qInfo() << "BalanceEntry added! Entries: ";
+	for (auto& entry : entries)
+	{
+		qInfo()
+			<< " amount:" << entry.amount
+			<< " balanceEntryID:" << entry.BalanceEntryID
+			<< " type:" << static_cast<int>(entry.type)
+			<< " comment:" << entry.comment
+			<< " date:" << entry.date
+			<< " description:" << entry.description
+			<< " personID:" << entry.personID;
+	}
 	return 0;
 }
 

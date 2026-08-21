@@ -1,8 +1,22 @@
 #include "CreditRepoInMem.h"
 
+#include <QDebug>
+
 int64_t CreditRepoInMem::addEntry(const CreditEntry& entry)
 {
 	entries.emplace_back(entry);
+
+	qInfo() << "CreditEntry added! Entries: ";
+	for (auto& entry : entries)
+	{
+		qInfo()
+			<< " amount:" << entry.amount
+			<< " creditEntryID:" << entry.creditEntryID
+			<< " date:" << entry.date
+			<< " description:" << entry.description
+			<< " personID:" << entry.personID;
+	}
+
 	return 0;
 }
 

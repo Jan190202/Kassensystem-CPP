@@ -34,6 +34,8 @@ private:
 	void removeEntry(AddTabEntry* entry);
 	void clearEntries();
 	void shiftEntries();
+	void apply();
+	void save();
 
 	ConsumptionService& consumptionService;
 	const LowerButtonBundle& lowerButtons;

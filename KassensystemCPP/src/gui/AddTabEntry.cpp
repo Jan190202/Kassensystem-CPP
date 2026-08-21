@@ -64,13 +64,7 @@ AddTabEntry::AddTabEntry(const QList<QString>& nameList, QWidget* parent)
 
 	auto consumptionInputChanged = [&]()
 		{
-			ConsumptionInputs inputs{
-				.nBeer05 = spinboxBeer05->value(),
-				.nBeer04 = spinboxBeer04->value(),
-				.nSoftdrinks = spinboxSoftdrinks->value(),
-				.nWater = spinboxWater->value(),
-				.otherExpense = spinboxCustom->value() };
-
+			ConsumptionInputs inputs = getEntryInputs();
 			emit calcEntryCost(inputs, entryCost); // entryCost passed by reference for result retrieval
 			lCost->setText(QtUtils::toCurrencyFormat(entryCost));
 		};
@@ -116,6 +110,17 @@ void AddTabEntry::removeFromGrid(QGridLayout* grid)
 	grid->removeWidget(spinboxCustom);
 	grid->removeWidget(lCost);
 	grid->removeWidget(btnRemove);
+}
+
+ConsumptionInputs AddTabEntry::getEntryInputs() const
+{
+	return ConsumptionInputs{
+		.personName = nameSelect->currentText().toStdString(),
+		.nBeer05 = spinboxBeer05->value(),
+		.nBeer04 = spinboxBeer04->value(),
+		.nSoftdrinks = spinboxSoftdrinks->value(),
+		.nWater = spinboxWater->value(),
+		.otherExpense = spinboxCustom->value() };
 }
 
 //QWidget* AddTabEntry::getFirstWidget()
