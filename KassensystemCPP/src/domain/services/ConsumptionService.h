@@ -15,6 +15,7 @@ public:
 	
 	double calculateDebt(const ConsumptionRequest&) const;
 	std::vector<ConsumptionEntry> getEntries(int personID) const;
+	std::vector<std::string> getPersonNames() const;
 private:
 	ConsumptionRepository* consumptionRepo;
 	DebtRepository* debtRepo;

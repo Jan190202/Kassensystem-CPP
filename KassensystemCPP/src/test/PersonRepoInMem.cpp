@@ -4,6 +4,8 @@
 #include <vector>
 #include <random>
 
+#include <QDebug>
+
 Person PersonRepoInMem::findOrCreateEntry(const std::string& name)
 {
 	for (auto& entry : entries)
@@ -51,4 +53,16 @@ bool PersonRepoInMem::isUnique(int64_t id)
 		}
 	}
 	return true;
+}
+
+std::vector<std::string> PersonRepoInMem::getNames() const
+{
+	std::vector<std::string> nameVec; //entries.size()
+	
+	for (auto& entry : entries)
+	{
+		nameVec.push_back(entry.getName());
+	}
+
+	return nameVec;
 }

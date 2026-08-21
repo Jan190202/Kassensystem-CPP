@@ -9,6 +9,17 @@ BalanceService::BalanceService(BalanceRepository* balanceRepo, CreditRepository*
 
 int64_t BalanceService::addEntry(const BalanceRequest& request)
 {
+	int64_t personID{};
+	if (request.isCovered)
+	{
+		personID = personRepo->findOrCreateEntry(request.personName).getID();
+	}
+	else
+	{
+		personID = -1;
+	}
+		
+	
 	BalanceEntry entry{
 		.BalanceEntryID = 0,
 		.type = request.type,
@@ -16,7 +27,7 @@ int64_t BalanceService::addEntry(const BalanceRequest& request)
 		.amount = request.amount,
 		.date = request.date,
 		.comment = request.comment,
-		.personID = personRepo->findOrCreateEntry(request.personName).getID()
+		.personID = personID
 	};
 
 	if (entry.personID >= 0 && entry.type == BalanceType::spending)

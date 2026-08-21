@@ -3,6 +3,7 @@
 #include <QObject>
 #include <QList>
 #include <QString>
+#include "GuiTypes.h"
 
 class QComboBox;
 class QDoubleSpinBox;
@@ -12,12 +13,15 @@ class QPushButton;
 class QSpinBox;
 class QWidget;
 
+
+
 class AddTabEntry : public QObject
 {
 	Q_OBJECT
 
 signals:
 	void remove(AddTabEntry* removedEntry);
+	void consumptionInputChanged(ConsumptionInputs&);
 
 public:
 	AddTabEntry(const QList<QString>& nameList = { QString() },

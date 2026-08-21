@@ -2,6 +2,7 @@
 
 #include "AddTabEntry.h"
 #include "qtutils/QtConversions.h"
+#include "GuiTypes.h"
 
 #include <QDate>
 #include <QDateEdit>
@@ -98,9 +99,7 @@ void AddTab::initialize()
 
 void AddTab::addEntry()
 {
-	std::vector<std::string> nameList = { "Jane Doe", "John Doe" };
-
-	const QList<QString> nameListQ = QtUtils::strVecToQStrList(nameList);
+	QList<QString> nameListQ = QtUtils::strVecToQStrList(consumptionService.getPersonNames());
 
 	auto* newEntry = new AddTabEntry(nameListQ, this);
 
@@ -110,6 +109,10 @@ void AddTab::addEntry()
 
 	connect(newEntry, &AddTabEntry::remove,
 		this, &AddTab::removeEntry);
+	connect(newEntry, &AddTabEntry::consumptionInputChanged, this, [this](ConsumptionInputs& inputs)
+		{
+
+		});
 
 	// set tabulator switch from last widget of lowest entry to addButton
 	QWidget::setTabOrder(newEntry->getLastWidget(), btnAddEntry);

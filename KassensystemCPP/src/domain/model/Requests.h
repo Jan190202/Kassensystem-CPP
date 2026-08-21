@@ -13,10 +13,11 @@ struct ConsumptionRequest
 
 struct BalanceRequest
 {
-	std::string personName;
 	BalanceType type;
 	std::string description;
 	double amount;
 	QDate date;
 	std::string comment;
+	bool isCovered;
+	std::string personName;
 };

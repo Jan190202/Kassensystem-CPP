@@ -15,3 +15,9 @@ struct ServiceBundle
 	ConsumptionService& consumptionService;
 	BalanceService& balanceService;
 };
+
+struct ConsumptionInputs
+{
+	int nBeer05, nBeer04, nSoftdrinks, nWater;
+	double customExpense;
+};

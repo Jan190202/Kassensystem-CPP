@@ -24,19 +24,19 @@
 int main(int argc, char* argv[])
 {
 	// Domain Testing
-	Person p1("Dieter",		1);
-	Person p2("Gerhardt",	2);
-	Person p3("Udo",		3);
-	Person p4("Sabine",		4);
-	Person p5("Laura",		5);
+	//Person p1("Dieter",		1);
+	//Person p2("Gerhardt",	2);
+	//Person p3("Udo",		3);
+	//Person p4("Sabine",		4);
+	//Person p5("Laura",		5);
 
 	ConsumptionRequest cReq1{ .personName = "Dieter", .date = QDate::currentDate(), .nBeer05 = 1, .nBeer04 = 2, .nSoftdrinks = 3, .nWater = 1, .otherExpense = 1.4 };
 	ConsumptionRequest cReq2{ .personName = "Maja",	 .date = QDate::currentDate(), .nBeer05 = 2, .nBeer04 = 2, .nSoftdrinks = 5, .nWater = 5, .otherExpense = 3.1 };
 	ConsumptionRequest cReq3{ .personName = "Max",    .date = QDate::currentDate(), .nBeer05 = 0, .nBeer04 = 1, .nSoftdrinks = 0, .nWater = 0, .otherExpense = 1 };
 
-	BalanceRequest bReq1{ .personName = "",		.type = BalanceType::spending, .description = "", .amount = 11, .date = QDate::currentDate(), .comment = "" };
-	BalanceRequest bReq2{ .personName = "",			.type = BalanceType::earning,  .description = "", .amount = 200, .date = QDate::currentDate(), .comment = "" };
-	BalanceRequest bReq3{ .personName = "Tim",		.type = BalanceType::spending, .description = "", .amount = 1, .date = QDate::currentDate(), .comment = "" };
+	BalanceRequest bReq1{ .type = BalanceType::spending, .description = "", .amount = 11, .date = QDate::currentDate(), .comment = "", .isCovered = false, .personName = ""};
+	BalanceRequest bReq2{ .type = BalanceType::earning,  .description = "", .amount = 200, .date = QDate::currentDate(), .comment = "", .isCovered = false, .personName = "" };
+	BalanceRequest bReq3{ .type = BalanceType::spending, .description = "", .amount = 1, .date = QDate::currentDate(), .comment = "", .isCovered = true, .personName = "Tim" };
 
 	PaymentEntry pEntry1{ .paymentEntryID = 0, .personID = 1, .date = QDate::currentDate(), .amount = 100, .overpaymentType = OverpaymentDisposition::credit };
 	PaymentEntry pEntry2{ .paymentEntryID = 0, .personID = 2, .date = QDate::currentDate(), .amount = 200, .overpaymentType = OverpaymentDisposition::tip };
