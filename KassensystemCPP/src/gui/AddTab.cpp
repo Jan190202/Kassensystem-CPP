@@ -26,7 +26,7 @@ void AddTab::initialize()
 {
 	monthSelection = new QDateEdit(QDate::currentDate().addMonths(-1), this);
 	monthSelection->setDisplayFormat(QStringLiteral("MMMM yy"));
-	monthSelection->setCalendarPopup(true);
+	monthSelection->setCalendarPopup(false);
 	monthSelection->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
 
 	btnAddEntry = new QPushButton(tr("+ Eintrag hinzufügen"), this);
@@ -96,6 +96,8 @@ void AddTab::initialize()
 	addTabMainLayout->addWidget(btnAddEntry);
 	addTabMainLayout->addStretch();
 
+	btnAddEntry->setFocus(Qt::TabFocusReason);
+
 	connect(btnAddEntry, &QPushButton::clicked, this, &AddTab::addEntry);
 	connect(lowerButtons.btnApply, &QPushButton::clicked, this, &AddTab::apply);
 }
@@ -157,9 +159,15 @@ void AddTab::apply()
 		ConsumptionInputs inputs = entry->getEntryInputs();
 		removeEntry(entry);
 
+		// get last day of month
+		QDate setDate = monthSelection->date();
+		int nDays = setDate.daysInMonth();
+		int setDays = setDate.day();
+		QDate dateAtMonthEnd = setDate.addDays(nDays - setDays);
+
 		ConsumptionRequest request{
 			.personName = inputs.personName,
-			.date = monthSelection->date(),
+			.date = dateAtMonthEnd,
 			.nBeer05 = inputs.nBeer05,
 			.nBeer04 = inputs.nBeer04,
 			.nSoftdrinks = inputs.nSoftdrinks,
