@@ -10,7 +10,8 @@ set(CMAKE_AUTORCC ON)
 #)
 
 file(GLOB_RECURSE SOURCES CONFIGURE_DEPENDS src/*.cpp)
-add_executable(KassensystemCPP ${SOURCES})
+file(GLOB_RECURSE HEADERS CONFIGURE_DEPENDS src/*.h)
+add_executable(KassensystemCPP ${SOURCES} ${HEADERS})
 
 target_include_directories(KassensystemCPP PRIVATE src) 
 	# src als root pfad für die include suche hinzufügen 
