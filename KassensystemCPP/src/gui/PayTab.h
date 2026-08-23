@@ -1,6 +1,7 @@
 #pragma once
 #include "BaseTab.h"
 #include "domain/services/PaymentService.h"
+#include "domain/model/Requests.h"
 #include "GuiTypes.h"
 
 class QComboBox;
@@ -14,6 +15,7 @@ class QRadioButton;
 class PayTab : public BaseTab
 {
 	Q_OBJECT
+	
 public:
 	PayTab(const LowerButtonBundle& lowerButtons, PaymentService& paymentService, QWidget* parent = nullptr);
 	virtual void initialize() override;
@@ -32,4 +34,6 @@ private:
 
 	PaymentService& paymentService;
 	const LowerButtonBundle& lowerButtons;
+private slots:
+	void personChanged(int64_t personID);
 };

@@ -21,3 +21,11 @@ struct BalanceRequest
 	bool isCovered;
 	std::string personName;
 };
+
+struct PaymentRequest
+{
+	std::string personName;
+	QDate date;
+	double amount;
+	OverpaymentDisposition overpaymentType;
+};

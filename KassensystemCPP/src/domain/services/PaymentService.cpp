@@ -1,16 +1,25 @@
 #include "PaymentService.h"
 
-PaymentService::PaymentService(PaymentRepository* paymentRepo, CreditRepository* creditRepo, DebtRepository* debtRepo, BalanceRepository* balanceRepo)
+PaymentService::PaymentService(PaymentRepository* paymentRepo, CreditRepository* creditRepo, DebtRepository* debtRepo, BalanceRepository* balanceRepo, PersonRepository* personRepo)
 {
 	this->paymentRepo = paymentRepo;
 	this->creditRepo = creditRepo;
 	this->debtRepo = debtRepo;
 	this->balanceRepo = balanceRepo;
+	this->personRepo = personRepo;
 }
 
-void PaymentService::addPayment(const PaymentEntry& entry)
+void PaymentService::addPayment(const PaymentRequest& request)
 {
-	if (entry.amount < 1e-9) return;
+	if (request.amount < 1e-9) return;
+
+	PaymentEntry entry{
+		.paymentEntryID = 0,
+		.personID = personRepo->findOrCreateEntry(request.personName).getID(),
+		.date = request.date,
+		.amount = request.amount,
+		.overpaymentType = request.overpaymentType
+	};
 
 	int64_t paymentEntryID = addPaymentEntry(entry);
 	double overpaymentAmount = addPaymentAllocation(paymentEntryID, entry.personID, entry.amount, entry.date);

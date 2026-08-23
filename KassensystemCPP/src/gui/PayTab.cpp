@@ -142,4 +142,40 @@ void PayTab::initialize()
 	mainLayout->addLayout(leftLayout, 1);
 	mainLayout->addWidget(vLine);
 	mainLayout->addWidget(tblConsumption, 3);
+
+	connect(lowerButtons.btnApply, &QPushButton::clicked, this, [&]()
+		{
+			PaymentRequest request{
+				.personName = nameSelect->currentText().toStdString(),
+				.date = QDate::currentDate(),
+				.amount = paymentSpinBox->value(),
+				.overpaymentType = btnSurplusToCredit->isChecked() ? OverpaymentDisposition::credit : OverpaymentDisposition::tip
+			};
+
+			paymentService.addPayment(request);
+		});
+
+	connect(btnUseCredit, &QPushButton::clicked, this, [&]()
+		{
+			// TBD
+		});
+
+	connect(fullPaymentCheckBox, &QCheckBox::checkStateChanged, this, [&](Qt::CheckState state)
+		{
+			switch (state)
+			{
+			case Qt::Checked:
+				// TBD
+				break;
+			case Qt::Unchecked:
+				// TBD
+				break;
+			}
+		});
+
+	connect(nameSelect, &QComboBox::currentTextChanged, this, [&]()
+		{
+			std::string currentName = nameSelect->currentText().toStdString();
+			// TBD
+		});
 }
