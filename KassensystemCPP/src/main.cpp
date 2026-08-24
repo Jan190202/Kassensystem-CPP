@@ -32,7 +32,7 @@ int main(int argc, char* argv[])
 
 	BalanceService			baSer(baRep, crRep, peRep);
 	ConsumptionService		coSer(coRep, deRep, peRep);
-	PaymentService			paSer(paRep, crRep, deRep, baRep);
+	PaymentService			paSer(paRep, crRep, deRep, baRep, peRep);
 
 	// domain testing
 	//Person p1("Dieter", 1);
