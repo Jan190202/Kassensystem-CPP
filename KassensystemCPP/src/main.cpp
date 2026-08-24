@@ -32,9 +32,11 @@ int main(int argc, char* argv[])
 
 	BalanceService			baSer(baRep, crRep, peRep);
 	ConsumptionService		coSer(coRep, deRep, peRep);
-	PaymentService			paSer(paRep, crRep, deRep, baRep);
+	PaymentService			paSer(paRep, crRep, deRep, baRep, peRep);
 
 	// domain testing
+	peRep->findOrCreateEntry("Tim Ebert");
+	peRep->findOrCreateEntry("Alfons Strauß");
 	//Person p1("Dieter", 1);
 	//Person p2("Gerhardt", 2);
 	//Person p3("Udo", 3);
