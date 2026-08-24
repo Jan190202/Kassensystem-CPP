@@ -5,6 +5,7 @@
 #include <QDialog>
 #include <string>
 #include <QDate>
+#include <vector>
 
 class QDateEdit;
 class QLineEdit;
@@ -27,7 +28,7 @@ class BalanceTabDialog : public QDialog
 {
 	Q_OBJECT
 public:
-	BalanceTabDialog(btnIndex mode, QWidget* parent);
+	BalanceTabDialog(btnIndex mode, std::vector<std::string> personNames, QWidget* parent);
 	dlgInputs& getInputs() const;
 private:
 	QLineEdit*		edtDescription;

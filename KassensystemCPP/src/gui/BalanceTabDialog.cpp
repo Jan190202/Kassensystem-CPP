@@ -21,7 +21,7 @@
 
 #include <string>
 
-BalanceTabDialog::BalanceTabDialog(btnIndex mode, QWidget* parent) : QDialog(parent)
+BalanceTabDialog::BalanceTabDialog(btnIndex mode, std::vector<std::string> personNames, QWidget* parent) : QDialog(parent)
 {
 	switch (mode)
 	{
@@ -84,7 +84,7 @@ BalanceTabDialog::BalanceTabDialog(btnIndex mode, QWidget* parent) : QDialog(par
 
 	edtCoveringPerson = new QComboBox();
 	edtCoveringPerson->setEnabled(false);
-	edtCoveringPerson->insertItems(0, QtUtils::strVecToQStrList({ "Jane Doe", "John Doe" }));
+	edtCoveringPerson->insertItems(0, QtUtils::strVecToQStrList(personNames));
 
 	// Checkbox + Dropdown eng nebeneinander statt über volle Formularbreite verteilt
 	auto* statusLayout = new QHBoxLayout;

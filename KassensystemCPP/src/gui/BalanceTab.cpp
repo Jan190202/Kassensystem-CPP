@@ -152,7 +152,8 @@ void BalanceTab::initialize()
 
 void BalanceTab::addEntry(btnIndex mode)
 {
-	auto* inputDialog = new BalanceTabDialog(mode, this);
+	std::vector<std::string> personNames = balanceService.getPersonNames();
+	auto* inputDialog = new BalanceTabDialog(mode, personNames, this);
 	if (inputDialog->exec() == QDialog::Accepted)
 	{
 		// inputs given and OK pressed

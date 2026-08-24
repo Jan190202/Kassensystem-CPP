@@ -99,3 +99,8 @@ int64_t PaymentService::addTip(int64_t personID, double amount, QDate date)
 		.personID = personID }
 		);
 }
+
+std::vector<std::string> PaymentService::getPersonNames() const
+{
+	return personRepo->getNames();
+}

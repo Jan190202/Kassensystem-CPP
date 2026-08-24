@@ -59,3 +59,8 @@ int64_t BalanceService::addCredit(int64_t personID, double amount, QDate date, s
 			.description = description }
 			);
 }
+
+std::vector<std::string> BalanceService::getPersonNames() const
+{
+	return personRepo->getNames();
+}

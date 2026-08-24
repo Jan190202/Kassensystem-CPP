@@ -1,4 +1,5 @@
 #include "PayTab.h"
+#include "qtutils/QtConversions.h"
 
 #include <QButtonGroup>
 #include <QCheckBox>
@@ -21,6 +22,8 @@ void PayTab::initialize()
 {
 	nameSelect = new QComboBox(this);
 	nameSelect->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
+	nameSelect->addItems(QtUtils::strVecToQStrList(paymentService.getPersonNames()));
+	nameSelect->setEditable(false);
 
 	// Betragsübersicht
 	auto* totalTextLabel	= new QLabel(tr("Gesamt"), this);

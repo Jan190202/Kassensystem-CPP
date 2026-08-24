@@ -16,6 +16,7 @@ public:
 	
 	void addPayment(const PaymentRequest& request);
 	double getPaidAmount(int64_t personID) const;
+	std::vector<std::string> getPersonNames() const;
 private:
 	int64_t addPaymentEntry(const PaymentEntry& entry);
 	double addPaymentAllocation(int64_t paymentEntryID, int64_t personID, double amount, QDate date);
