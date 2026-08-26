@@ -34,6 +34,6 @@ private:
 
 	PaymentService& paymentService;
 	const LowerButtonBundle& lowerButtons;
-//private slots:
+//private Q_SLOTS:
 //	void personChanged(int64_t personID);
 };

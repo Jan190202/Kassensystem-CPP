@@ -5,6 +5,7 @@
 #include "domain/services/ConsumptionService.h"
 #include "domain/services/PaymentService.h"
 #include <string>
+#include <ostream>
 
 enum class btnIndex
 {
@@ -31,3 +32,5 @@ struct ConsumptionInputs
 	int nBeer05, nBeer04, nSoftdrinks, nWater;
 	double otherExpense;
 };
+
+std::ostream& operator<<(std::ostream& out, const ConsumptionInputs& inputs);

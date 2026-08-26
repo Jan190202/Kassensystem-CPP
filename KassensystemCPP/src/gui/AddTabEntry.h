@@ -20,7 +20,7 @@ class AddTabEntry : public QObject
 {
 	Q_OBJECT
 
-signals:
+Q_SIGNALS:
 	void remove(AddTabEntry* removedEntry);
 	void calcEntryCost(ConsumptionInputs&, double&);
 

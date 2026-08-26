@@ -58,14 +58,14 @@ AddTabEntry::AddTabEntry(const QList<QString>& nameList, QWidget* parent)
 	btnRemove->setToolTip(tr("Eintrag entfernen"));
 	btnRemove->setFixedWidth(36);
 
-	connect(btnRemove, &QPushButton::clicked, this, [this]() { emit remove(this); });
+	connect(btnRemove, &QPushButton::clicked, this, [this]() { Q_EMIT remove(this); });
 	//connect(nameSelect, &QComboBox::)
 
 
 	auto consumptionInputChanged = [&]()
 		{
 			ConsumptionInputs inputs = getEntryInputs();
-			emit calcEntryCost(inputs, entryCost); // entryCost passed by reference for result retrieval
+			Q_EMIT calcEntryCost(inputs, entryCost); // entryCost passed by reference for result retrieval
 			lCost->setText(QtUtils::toCurrencyFormat(entryCost));
 		};
 

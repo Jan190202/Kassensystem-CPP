@@ -33,6 +33,6 @@ private:
 
 	BalanceService& balanceService;
 	const LowerButtonBundle& lowerButtons;
-private slots:
+private Q_SLOTS:
 	void collectResults();
 };

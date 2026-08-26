@@ -20,7 +20,7 @@ public:
 	AddTab(const LowerButtonBundle& lowerButtons, ConsumptionService& consumptionService, QWidget* parent = nullptr);
 	void initialize() override;
 
-private slots:
+private Q_SLOTS:
 	void addEntry();
 
 private:
