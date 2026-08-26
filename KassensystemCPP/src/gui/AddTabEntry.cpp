@@ -11,8 +11,9 @@
 #include <QCompleter>
 
 #include <QDebug>
+#include <iostream>
 
-AddTabEntry::AddTabEntry(const QList<QString>& nameList, QWidget* parent)
+AddTabEntry::AddTabEntry(const QList<QString>& nameList, const ConsumptionInputs& inputsPredef, QWidget* parent)
 {
 	nameSelect = new QComboBox(parent);
 	nameSelect->addItems(nameList);
@@ -59,21 +60,24 @@ AddTabEntry::AddTabEntry(const QList<QString>& nameList, QWidget* parent)
 	btnRemove->setFixedWidth(36);
 
 	connect(btnRemove, &QPushButton::clicked, this, [this]() { Q_EMIT remove(this); });
-	//connect(nameSelect, &QComboBox::)
 
+	// set predef inputs
+	if (!inputsPredef.personName.empty())
+	{
+		nameSelect->setCurrentText(QString::fromStdString(inputsPredef.personName));
+	}
+	spinboxBeer05->setValue(inputsPredef.nBeer05);
+	spinboxBeer04->setValue(inputsPredef.nBeer04);
+	spinboxSoftdrinks->setValue(inputsPredef.nSoftdrinks);
+	spinboxWater->setValue(inputsPredef.nWater);
+	spinboxCustom->setValue(inputsPredef.otherExpense);
 
-	auto consumptionInputChanged = [&]()
-		{
-			ConsumptionInputs inputs = getEntryInputs();
-			Q_EMIT calcEntryCost(inputs, entryCost); // entryCost passed by reference for result retrieval
-			lCost->setText(QtUtils::toCurrencyFormat(entryCost));
-		};
-
-	connect(spinboxBeer05, &QSpinBox::valueChanged, this, consumptionInputChanged);
-	connect(spinboxBeer04, &QSpinBox::valueChanged, this, consumptionInputChanged);
-	connect(spinboxSoftdrinks, &QSpinBox::valueChanged, this, consumptionInputChanged);
-	connect(spinboxWater, &QSpinBox::valueChanged, this, consumptionInputChanged);
-	connect(spinboxCustom, &QDoubleSpinBox::valueChanged, this, consumptionInputChanged);
+	// set cost calculation for future changes
+	connect(spinboxBeer05, &QSpinBox::valueChanged, this, [&]() {refreshCost(); });
+	connect(spinboxBeer04, &QSpinBox::valueChanged, this, [&]() {refreshCost(); });
+	connect(spinboxSoftdrinks, &QSpinBox::valueChanged, this, [&]() {refreshCost(); });
+	connect(spinboxWater, &QSpinBox::valueChanged, this, [&]() {refreshCost(); });
+	connect(spinboxCustom, &QDoubleSpinBox::valueChanged, this, [&]() {refreshCost(); });
 }
 
 AddTabEntry::~AddTabEntry()
@@ -132,3 +136,10 @@ QWidget* AddTabEntry::getLastWidget()
 {
 	return btnRemove;
 }
+
+void AddTabEntry::refreshCost()
+{
+	ConsumptionInputs inputs = getEntryInputs();
+	Q_EMIT calcEntryCost(inputs, entryCost); // entryCost passed by reference for result retrieval
+	lCost->setText(QtUtils::toCurrencyFormat(entryCost));
+};

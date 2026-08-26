@@ -41,21 +41,21 @@ int main(int argc, char* argv[])
 	}
 
 
-	//// GUI Testing
-	//BalanceRepository* baRep		= new BalanceRepoInMem();
-	//ConsumptionRepository* coRep	= new ConsumptionRepoInMem();
-	//CreditRepository* crRep			= new CreditRepoInMem();
-	//DebtRepository* deRep			= new DebtRepoInMem();
-	//PaymentRepository* paRep		= new PaymentRepoInMem();
-	//PersonRepository* peRep			= new PersonRepoInMem();
+	// GUI Testing
+	BalanceRepository* baRep		= new BalanceRepoInMem();
+	ConsumptionRepository* coRep	= new ConsumptionRepoInMem();
+	CreditRepository* crRep			= new CreditRepoInMem();
+	DebtRepository* deRep			= new DebtRepoInMem();
+	PaymentRepository* paRep		= new PaymentRepoInMem();
+	PersonRepository* peRep			= new PersonRepoInMem();
 
-	//BalanceService			baSer(baRep, crRep, peRep);
-	//ConsumptionService		coSer(coRep, deRep, peRep);
-	//PaymentService			paSer(paRep, crRep, deRep, baRep, peRep);
+	BalanceService			baSer(baRep, crRep, peRep);
+	ConsumptionService		coSer(coRep, deRep, peRep);
+	PaymentService			paSer(paRep, crRep, deRep, baRep, peRep);
 
-	//auto services = ServiceBundle{ .paymentService = paSer, .consumptionService = coSer, .balanceService = baSer };
-	//CashRegisterSystemUI sysUI(services);
-	//sysUI.show();
+	auto services = ServiceBundle{ .paymentService = paSer, .consumptionService = coSer, .balanceService = baSer };
+	CashRegisterSystemUI sysUI(services);
+	sysUI.show();
 
 	///////////////////////////////////////////////////////////////////////////////////////////////
 	return app.exec();

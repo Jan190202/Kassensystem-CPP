@@ -3,6 +3,7 @@
 #include "AddTabEntry.h"
 #include "qtutils/QtConversions.h"
 #include "GuiTypes.h"
+#include "ocr/EntryRecognizer.h"
 
 #include <QDate>
 #include <QDateEdit>
@@ -28,6 +29,8 @@ void AddTab::initialize()
 	monthSelection->setDisplayFormat(QStringLiteral("MMMM yy"));
 	monthSelection->setCalendarPopup(false);
 	monthSelection->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
+
+	btnScanDocument = new QPushButton(tr("Photo"), this);
 
 	btnAddEntry = new QPushButton(tr("+ Eintrag hinzufügen"), this);
 	btnAddEntry->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
@@ -81,40 +84,48 @@ void AddTab::initialize()
 	auto* columnSpacer = new QSpacerItem(36, 0, QSizePolicy::Fixed, QSizePolicy::Minimum);
 	entriesGrid->addItem(columnSpacer, 0, 7);
 
-	auto* monthLayout = new QHBoxLayout();
-	monthLayout->setContentsMargins(0, 0, 0, 0);
-	monthLayout->setSpacing(10);
-	monthLayout->addWidget(new QLabel(tr("Abrechnungsmonat"), this));
-	monthLayout->addWidget(monthSelection, 1);
+	auto* firstRowLayout = new QHBoxLayout();
+	firstRowLayout->setContentsMargins(0, 0, 0, 0);
+	firstRowLayout->setSpacing(10);
+	firstRowLayout->addWidget(new QLabel(tr("Abrechnungsmonat"), this));
+	firstRowLayout->addWidget(monthSelection, 1);
+	firstRowLayout->addWidget(btnScanDocument);
 
 	addTabMainLayout = new QVBoxLayout(this);
 	addTabMainLayout->setContentsMargins(18, 18, 18, 18);
 	addTabMainLayout->setSpacing(14);
 
-	addTabMainLayout->addLayout(monthLayout);
+	addTabMainLayout->addLayout(firstRowLayout);
 	addTabMainLayout->addLayout(entriesGrid);
 	addTabMainLayout->addWidget(btnAddEntry);
 	addTabMainLayout->addStretch();
 
 	btnAddEntry->setFocus(Qt::TabFocusReason);
 
-	connect(btnAddEntry, &QPushButton::clicked, this, &AddTab::addEntry);
+	connect(btnAddEntry, &QPushButton::clicked, this, [&]() {Q_EMIT addEntry(); }); // lambda needed to emit addEntry() with standard argument
 	connect(lowerButtons.btnApply, &QPushButton::clicked, this, &AddTab::apply);
+	connect(btnScanDocument, &QPushButton::clicked, this, [&]()
+		{
+			std::string imagePath;
+			Q_EMIT takePicture(imagePath); // pass by reference, TBD
+			std::vector<ConsumptionInputs> inputVector = EntryRecognizer::instance().readDocument(imagePath);
+			EntryRecognizer::instance().shutdownInterpreter();
+			clearEntries();
+			for (auto& input : inputVector)
+			{
+				Q_EMIT addEntry(input);
+			}
+		});
 }
 
-void AddTab::addEntry()
+void AddTab::addEntry(const ConsumptionInputs& inputsPredef)
 {
 	QList<QString> nameListQ = QtUtils::strVecToQStrList(consumptionService.getPersonNames());
 
-	auto* newEntry = new AddTabEntry(nameListQ, this);
+	auto* newEntry = new AddTabEntry(nameListQ, inputsPredef, this);
 
-	newEntry->addToGrid(entriesGrid, static_cast<int>(entries.size()) + 1);
-
-	entries.push_back(newEntry);
-
-	connect(newEntry, &AddTabEntry::remove,
-		this, &AddTab::removeEntry);
-	connect(newEntry, &AddTabEntry::calcEntryCost, this, [this](ConsumptionInputs& inputs, double& entryCost)
+	connect(newEntry, &AddTabEntry::remove, this, &AddTab::removeEntry);
+	connect(newEntry, &AddTabEntry::calcEntryCost, this, [this](const ConsumptionInputs& inputs, double& entryCost)
 		{
 			ConsumptionRequest request{
 				.nBeer05 = inputs.nBeer05,
@@ -124,6 +135,10 @@ void AddTab::addEntry()
 				.otherExpense = inputs.otherExpense };
 			entryCost = consumptionService.calculateDebt(request);
 		});
+	newEntry->refreshCost();
+
+	newEntry->addToGrid(entriesGrid, static_cast<int>(entries.size()) + 1);
+	entries.push_back(newEntry);
 
 	// set tabulator switch from last widget of lowest entry to addButton
 	QWidget::setTabOrder(newEntry->getLastWidget(), btnAddEntry);
@@ -149,6 +164,15 @@ void AddTab::shiftEntries()
 		entries[index]->removeFromGrid(entriesGrid);
 		entries[index]->addToGrid(entriesGrid, index + 1);
 	}
+}
+
+void AddTab::clearEntries()
+{
+	while (!entries.empty())
+	{
+		AddTabEntry* entry = entries.back();
+		removeEntry(entry);
+	};
 }
 
 void AddTab::apply()

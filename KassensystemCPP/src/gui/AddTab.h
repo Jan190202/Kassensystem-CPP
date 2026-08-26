@@ -15,16 +15,18 @@ class QVBoxLayout;
 class AddTab : public BaseTab
 {
 	Q_OBJECT
-
+Q_SIGNALS:
+	void takePicture(std::string&);
 public:
 	AddTab(const LowerButtonBundle& lowerButtons, ConsumptionService& consumptionService, QWidget* parent = nullptr);
 	void initialize() override;
 
 private Q_SLOTS:
-	void addEntry();
+	void addEntry(const ConsumptionInputs& = ConsumptionInputs());
 
 private:
 	QDateEdit* monthSelection = nullptr;
+	QPushButton* btnScanDocument = nullptr;
 	std::vector<AddTabEntry*> entries;
 
 	QPushButton* btnAddEntry = nullptr;

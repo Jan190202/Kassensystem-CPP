@@ -23,10 +23,8 @@ class AddTabEntry : public QObject
 Q_SIGNALS:
 	void remove(AddTabEntry* removedEntry);
 	void calcEntryCost(ConsumptionInputs&, double&);
-
 public:
-	AddTabEntry(const QList<QString>& nameList = { QString() },
-		QWidget* parent = nullptr);
+	AddTabEntry(const QList<QString>& nameList = { QString() }, const ConsumptionInputs& = ConsumptionInputs(), QWidget* parent = nullptr);
 	~AddTabEntry() override;
 
 	void addToGrid(QGridLayout* grid, int row);
@@ -34,6 +32,7 @@ public:
 	ConsumptionInputs getEntryInputs() const;
 	//QWidget* getFirstWidget();
 	QWidget* getLastWidget();
+	void refreshCost();
 private:
 	QComboBox* nameSelect = nullptr;
 	QSpinBox* spinboxBeer05 = nullptr;
