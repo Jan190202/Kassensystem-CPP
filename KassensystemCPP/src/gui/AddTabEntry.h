@@ -33,6 +33,7 @@ public:
 	//QWidget* getFirstWidget();
 	QWidget* getLastWidget();
 	void refreshCost();
+	void valueChanged(QSpinBox* changedSpinbox = nullptr, double initValue = 0);
 private:
 	QComboBox* nameSelect = nullptr;
 	QSpinBox* spinboxBeer05 = nullptr;
@@ -44,4 +45,5 @@ private:
 	QPushButton* btnRemove = nullptr;
 
 	double entryCost{};
+	ConsumptionInputs initInputs;
 };

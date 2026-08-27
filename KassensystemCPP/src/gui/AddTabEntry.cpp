@@ -72,12 +72,14 @@ AddTabEntry::AddTabEntry(const QList<QString>& nameList, const ConsumptionInputs
 	spinboxWater->setValue(inputsPredef.nWater);
 	spinboxCustom->setValue(inputsPredef.otherExpense);
 
+	initInputs = getEntryInputs();
+
 	// set cost calculation for future changes
-	connect(spinboxBeer05, &QSpinBox::valueChanged, this, [&]() {refreshCost(); });
-	connect(spinboxBeer04, &QSpinBox::valueChanged, this, [&]() {refreshCost(); });
-	connect(spinboxSoftdrinks, &QSpinBox::valueChanged, this, [&]() {refreshCost(); });
-	connect(spinboxWater, &QSpinBox::valueChanged, this, [&]() {refreshCost(); });
-	connect(spinboxCustom, &QDoubleSpinBox::valueChanged, this, [&]() {refreshCost(); });
+	connect(spinboxBeer05,		&QSpinBox::valueChanged,		this, [&]() {valueChanged(spinboxBeer05, initInputs.nBeer05); });
+	connect(spinboxBeer04,		&QSpinBox::valueChanged,		this, [&]() {valueChanged(spinboxBeer04, initInputs.nBeer04); });
+	connect(spinboxSoftdrinks,	&QSpinBox::valueChanged,		this, [&]() {valueChanged(spinboxSoftdrinks, initInputs.nSoftdrinks); });
+	connect(spinboxWater,		&QSpinBox::valueChanged,		this, [&]() {valueChanged(spinboxWater, initInputs.nWater); });
+	connect(spinboxCustom,		&QDoubleSpinBox::valueChanged,	this, [&]() {valueChanged(spinboxWater, initInputs.nWater); });
 }
 
 AddTabEntry::~AddTabEntry()
@@ -143,3 +145,19 @@ void AddTabEntry::refreshCost()
 	Q_EMIT calcEntryCost(inputs, entryCost); // entryCost passed by reference for result retrieval
 	lCost->setText(QtUtils::toCurrencyFormat(entryCost));
 };
+
+void AddTabEntry::valueChanged(QSpinBox* changedSpinBox, double initValue)
+{
+	if (changedSpinBox) // !nullptr -> spinbox changed and to be colored
+	{
+		if (std::abs(changedSpinBox->value() - initValue) < 1e-9) // new value is init value -> default color
+		{
+			changedSpinBox->setStyleSheet("");
+		}
+		else // new value differs from init values -> other color
+		{
+			changedSpinBox->setStyleSheet("QSpinBox { background-color: #9B870C; }");
+		}
+	}
+	refreshCost();
+}
