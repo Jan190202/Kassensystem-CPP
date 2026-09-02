@@ -6,6 +6,7 @@
 #include <string>
 #include <QDate>
 #include <vector>
+#include <optional>
 
 class QDateEdit;
 class QLineEdit;
@@ -20,15 +21,14 @@ struct dlgInputs
 	double cost;
 	QDate date;
 	std::string comment;
-	bool isCovered = false;
-	std::string coveringPerson;
+	std::optional<int64_t> coveringPersonID;
 };
 
 class BalanceTabDialog : public QDialog
 {
 	Q_OBJECT
 public:
-	BalanceTabDialog(btnIndex mode, std::vector<std::string> personNames, QWidget* parent);
+	BalanceTabDialog(btnIndex mode, std::vector<Person> personVec, QWidget* parent);
 	dlgInputs& getInputs() const;
 private:
 	QLineEdit*		edtDescription;

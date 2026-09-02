@@ -1,5 +1,7 @@
 #include "BalanceService.h"
 
+#include <optional>
+
 BalanceService::BalanceService(BalanceRepository* balanceRepo, CreditRepository* creditRepo, PersonRepository* personRepo)
 {
 	this->balanceRepo = balanceRepo;
@@ -10,15 +12,14 @@ BalanceService::BalanceService(BalanceRepository* balanceRepo, CreditRepository*
 int64_t BalanceService::addEntry(const BalanceRequest& request)
 {
 	int64_t personID{};
-	if (request.isCovered)
+	if (request.coveringPersonID.has_value())
 	{
-		personID = personRepo->findOrCreateEntry(request.personName).getID();
+		personID = request.coveringPersonID.value();
 	}
 	else
 	{
 		personID = -1;
 	}
-		
 	
 	BalanceEntry entry{
 		.BalanceEntryID = 0,
@@ -30,7 +31,7 @@ int64_t BalanceService::addEntry(const BalanceRequest& request)
 		.personID = personID
 	};
 
-	if (entry.personID >= 0 && entry.type == BalanceType::spending)
+	if (entry.personID >= 0 && entry.type == BalanceType::Spending)
 	{
 		addCredit(entry.personID, entry.amount, entry.date, "Abteilungsausgabe übernommen");
 	}
@@ -58,9 +59,4 @@ int64_t BalanceService::addCredit(int64_t personID, double amount, QDate date, s
 			.amount = amount, 
 			.description = description }
 			);
-}
-
-std::vector<std::string> BalanceService::getPersonNames() const
-{
-	return personRepo->getNames();
 }

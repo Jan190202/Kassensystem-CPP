@@ -1,4 +1,5 @@
 #include "QtConversions.h"
+#include <algorithm>
 
 namespace QtUtils
 {

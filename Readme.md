@@ -1,1 +1,3 @@
-Kassensystem in CPP mit CMake und Qt 
+Cash register system using C++ 
+Meta-Builder: CMake
+Framework für Ui and Database: Qt

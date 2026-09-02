@@ -5,6 +5,7 @@
 #include "domain/services/ConsumptionService.h"
 #include "domain/services/PaymentService.h"
 #include <string>
+#include <variant>
 
 enum class btnIndex
 {
@@ -16,6 +17,7 @@ struct ServiceBundle
 	PaymentService& paymentService;
 	ConsumptionService& consumptionService;
 	BalanceService& balanceService;
+	PersonRepository* personRepo;
 };
 
 struct LowerButtonBundle
@@ -27,7 +29,7 @@ struct LowerButtonBundle
 
 struct ConsumptionInputs
 {
-	std::string personName;
+	std::variant<int64_t, std::string> personInput;
 	int nBeer05, nBeer04, nSoftdrinks, nWater;
 	double otherExpense;
 };

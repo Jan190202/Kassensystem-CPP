@@ -28,7 +28,7 @@ double BalanceRepoInMem::getTotalEarnings() const
 
 	for (auto& entry : entries)
 	{
-		if (entry.type == BalanceType::earning)
+		if (entry.type == BalanceType::Earning)
 		{
 			totalEarnings += entry.amount;
 		}
@@ -43,7 +43,7 @@ double BalanceRepoInMem::getTotalSpendings() const
 
 	for (auto& entry : entries)
 	{
-		if (entry.type == BalanceType::spending)
+		if (entry.type == BalanceType::Spending)
 		{
 			totalSpendings += entry.amount;
 		}

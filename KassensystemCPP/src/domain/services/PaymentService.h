@@ -16,9 +16,9 @@ public:
 	
 	void addPayment(const PaymentRequest& request);
 	double getPaidAmount(int64_t personID) const;
-	std::vector<std::string> getPersonNames() const;
+	double getTotalAmount(int64_t personID) const;
+	double getCreditAmount(int64_t personID) const;
 private:
-	int64_t addPaymentEntry(const PaymentEntry& entry);
 	double addPaymentAllocation(int64_t paymentEntryID, int64_t personID, double amount, QDate date);
 	int64_t addTip(int64_t personID, double amount, QDate date);
 	int64_t addCredit(int64_t personID, double amount, QDate date, std::string description);

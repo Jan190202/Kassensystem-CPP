@@ -1,13 +1,7 @@
 #include "PaymentService.h"
 
 PaymentService::PaymentService(PaymentRepository* paymentRepo, CreditRepository* creditRepo, DebtRepository* debtRepo, BalanceRepository* balanceRepo, PersonRepository* personRepo)
-{
-	this->paymentRepo = paymentRepo;
-	this->creditRepo = creditRepo;
-	this->debtRepo = debtRepo;
-	this->balanceRepo = balanceRepo;
-	this->personRepo = personRepo;
-}
+	: paymentRepo(paymentRepo), creditRepo(creditRepo), debtRepo(debtRepo), balanceRepo(balanceRepo), personRepo(personRepo) {}
 
 void PaymentService::addPayment(const PaymentRequest& request)
 {
@@ -15,23 +9,23 @@ void PaymentService::addPayment(const PaymentRequest& request)
 
 	PaymentEntry entry{
 		.paymentEntryID = 0,
-		.personID = personRepo->findOrCreateEntry(request.personName).getID(),
+		.personID = request.personID,
 		.date = request.date,
 		.amount = request.amount,
 		.overpaymentType = request.overpaymentType
 	};
 
-	int64_t paymentEntryID = addPaymentEntry(entry);
+	int64_t paymentEntryID = paymentRepo->addPaymentEntry(entry);
 	double overpaymentAmount = addPaymentAllocation(paymentEntryID, entry.personID, entry.amount, entry.date);
 
 	if (overpaymentAmount > 1e-9)
 	{
 		switch (entry.overpaymentType)
 		{
-		case OverpaymentDisposition::credit:
+		case OverpaymentDisposition::Credit:
 			addCredit(entry.personID, entry.amount, entry.date, "Guthaben durch Einzahlung/Überbezahlung");
 			break;
-		case OverpaymentDisposition::tip:
+		case OverpaymentDisposition::Tip:
 			addTip(entry.personID, entry.amount, entry.date);
 			break;
 		}
@@ -43,14 +37,19 @@ double PaymentService::getPaidAmount(int64_t personID) const
 	return paymentRepo->getPaidAmount(personID);
 }
 
-int64_t PaymentService::addPaymentEntry(const PaymentEntry& entry)
+double PaymentService::getTotalAmount(int64_t personID) const
 {
-	return paymentRepo->addPaymentEntry(entry);
+	return debtRepo->getTotal(personID);
+}
+
+double PaymentService::getCreditAmount(int64_t personID) const
+{
+	return creditRepo->getCredit(personID);
 }
 
 double PaymentService::addPaymentAllocation(int64_t paymentEntryID, int64_t personID, double amount, QDate date)
 {
-	std::vector<DebtEntryRemaining> remainingDebtEntries = debtRepo->getOutstanding(personID);
+	std::vector<DebtEntryRemaining> remainingDebtEntries = debtRepo->getOutstandingEntries(personID);
 	
 	double amountLeft = amount;
 	for (auto& entryRem : remainingDebtEntries)
@@ -91,16 +90,11 @@ int64_t PaymentService::addTip(int64_t personID, double amount, QDate date)
 	return balanceRepo->addEntry(
 		BalanceEntry{ 
 		.BalanceEntryID = 0, 
-		.type = BalanceType::earning, 
+		.type = BalanceType::Earning, 
 		.description = "Trinkgeld", 
 		.amount = amount, 
 		.date = date, 
 		.comment = "", 
 		.personID = personID }
 		);
-}
-
-std::vector<std::string> PaymentService::getPersonNames() const
-{
-	return personRepo->getNames();
 }

@@ -1,4 +1,7 @@
 #include "AddTabEntry.h"
+#include "qtutils/QtConversions.h"
+
+#include <variant>
 
 #include <QComboBox>
 #include <QDoubleSpinBox>
@@ -12,10 +15,15 @@
 
 #include <QDebug>
 
-AddTabEntry::AddTabEntry(const QList<QString>& nameList, QWidget* parent)
+AddTabEntry::AddTabEntry(const std::vector<Person>& personVec, QWidget* parent)
 {
 	nameSelect = new QComboBox(parent);
-	nameSelect->addItems(nameList);
+	QList<QString> nameList = QtUtils::personVecToQStrList(personVec, &Person::getFullSpecifier);
+	for (size_t i = 0; i < personVec.size(); i++) 
+		nameSelect->addItem(
+			nameList.at(i), 
+			QVariant::fromValue(personVec.at(i).getID())
+		);
 	nameSelect->setEditable(true);
 	nameSelect->setDuplicatesEnabled(false);
 	auto* dropDownCompleter = new QCompleter(nameList);
@@ -59,8 +67,6 @@ AddTabEntry::AddTabEntry(const QList<QString>& nameList, QWidget* parent)
 	btnRemove->setFixedWidth(36);
 
 	connect(btnRemove, &QPushButton::clicked, this, [this]() { emit remove(this); });
-	//connect(nameSelect, &QComboBox::)
-
 
 	auto consumptionInputChanged = [&]()
 		{
@@ -114,8 +120,19 @@ void AddTabEntry::removeFromGrid(QGridLayout* grid)
 
 ConsumptionInputs AddTabEntry::getEntryInputs() const
 {
+	std::variant<int64_t, std::string> personInput;
+	QVariant currentData = nameSelect->currentData();
+	if (currentData.isValid())
+	{
+		personInput = currentData.toLongLong();
+	}
+	else
+	{
+		personInput = nameSelect->currentText().toStdString();
+	}
+
 	return ConsumptionInputs{
-		.personName = nameSelect->currentText().toStdString(),
+		.personInput = personInput,
 		.nBeer05 = spinboxBeer05->value(),
 		.nBeer04 = spinboxBeer04->value(),
 		.nSoftdrinks = spinboxSoftdrinks->value(),

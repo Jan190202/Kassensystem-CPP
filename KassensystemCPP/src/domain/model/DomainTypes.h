@@ -2,10 +2,10 @@
 
 enum class BalanceType
 {
-	earning, spending
+	Earning, Spending
 };
 
 enum class OverpaymentDisposition
 {
-	credit, tip
+	Credit, Tip
 };

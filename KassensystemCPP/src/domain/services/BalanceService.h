@@ -15,7 +15,6 @@ public:
 	int64_t addEntry(const BalanceRequest&);
 	double getTotalEarnings() const;
 	double getTotalSpendings() const;
-	std::vector<std::string> getPersonNames() const;
 private:
 	int64_t addCredit(int64_t personID, double amount, QDate date, std::string description);
 

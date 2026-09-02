@@ -6,25 +6,25 @@
 
 #include <QDebug>
 
-Person PersonRepoInMem::findOrCreateEntry(const std::string& name)
+
+std::expected<Person,std::string> PersonRepoInMem::findEntry(int64_t personID)
 {
 	for (auto& entry : entries)
 	{
-		if (entry.getName() == name)
+		if (entry.getID() == personID)
 		{
 			return entry;
 		}
-
 	}
-	
-	// name not found -> create person
-	return addEntry(name);
+
+	return std::unexpected("Entry not found!");
 }
 
-Person PersonRepoInMem::addEntry(const std::string& name)
+Person PersonRepoInMem::addEntry(const std::string& firstName, const std::string& lastName, const std::string& nickName, const std::string& info)
 {
 	int64_t id = getUniqueID();
-	Person person{ name, id };
+
+	Person person{ firstName, lastName, id, nickName, info };
 	entries.push_back(person);
 
 	qInfo() << "PersonEntry added! Entries: ";
@@ -32,7 +32,7 @@ Person PersonRepoInMem::addEntry(const std::string& name)
 	{
 		qInfo()
 			<< " ID:" << entry.getID()
-			<< " name:" << entry.getName();
+			<< " name:" << entry.getFullSpecifier();
 	}
 
 	return person;
@@ -64,14 +64,7 @@ bool PersonRepoInMem::isUnique(int64_t id)
 	return true;
 }
 
-std::vector<std::string> PersonRepoInMem::getNames() const
+std::vector<Person> PersonRepoInMem::getAll() const
 {
-	std::vector<std::string> nameVec; //entries.size()
-	
-	for (auto& entry : entries)
-	{
-		nameVec.push_back(entry.getName());
-	}
-
-	return nameVec;
+	return entries;
 }

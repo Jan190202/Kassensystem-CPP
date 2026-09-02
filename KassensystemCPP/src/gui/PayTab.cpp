@@ -16,14 +16,22 @@
 #include <QTableWidget>
 #include <QVBoxLayout>
 
-PayTab::PayTab(const LowerButtonBundle& lowerButtons, PaymentService& paymentService, QWidget* parent) : lowerButtons(lowerButtons), paymentService(paymentService), BaseTab(parent) {}
+
+PayTab::PayTab(const LowerButtonBundle& lowerButtons, PaymentService& paymentService, PersonRepository* personRepo, QWidget* parent) 
+	: lowerButtons(lowerButtons), paymentService(paymentService), personRepo(personRepo), BaseTab(parent) {}
 
 void PayTab::initialize()
 {
 	nameSelect = new QComboBox(this);
 	nameSelect->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
-	nameSelect->addItems(QtUtils::strVecToQStrList(paymentService.getPersonNames()));
 	nameSelect->setEditable(false);
+	std::vector<Person> personVec = personRepo->getAll();
+	QList<QString> nameList = QtUtils::personVecToQStrList(personVec, &Person::getFullSpecifier);
+	for (size_t i = 0; i < personVec.size(); i++)
+		nameSelect->addItem(
+			nameList.at(i),
+			personVec.at(i).getID()
+		);
 
 	// Betragsübersicht
 	auto* totalTextLabel	= new QLabel(tr("Gesamt"), this);
@@ -31,10 +39,10 @@ void PayTab::initialize()
 	auto* dueTextLabel		= new QLabel(tr("Ausstehend"), this);
 	auto* creditTextLabel	= new QLabel(tr("Guthaben"), this);
 
-	totalNumLabel	= new QLabel(tr("0,00 €"), this);
-	paidNumLabel	= new QLabel(tr("0,00 €"), this);
-	dueNumLabel		= new QLabel(tr("0,00 €"), this);
-	creditNumLabel	= new QLabel(tr("0,00 €"), this);
+	totalNumLabel	= new QLabel(QtUtils::toCurrencyFormat(0.0), this);
+	paidNumLabel	= new QLabel(QtUtils::toCurrencyFormat(0.0), this);
+	dueNumLabel		= new QLabel(QtUtils::toCurrencyFormat(0.0), this);
+	creditNumLabel	= new QLabel(QtUtils::toCurrencyFormat(0.0), this);
 
 	const auto configureAmountLabel = [](QLabel* label)
 		{
@@ -146,13 +154,15 @@ void PayTab::initialize()
 	mainLayout->addWidget(vLine);
 	mainLayout->addWidget(tblConsumption, 3);
 
+	refreshData();
+
 	connect(lowerButtons.btnApply, &QPushButton::clicked, this, [&]()
 		{
 			PaymentRequest request{
-				.personName = nameSelect->currentText().toStdString(),
+				.personID = nameSelect->currentData().toLongLong(),
 				.date = QDate::currentDate(),
 				.amount = paymentSpinBox->value(),
-				.overpaymentType = btnSurplusToCredit->isChecked() ? OverpaymentDisposition::credit : OverpaymentDisposition::tip
+				.overpaymentType = btnSurplusToCredit->isChecked() ? OverpaymentDisposition::Credit : OverpaymentDisposition::Tip
 			};
 
 			paymentService.addPayment(request);
@@ -168,10 +178,12 @@ void PayTab::initialize()
 			switch (state)
 			{
 			case Qt::Checked:
-				// TBD
+				paymentSpinBox->setEnabled(false);
+				paymentSpinBox->setValue(due);
 				break;
 			case Qt::Unchecked:
-				// TBD
+				paymentSpinBox->setEnabled(true);
+				paymentSpinBox->setValue(0.0);
 				break;
 			}
 		});
@@ -181,4 +193,28 @@ void PayTab::initialize()
 			std::string currentName = nameSelect->currentText().toStdString();
 			// TBD
 		});
+}
+
+void PayTab::refreshData()
+{
+	int64_t personID = nameSelect->currentData().toLongLong();
+
+	total = paymentService.getTotalAmount(personID);
+	paid = paymentService.getPaidAmount(personID);
+	credit = paymentService.getCreditAmount(personID);
+	due = total - paid;
+
+	// refresh table
+	// TBD
+
+	// refresh labels
+	totalNumLabel->setText(QtUtils::toCurrencyFormat(total));
+	paidNumLabel->setText(QtUtils::toCurrencyFormat(paid));
+	dueNumLabel->setText(QtUtils::toCurrencyFormat(due));
+	creditNumLabel->setText(QtUtils::toCurrencyFormat(credit));
+
+	// reinit checkboxes and buttons
+	credit > 1e-9 ? btnUseCredit->setEnabled(true) : btnUseCredit->setEnabled(false);
+	btnSurplusToCredit->setChecked(true);
+	fullPaymentCheckBox->setChecked(false);
 }

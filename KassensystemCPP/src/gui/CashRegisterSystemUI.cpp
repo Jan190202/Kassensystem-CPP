@@ -10,6 +10,8 @@
 #include <QPushButton>
 #include <QMainWindow>
 
+#include <QDebug>
+
 CashRegisterSystemUI::CashRegisterSystemUI(const ServiceBundle& services, QWidget* parent) : QMainWindow(parent)
 {
 	setWindowTitle(tr("Kassensystem"));
@@ -39,7 +41,7 @@ void CashRegisterSystemUI::initUi(const ServiceBundle& services)
 	QTabWidget* tabSelector = new QTabWidget(central);
 	rootLayout->insertWidget(0, tabSelector);
 
-	tabs = { new PayTab(lowerButtons, services.paymentService), new AddTab(lowerButtons, services.consumptionService), new BalanceTab(lowerButtons, services.balanceService) };
+	tabs = { new PayTab(lowerButtons, services.paymentService, services.personRepo), new AddTab(lowerButtons, services.consumptionService, services.personRepo), new BalanceTab(lowerButtons, services.balanceService, services.personRepo) };
 
 	tabSelector->addTab(tabs.at(static_cast<int>(tabIndex::pay)), tr("Schulden begleichen"));
 	tabSelector->addTab(tabs.at(static_cast<int>(tabIndex::add)), tr("Einträge hinzufügen"));

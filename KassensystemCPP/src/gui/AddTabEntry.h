@@ -25,7 +25,7 @@ signals:
 	void calcEntryCost(ConsumptionInputs&, double&);
 
 public:
-	AddTabEntry(const QList<QString>& nameList = { QString() },
+	AddTabEntry(const std::vector<Person>& personVec = {},
 		QWidget* parent = nullptr);
 	~AddTabEntry() override;
 

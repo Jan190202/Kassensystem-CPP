@@ -15,7 +15,8 @@
 
 #include <QDebug>
 
-BalanceTab::BalanceTab(const LowerButtonBundle& lowerButtons, BalanceService& balanceService, QWidget* parent) : lowerButtons(lowerButtons), balanceService(balanceService), BaseTab(parent) {}
+BalanceTab::BalanceTab(const LowerButtonBundle& lowerButtons, BalanceService& balanceService, PersonRepository* personRepo, QWidget* parent) 
+	: lowerButtons(lowerButtons), balanceService(balanceService), personRepo(personRepo), BaseTab(parent) {}
 
 void BalanceTab::initialize()
 {
@@ -152,15 +153,18 @@ void BalanceTab::initialize()
 
 void BalanceTab::addEntry(btnIndex mode)
 {
-	std::vector<std::string> personNames = balanceService.getPersonNames();
-	auto* inputDialog = new BalanceTabDialog(mode, personNames, this);
+	std::vector<Person> personVec = personRepo->getAll();
+	auto* inputDialog = new BalanceTabDialog(mode, personVec, this);
 	if (inputDialog->exec() == QDialog::Accepted)
 	{
 		// inputs given and OK pressed
 		dlgInputs inputs = inputDialog->getInputs();
 		qInfo() << inputs.description;
-		qInfo() << inputs.isCovered;
-		qInfo() << inputs.coveringPerson;
+		qInfo() << inputs.coveringPersonID.has_value();
+		if (inputs.coveringPersonID.has_value())
+		{
+			qInfo() << inputs.coveringPersonID.value();
+		}
 		qInfo() << inputs.comment;
 	}
 	else {} // cancel pressed

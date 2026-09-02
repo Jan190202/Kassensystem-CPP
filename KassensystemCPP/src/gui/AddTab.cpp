@@ -20,7 +20,7 @@
 
 #include <QDebug>
 
-AddTab::AddTab(const LowerButtonBundle& lowerButtons, ConsumptionService& consumptionService, QWidget* parent) : lowerButtons(lowerButtons), consumptionService(consumptionService), BaseTab(parent) {}
+AddTab::AddTab(const LowerButtonBundle& lowerButtons, ConsumptionService& consumptionService, PersonRepository* personRepo, QWidget* parent) : lowerButtons(lowerButtons), consumptionService(consumptionService), personRepo(personRepo), BaseTab(parent) {}
 
 void AddTab::initialize()
 {
@@ -104,9 +104,9 @@ void AddTab::initialize()
 
 void AddTab::addEntry()
 {
-	QList<QString> nameListQ = QtUtils::strVecToQStrList(consumptionService.getPersonNames());
+	std::vector<Person> personVec = personRepo->getAll();
 
-	auto* newEntry = new AddTabEntry(nameListQ, this);
+	auto* newEntry = new AddTabEntry(personVec, this);
 
 	newEntry->addToGrid(entriesGrid, static_cast<int>(entries.size()) + 1);
 
@@ -166,7 +166,7 @@ void AddTab::apply()
 		QDate dateAtMonthEnd = setDate.addDays(nDays - setDays);
 
 		ConsumptionRequest request{
-			.personName = inputs.personName,
+			.personInput = inputs.personInput,
 			.date = dateAtMonthEnd,
 			.nBeer05 = inputs.nBeer05,
 			.nBeer04 = inputs.nBeer04,

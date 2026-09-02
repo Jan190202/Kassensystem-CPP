@@ -31,7 +31,7 @@ double DebtRepoInMem::getTotal(int64_t personID) const
 	return amount;
 }
 
-std::vector<DebtEntryRemaining> DebtRepoInMem::getOutstanding(int64_t personID) const
+std::vector<DebtEntryRemaining> DebtRepoInMem::getOutstandingEntries(int64_t personID) const
 {
 	std::vector<DebtEntryRemaining> filteredEntries = {};
 

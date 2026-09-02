@@ -35,8 +35,8 @@ int main(int argc, char* argv[])
 	PaymentService			paSer(paRep, crRep, deRep, baRep, peRep);
 
 	// domain testing
-	peRep->findOrCreateEntry("Tim Ebert");
-	peRep->findOrCreateEntry("Alfons Strauß");
+	peRep->addEntry("Tim", "Ebert");
+	peRep->addEntry("Alfons", "Strauß");
 	//Person p1("Dieter", 1);
 	//Person p2("Gerhardt", 2);
 	//Person p3("Udo", 3);
@@ -71,7 +71,7 @@ int main(int argc, char* argv[])
 
 	// GUI Testing
 	QApplication app(argc, argv);
-	auto services = ServiceBundle{ .paymentService = paSer, .consumptionService = coSer, .balanceService = baSer };
+	auto services = ServiceBundle{ .paymentService = paSer, .consumptionService = coSer, .balanceService = baSer, .personRepo = peRep};
 	CashRegisterSystemUI sysUI(services);
 	sysUI.show();
 

@@ -21,7 +21,7 @@
 
 #include <string>
 
-BalanceTabDialog::BalanceTabDialog(btnIndex mode, std::vector<std::string> personNames, QWidget* parent) : QDialog(parent)
+BalanceTabDialog::BalanceTabDialog(btnIndex mode, std::vector<Person> personVec, QWidget* parent) : QDialog(parent)
 {
 	switch (mode)
 	{
@@ -84,7 +84,12 @@ BalanceTabDialog::BalanceTabDialog(btnIndex mode, std::vector<std::string> perso
 
 	edtCoveringPerson = new QComboBox();
 	edtCoveringPerson->setEnabled(false);
-	edtCoveringPerson->insertItems(0, QtUtils::strVecToQStrList(personNames));
+	QList<QString> nameList = QtUtils::personVecToQStrList(personVec, &Person::getFullName);
+	for (size_t i = 0; i < personVec.size(); i++)
+		edtCoveringPerson->addItem(
+			nameList.at(i),
+			personVec.at(i).getID()
+		);
 
 	// Checkbox + Dropdown eng nebeneinander statt über volle Formularbreite verteilt
 	auto* statusLayout = new QHBoxLayout;
@@ -150,10 +155,11 @@ dlgInputs& BalanceTabDialog::getInputs() const
 	inputs.cost = edtCost->value();
 	inputs.date = edtDate->date();
 	inputs.comment = edtComment->toPlainText().toStdString();
-	inputs.isCovered = edtIsCovered->isChecked();
-	if (inputs.isCovered)
+
+	if (edtIsCovered->isChecked())
 	{
-		inputs.coveringPerson = edtCoveringPerson->currentText().toStdString();
+		inputs.coveringPersonID = edtCoveringPerson->currentData().toLongLong();
 	}
+
 	return inputs;
 }

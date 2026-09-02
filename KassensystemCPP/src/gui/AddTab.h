@@ -17,7 +17,7 @@ class AddTab : public BaseTab
 	Q_OBJECT
 
 public:
-	AddTab(const LowerButtonBundle& lowerButtons, ConsumptionService& consumptionService, QWidget* parent = nullptr);
+	AddTab(const LowerButtonBundle& lowerButtons, ConsumptionService& consumptionService, PersonRepository* personRepo, QWidget* parent = nullptr);
 	void initialize() override;
 
 private slots:
@@ -38,5 +38,6 @@ private:
 	void save();
 
 	ConsumptionService& consumptionService;
+	PersonRepository* personRepo;
 	const LowerButtonBundle& lowerButtons;
 };

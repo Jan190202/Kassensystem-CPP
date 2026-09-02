@@ -1,28 +1,49 @@
 #include "ConsumptionService.h"
 #include "domain/model/PriceList.h"
 
+#include <QDebug>
+#include <regex>
+
 ConsumptionService::ConsumptionService(ConsumptionRepository* consumptionRepo, DebtRepository* debtRepo, PersonRepository* personRepo)
-{
-	this->consumptionRepo = consumptionRepo;
-	this->debtRepo = debtRepo;
-	this->personRepo = personRepo;
-}
+	: consumptionRepo(consumptionRepo), debtRepo(debtRepo), personRepo(personRepo) {}
 
 void ConsumptionService::addConsumption(const ConsumptionRequest& request)
 {
-	if (request.personName == "") return; // skip entries without name
-	
-	Person person = personRepo->findOrCreateEntry(request.personName);
+	// skip zero-entries
 	double amount = calculateDebt(request);
-	
-	if (amount < 1e-9) return; // skip zero-entries
-	
+	if (amount < 1e-9) return; 
 
-	DebtEntry dEntry{ .debtEntryID = 0, .personID = person.getID(), .date = request.date, .amount = amount};
-	int dEntryID = debtRepo->addEntry(dEntry);
+	// find or create Person entry
+	int64_t personID{};
+	if (std::holds_alternative<std::string>(request.personInput)) // new name, no avaliable ID
+	{		
+		std::string nameRequest = std::get<std::string>(request.personInput);
+
+		if (nameRequest == "") return; // skip entries without name
+
+		auto result = isValidNameFormat(nameRequest);
+
+		if (result.has_value())
+		{
+			PersonStringSpecifiers spec = result.value();
+			personID = personRepo->addEntry(spec.firstName, spec.lastName, spec.nickName, spec.info).getID();
+		}
+		else
+		{
+			qDebug() << "Error Code: " << static_cast<int>(result.error());
+		}	
+	}
+	else
+	{
+		personID = std::get<int64_t>(request.personInput);
+	}
+
+	// add debt and consumption entry
+	DebtEntry dEntry{ .debtEntryID = 0, .personID = personID, .date = request.date, .amount = amount};
+	int64_t dEntryID = debtRepo->addEntry(dEntry);
 
 	ConsumptionEntry cEntry{ .consumptionEntryID = 0, .debtEntryID = dEntryID, .nBeer05 = request.nBeer05 , .nBeer04 = request.nBeer04, .nSoftdrinks = request.nSoftdrinks, .nWater = request.nWater };
-	int cEntryID = consumptionRepo->addEntry(cEntry);
+	int64_t cEntryID = consumptionRepo->addEntry(cEntry);
 }
 
 std::vector<ConsumptionEntry> ConsumptionService::getEntries(int personID) const
@@ -40,7 +61,95 @@ double ConsumptionService::calculateDebt(const ConsumptionRequest& request) cons
 		request.otherExpense;
 }
 
-std::vector<std::string> ConsumptionService::getPersonNames() const
+std::expected< PersonStringSpecifiers, NameValidationError > ConsumptionService::isValidNameFormat(const std::string& nameRequest)
 {
-	return personRepo->getNames();
+	PersonStringSpecifiers result;
+	
+	// separate mandatory name part from the optional parentheses part
+	// matches anything up to an optional "(" followed by optional content inside ()
+	std::regex basePattern(R"(^([^\(]+)(?:\((.*)\))?\s*$)"); // R"(...)" --> raw string literal
+		// ^([^\(]+)(?:\((.*)\))?\s*$
+			// ^([^\(]+)		--> first capture group: anything in the beginning thats not a "("
+			// (?:\((.*)\))?	--> second capture group: parenthesis content (.*) inside non-capturing group of at most one whole parenthesis (?:...)
+			// \s*$				--> any number of whitespaces at the end
+	std::smatch baseMatches;
+
+	if (!std::regex_match(nameRequest, baseMatches, basePattern)) 
+	{
+		if (nameRequest.find('(') != std::string::npos && nameRequest.back() != ')') 
+		{
+			return std::unexpected(NameValidationError::TooManyComponents);
+		}
+		return std::unexpected(NameValidationError::UnbalancedParentheses);
+	}
+
+	std::string namePart = baseMatches[1].str();
+	std::string addPart = baseMatches[2].str();
+	bool hasParentheses = baseMatches[2].matched;
+
+	// detect closing parenthesis without an opening one
+	if (!hasParentheses && nameRequest.find(')') != std::string::npos) 
+	{
+		return std::unexpected(NameValidationError::UnbalancedParentheses);
+	}
+
+	// parse first and last name
+	std::regex namePattern(R"(^\s*(\w+)\s+(\w+)\s*$)");
+	std::smatch nameMatches;
+	if (!std::regex_match(namePart, nameMatches, namePattern)) // namePattern doesn't have exactly two words
+	{
+		std::regex oneWordCheck(R"(^\s*\w+\s*$)");
+		if (std::regex_match(namePart, oneWordCheck))  // namePattern has exactly one word
+		{
+			return std::unexpected(NameValidationError::FirstOrLastNameMissing);
+		}
+		return std::unexpected(NameValidationError::TooManyComponents); // namePattern has more than two words
+	}
+
+	result.firstName = nameMatches[1].str(); // first capture group (\w+)
+	result.lastName = nameMatches[2].str(); // second capture group (\w+)
+
+	// parse parenthesis part (if existing)
+	if (hasParentheses) 
+	{
+		// trim whitespaces at parenthesis
+		addPart = std::regex_replace(addPart, std::regex(R"(^\s+|\s+$)"), "");
+
+		if (addPart.empty()) 
+		{
+			result.nickName = "";
+			result.info = "";
+		}
+
+		// case ("X", Y)
+		// quotes are mandatory for nickname if a comma separator is found
+		std::regex bothPattern(R"(^ \" ([^\"]+) \"		\s* , \s*		(.+) $)");
+			// case ("X")
+			std::regex nickOnlyPattern(R"(^ \" ([^\"]+) \" $)");
+			std::smatch innerMatches;
+
+		if (std::regex_match(addPart, innerMatches, bothPattern)) // ("X",Y)
+		{
+			result.nickName = innerMatches[1].str();
+			result.info = innerMatches[2].str();
+		}
+		else if (std::regex_match(addPart, innerMatches, nickOnlyPattern)) // ("X")
+		{
+			result.nickName = innerMatches[1].str();
+			result.info = "";
+		}
+		else // neither ("X",Y) nor ("X") --> check (X, Y)
+		{
+			if (addPart.find('"') == std::string::npos) // no quotes at all --> (Y)
+			{
+				result.nickName = "";
+				result.info = addPart;
+			}
+			else // broken quotes, e.g. ("X, Y)
+			{
+				return std::unexpected(NameValidationError::InvalidNicknameFormat);
+			}
+		}
+	}
+	return result;
 }

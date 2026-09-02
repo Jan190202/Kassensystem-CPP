@@ -12,7 +12,7 @@ class BalanceTab : public BaseTab
 {
 	Q_OBJECT
 public:
-	BalanceTab(const LowerButtonBundle& lowerButtons, BalanceService& balanceService, QWidget* parent = nullptr);
+	BalanceTab(const LowerButtonBundle& lowerButtons, BalanceService& balanceService, PersonRepository* personRepo, QWidget* parent = nullptr);
 	virtual void initialize() override;
 private:
 	QTableWidget* tblSpendings	= nullptr;
@@ -32,6 +32,7 @@ private:
 	void addEntry(btnIndex mode);
 
 	BalanceService& balanceService;
+	PersonRepository* personRepo;
 	const LowerButtonBundle& lowerButtons;
 private slots:
 	void collectResults();
