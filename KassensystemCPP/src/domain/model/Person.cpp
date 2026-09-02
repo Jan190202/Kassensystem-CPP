@@ -32,10 +32,14 @@ std::string Person::getFullSpecifier() const
 {
 	std::string additionalString;
 
-	if (nickName.size() > 0 || info.size() > 0) 
-		additionalString = " (\"" + nickName + "\"," + info + ")";
+	bool isNickName = nickName.size() > 0;
+	bool isInfo = info.size() > 0;
 
-	return getFullName() + additionalString;
+	if (isNickName && isInfo) additionalString = " (\"" + nickName + "\"," + info + ")";
+	else if (isNickName) additionalString = "(\"" + nickName + "\")";
+	else if (isInfo) additionalString = "(" + info + ")";
+
+	return getFullName() + " " + additionalString;
 }
 
 int64_t Person::getID() const

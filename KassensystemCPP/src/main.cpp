@@ -36,7 +36,7 @@ int main(int argc, char* argv[])
 
 	// domain testing
 	peRep->addEntry("Tim", "Ebert");
-	peRep->addEntry("Alfons", "Strauß");
+	peRep->addEntry("Alfons", "Strauss");
 	//Person p1("Dieter", 1);
 	//Person p2("Gerhardt", 2);
 	//Person p3("Udo", 3);

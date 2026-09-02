@@ -43,12 +43,12 @@ void CashRegisterSystemUI::initUi(const ServiceBundle& services)
 
 	tabs = { new PayTab(lowerButtons, services.paymentService, services.personRepo), new AddTab(lowerButtons, services.consumptionService, services.personRepo), new BalanceTab(lowerButtons, services.balanceService, services.personRepo) };
 
-	tabSelector->addTab(tabs.at(static_cast<int>(tabIndex::pay)), tr("Schulden begleichen"));
-	tabSelector->addTab(tabs.at(static_cast<int>(tabIndex::add)), tr("Einträge hinzufügen"));
-	tabSelector->addTab(tabs.at(static_cast<int>(tabIndex::balance)), tr("Abteilungsbilanz bearbeiten"));
+	tabSelector->addTab(tabs.at(static_cast<int>(TabIndex::Pay)), tr("Schulden begleichen"));
+	tabSelector->addTab(tabs.at(static_cast<int>(TabIndex::Add)), tr("Einträge hinzufügen"));
+	tabSelector->addTab(tabs.at(static_cast<int>(TabIndex::Balance)), tr("Abteilungsbilanz bearbeiten"));
 	
 
-	activeTab = static_cast<int>(tabIndex::pay); // initialize first tab
+	activeTab = static_cast<int>(TabIndex::Add); // initialize first tab
 	initializeTab(activeTab);
 	tabSelector->setCurrentIndex(activeTab);
 

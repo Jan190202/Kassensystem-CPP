@@ -12,6 +12,7 @@
 #include <QSpinBox>
 #include <QWidget>
 #include <QCompleter>
+#include <QLineEdit>
 
 #include <QDebug>
 
@@ -80,6 +81,27 @@ AddTabEntry::AddTabEntry(const std::vector<Person>& personVec, QWidget* parent)
 	connect(spinboxSoftdrinks, &QSpinBox::valueChanged, this, consumptionInputChanged);
 	connect(spinboxWater, &QSpinBox::valueChanged, this, consumptionInputChanged);
 	connect(spinboxCustom, &QDoubleSpinBox::valueChanged, this, consumptionInputChanged);
+
+	// setup functionality that the input text of nameSelect is also submitted in focus-loss (editingFinished), not only enter-press
+	QLineEdit* nameEdit = nameSelect->lineEdit();
+	connect(nameEdit, &QLineEdit::editingFinished, this, [this, nameEdit]()
+		{
+			if (!nameEdit->isModified())
+				return; // already handled this text, avoid duplicate on enter-press and focus-loss
+
+			const QString text = nameSelect->currentText();
+			int index = nameSelect->findText(text);
+
+			if (!text.isEmpty() && index == -1) // avoid empty strings and duplicates
+			{
+				nameSelect->addItem(text);
+				index = nameSelect->count() - 1; // index of the item just added
+			}
+
+			nameSelect->setCurrentIndex(index);
+
+			nameEdit->setModified(false); // mark as handled
+		});
 }
 
 AddTabEntry::~AddTabEntry()
