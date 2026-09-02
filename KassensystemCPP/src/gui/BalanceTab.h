@@ -14,6 +14,7 @@ class BalanceTab : public BaseTab
 public:
 	BalanceTab(const LowerButtonBundle& lowerButtons, BalanceService& balanceService, PersonRepository* personRepo, QWidget* parent = nullptr);
 	virtual void initialize() override;
+	virtual void refresh() override;
 private:
 	QTableWidget* tblSpendings	= nullptr;
 	QTableWidget* tblEarnings	= nullptr;

@@ -19,6 +19,7 @@ class PayTab : public BaseTab
 public:
 	PayTab(const LowerButtonBundle& lowerButtons, PaymentService& paymentService, PersonRepository* personRepo, QWidget* parent = nullptr);
 	virtual void initialize() override;
+	virtual void refresh() override;
 private:
 	QComboBox*		nameSelect			= nullptr;
 	QLabel*			totalNumLabel		= nullptr;
@@ -37,6 +38,5 @@ private:
 	const LowerButtonBundle& lowerButtons;
 private: // temp values
 	double total{}, paid{}, due{}, credit{};
-private: // helper functions
-	void refreshData();
+	void nameChanged();
 };

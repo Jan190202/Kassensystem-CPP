@@ -18,7 +18,8 @@ class AddTab : public BaseTab
 
 public:
 	AddTab(const LowerButtonBundle& lowerButtons, ConsumptionService& consumptionService, PersonRepository* personRepo, QWidget* parent = nullptr);
-	void initialize() override;
+	virtual void initialize() override;
+	virtual void refresh() override;
 
 private slots:
 	void addEntry();

@@ -8,4 +8,5 @@ public:
 	explicit BaseTab(QWidget* parent = nullptr) : QWidget(parent) {};
 	virtual ~BaseTab() = default;
 	virtual void initialize() = 0;
+	virtual void refresh() = 0;
 };

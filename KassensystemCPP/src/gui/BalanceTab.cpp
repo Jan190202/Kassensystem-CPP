@@ -1,6 +1,7 @@
 #include "BalanceTab.h"
 #include "BalanceTabDialog.h"
 #include "GuiTypes.h"
+#include "qtutils/QtConversions.h"
 
 #include <QDate>
 #include <QFormLayout>
@@ -35,16 +36,16 @@ void BalanceTab::initialize()
 	tblSpendings->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
 
 	// Labels
-	lCashBefore			= new QLabel(tr("0,00 €"), this);
-	lCashDifference		= new QLabel(tr("0,00 €"), this);
-	lCashAfter			= new QLabel(tr("0,00 €"), this);
+	lCashBefore			= new QLabel(QtUtils::toCurrencyFormat(0.0), this);
+	lCashDifference		= new QLabel(QtUtils::toCurrencyFormat(0.0), this);
+	lCashAfter			= new QLabel(QtUtils::toCurrencyFormat(0.0), this);
 
-	lSavingsBefore		= new QLabel(tr("0,00 €"), this);
-	lSavingsDifference	= new QLabel(tr("0,00 €"), this);
-	lSavingsAfter		= new QLabel(tr("0,00 €"), this);
+	lSavingsBefore		= new QLabel(QtUtils::toCurrencyFormat(0.0), this);
+	lSavingsDifference	= new QLabel(QtUtils::toCurrencyFormat(0.0), this);
+	lSavingsAfter		= new QLabel(QtUtils::toCurrencyFormat(0.0), this);
 
-	lEarnings			= new QLabel(tr("0,00 €"), this);
-	lSpendings			= new QLabel(tr("0,00 €"), this);
+	lEarnings			= new QLabel(QtUtils::toCurrencyFormat(0.0), this);
+	lSpendings			= new QLabel(QtUtils::toCurrencyFormat(0.0), this);
 
 	const auto configureAmount = [](QLabel* label)
 		{
@@ -169,6 +170,11 @@ void BalanceTab::addEntry(btnIndex mode)
 	}
 	else {} // cancel pressed
 } 
+
+void BalanceTab::refresh()
+{
+	// TBD: refresh tables and labels
+}
 
 void BalanceTab::collectResults()
 {

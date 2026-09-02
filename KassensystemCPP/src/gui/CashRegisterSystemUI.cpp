@@ -47,27 +47,31 @@ void CashRegisterSystemUI::initUi(const ServiceBundle& services)
 	tabSelector->addTab(tabs.at(static_cast<int>(TabIndex::Add)), tr("Einträge hinzufügen"));
 	tabSelector->addTab(tabs.at(static_cast<int>(TabIndex::Balance)), tr("Abteilungsbilanz bearbeiten"));
 	
+	TabIndex initialTab = TabIndex::Add; // initialize first tab
+	changeTab(initialTab);
+	tabSelector->setCurrentIndex(static_cast<int>(initialTab));
 
-	activeTab = static_cast<int>(TabIndex::Add); // initialize first tab
-	initializeTab(activeTab);
-	tabSelector->setCurrentIndex(activeTab);
-
-
-	connect(tabSelector, &QTabWidget::currentChanged, this, [tabSelector, this]()
+	connect(tabSelector, &QTabWidget::currentChanged, this, [this](int idx)
 		{
-			activeTab = tabSelector->currentIndex();
-			initializeTab(activeTab);
+			changeTab(static_cast<TabIndex>(idx));
 		});
 
 	connect(lowerButtons.btnCancel, &QPushButton::clicked, qApp, &QCoreApplication::quit);
 }
 
-void CashRegisterSystemUI::initializeTab(int tabNum)
+void CashRegisterSystemUI::changeTab(TabIndex activeTab)
 {
-	// demanded tab already created
-	if (loadedTabs.at(tabNum)) return;
+	int activeTabNum = static_cast<int>(activeTab);
 
-	// demanded tab not yet created
-	tabs.at(tabNum)->initialize();
-	loadedTabs.at(tabNum) = true;
+	if (loadedTabs.at(activeTabNum))
+	{
+		// demanded tab already created
+		tabs.at(activeTabNum)->refresh();
+	}
+	else
+	{
+		// demanded tab not yet created
+		tabs.at(activeTabNum)->initialize();
+		loadedTabs.at(activeTabNum) = true;
+	}
 }

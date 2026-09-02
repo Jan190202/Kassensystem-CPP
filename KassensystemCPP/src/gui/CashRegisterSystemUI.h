@@ -20,5 +20,5 @@ private:
 	std::array<bool, 3> loadedTabs = {false};
 
 	void initUi(const ServiceBundle& services);
-	void initializeTab(int tabNum);
+	void changeTab(TabIndex idx);
 };

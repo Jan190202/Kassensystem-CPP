@@ -25,13 +25,6 @@ void PayTab::initialize()
 	nameSelect = new QComboBox(this);
 	nameSelect->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
 	nameSelect->setEditable(false);
-	std::vector<Person> personVec = personRepo->getAll();
-	QList<QString> nameList = QtUtils::personVecToQStrList(personVec, &Person::getFullSpecifier);
-	for (size_t i = 0; i < personVec.size(); i++)
-		nameSelect->addItem(
-			nameList.at(i),
-			personVec.at(i).getID()
-		);
 
 	// Betragsübersicht
 	auto* totalTextLabel	= new QLabel(tr("Gesamt"), this);
@@ -154,7 +147,7 @@ void PayTab::initialize()
 	mainLayout->addWidget(vLine);
 	mainLayout->addWidget(tblConsumption, 3);
 
-	refreshData();
+	refresh();
 
 	connect(lowerButtons.btnApply, &QPushButton::clicked, this, [&]()
 		{
@@ -195,7 +188,7 @@ void PayTab::initialize()
 		});
 }
 
-void PayTab::refreshData()
+void PayTab::nameChanged()
 {
 	int64_t personID = nameSelect->currentData().toLongLong();
 
@@ -217,4 +210,19 @@ void PayTab::refreshData()
 	credit > 1e-9 ? btnUseCredit->setEnabled(true) : btnUseCredit->setEnabled(false);
 	btnSurplusToCredit->setChecked(true);
 	fullPaymentCheckBox->setChecked(false);
+}
+
+void PayTab::refresh()
+{
+	nameSelect->clear();
+	
+	std::vector<Person> personVec = personRepo->getAll();
+	QList<QString> nameList = QtUtils::personVecToQStrList(personVec, &Person::getFullSpecifier);
+	for (size_t i = 0; i < personVec.size(); i++)
+		nameSelect->addItem(
+			nameList.at(i),
+			personVec.at(i).getID()
+		);
+
+	nameChanged();
 }

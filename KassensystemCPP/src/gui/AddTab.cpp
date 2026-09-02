@@ -102,6 +102,20 @@ void AddTab::initialize()
 	connect(lowerButtons.btnApply, &QPushButton::clicked, this, &AddTab::apply);
 }
 
+void AddTab::refresh()
+{
+	clearEntries();
+}
+
+void AddTab::clearEntries()
+{
+	while (!entries.empty())
+	{
+		AddTabEntry* entry = entries.back();
+		removeEntry(entry);
+	}
+}
+
 void AddTab::addEntry()
 {
 	std::vector<Person> personVec = personRepo->getAll();
