@@ -7,9 +7,9 @@
 #include <string>
 #include <variant>
 
-enum class btnIndex
+enum class BtnIndex
 {
-	addEarning, addSpending
+	AddEarning, AddSpending
 };
 
 struct ServiceBundle

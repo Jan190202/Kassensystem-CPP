@@ -26,7 +26,7 @@ void PayTab::initialize()
 	nameSelect->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
 	nameSelect->setEditable(false);
 
-	// Betragsübersicht
+	// overview
 	auto* totalTextLabel	= new QLabel(tr("Gesamt"), this);
 	auto* paidTextLabel		= new QLabel(tr("Bezahlt"), this);
 	auto* dueTextLabel		= new QLabel(tr("Ausstehend"), this);
@@ -55,7 +55,7 @@ void PayTab::initialize()
 	btnUseCredit = new QPushButton(tr("Refresh"), this);
 	btnUseCredit->setEnabled(false);
 
-	// Zahlung
+	// payment
 	paymentSpinBox = new QDoubleSpinBox(this);
 	paymentSpinBox->setDecimals(2);
 	paymentSpinBox->setMinimum(0.0);
@@ -65,7 +65,7 @@ void PayTab::initialize()
 
 	fullPaymentCheckBox = new QCheckBox(tr("Ausstand übernehmen"), this);
 
-	// Überschuss
+	// surplus
 	btnSurplusToCredit = new QRadioButton(tr("als Guthaben"), this);
 	btnSurplusToCredit->setChecked(true);
 
@@ -75,11 +75,11 @@ void PayTab::initialize()
 	surplusGroup->addButton(btnSurplusToCredit);
 	surplusGroup->addButton(btnSurplusToTip);
 
-	// Rechte Seite / Tabelle
+	// right side / table
 	tblConsumption = new QTableWidget();
 	tblConsumption->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
 
-	// Linke Seite
+	// left side
 	auto* leftLayout = new QVBoxLayout();
 	leftLayout->setContentsMargins(0, 0, 0, 0);
 	leftLayout->setSpacing(14);
@@ -183,8 +183,7 @@ void PayTab::initialize()
 
 	connect(nameSelect, &QComboBox::currentTextChanged, this, [&]()
 		{
-			std::string currentName = nameSelect->currentText().toStdString();
-			// TBD
+			nameChanged();
 		});
 }
 

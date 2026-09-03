@@ -21,21 +21,21 @@ BalanceTab::BalanceTab(const LowerButtonBundle& lowerButtons, BalanceService& ba
 
 void BalanceTab::initialize()
 {
-	// Temporary
+	// temporary
 	dateBefore = QDate(2000, 1, 1);
 
-	// Buttons
+	// buttons
 	auto* btnAddEarning		= new QPushButton(tr("+ Einnahme"), this);
 	auto* btnAddSpending	= new QPushButton(tr("+ Ausgabe"), this);
 
-	// Tables
+	// tables
 	tblEarnings		= new QTableWidget(this);
 	tblSpendings	= new QTableWidget(this);
 
 	tblEarnings->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
 	tblSpendings->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
 
-	// Labels
+	// labels
 	lCashBefore			= new QLabel(QtUtils::toCurrencyFormat(0.0), this);
 	lCashDifference		= new QLabel(QtUtils::toCurrencyFormat(0.0), this);
 	lCashAfter			= new QLabel(QtUtils::toCurrencyFormat(0.0), this);
@@ -148,11 +148,11 @@ void BalanceTab::initialize()
 	mainLayout->addLayout(tableLayout, 1);
 	mainLayout->addLayout(summaryLayout);
 
-	connect(btnAddEarning,  &QPushButton::clicked, this, [=]() {BalanceTab::addEntry(btnIndex::addEarning); });
-	connect(btnAddSpending, &QPushButton::clicked, this, [=]() {BalanceTab::addEntry(btnIndex::addSpending); });
+	connect(btnAddEarning,  &QPushButton::clicked, this, [=]() {BalanceTab::addEntry(BtnIndex::AddEarning); });
+	connect(btnAddSpending, &QPushButton::clicked, this, [=]() {BalanceTab::addEntry(BtnIndex::AddSpending); });
 }
 
-void BalanceTab::addEntry(btnIndex mode)
+void BalanceTab::addEntry(BtnIndex mode)
 {
 	std::vector<Person> personVec = personRepo->getAll();
 	auto* inputDialog = new BalanceTabDialog(mode, personVec, this);

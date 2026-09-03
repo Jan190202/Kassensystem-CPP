@@ -21,23 +21,21 @@
 
 #include <string>
 
-BalanceTabDialog::BalanceTabDialog(btnIndex mode, std::vector<Person> personVec, QWidget* parent) : QDialog(parent)
+BalanceTabDialog::BalanceTabDialog(BtnIndex mode, std::vector<Person> personVec, QWidget* parent) : QDialog(parent)
 {
 	switch (mode)
 	{
-	case btnIndex::addEarning:
+	case BtnIndex::AddEarning:
 		setWindowTitle(tr("Einnahme hinzufügen"));
 		break;
-	case btnIndex::addSpending:
+	case BtnIndex::AddSpending:
 		setWindowTitle(tr("Ausgabe hinzufügen"));
 		break;
 	}
 
-	// --- zentral definierter Fett-Font für alle Sektions-/Feld-Labels ---
 	QFont boldFont = font();
 	boldFont.setBold(true);
 
-	// --- Eingabe-Widgets: Hauptdaten ---
 	edtDescription = new QLineEdit();
 	edtDescription->setPlaceholderText(tr("z. B. Spende, Geschenk, ..."));
 
@@ -56,7 +54,6 @@ BalanceTabDialog::BalanceTabDialog(btnIndex mode, std::vector<Person> personVec,
 	edtComment->setPlaceholderText(tr("optional"));
 	edtComment->setFixedHeight(70);
 
-	// --- Sektion 1: Formular für die Basisdaten ---
 	auto* lblDescription = new QLabel(tr("Bezeichnung:"));
 	lblDescription->setFont(boldFont);
 	auto* lblCost = new QLabel(tr("Betrag:"));
@@ -78,7 +75,7 @@ BalanceTabDialog::BalanceTabDialog(btnIndex mode, std::vector<Person> personVec,
 	form->addRow(lblDate, edtDate);
 	form->addRow(lblComment, edtComment);
 
-	// --- Sektion 2: Zahlungsstatus (visuell abgetrennt) ---
+
 	edtIsCovered = new QCheckBox(tr("Von Mitglied getragen:"));
 	edtIsCovered->setChecked(false);
 
@@ -91,7 +88,6 @@ BalanceTabDialog::BalanceTabDialog(btnIndex mode, std::vector<Person> personVec,
 			personVec.at(i).getID()
 		);
 
-	// Checkbox + Dropdown eng nebeneinander statt über volle Formularbreite verteilt
 	auto* statusLayout = new QHBoxLayout;
 	statusLayout->addWidget(edtIsCovered);
 	statusLayout->addWidget(edtCoveringPerson);
@@ -104,12 +100,10 @@ BalanceTabDialog::BalanceTabDialog(btnIndex mode, std::vector<Person> personVec,
 	topSeparator->setFrameShape(QFrame::HLine);
 	topSeparator->setFrameShadow(QFrame::Sunken);
 
-	// --- Trennlinie vor den Buttons ---
 	auto* bottomSeparator = new QFrame;
 	bottomSeparator->setFrameShape(QFrame::HLine);
 	bottomSeparator->setFrameShadow(QFrame::Sunken);
 
-	// --- Buttons, rechtsbündig ---
 	auto* btnOK = new QPushButton(tr("OK"));
 	auto* btnCancel = new QPushButton(tr("Cancel"));
 	btnOK->setDefault(true);
@@ -121,14 +115,13 @@ BalanceTabDialog::BalanceTabDialog(btnIndex mode, std::vector<Person> personVec,
 	btnLayout->addWidget(btnCancel);
 	btnLayout->addWidget(btnOK);
 
-	// --- Gesamtlayout ---
 	auto* mainLayout = new QVBoxLayout(this);
 	mainLayout->setContentsMargins(24, 20, 24, 16);
 	mainLayout->setSpacing(12);
 
 	mainLayout->addLayout(form);
 	mainLayout->addSpacing(8);
-	if (mode == btnIndex::addSpending)
+	if (mode == BtnIndex::AddSpending)
 	{
 		mainLayout->addWidget(topSeparator);
 		mainLayout->addWidget(sectionLabel);
@@ -143,7 +136,6 @@ BalanceTabDialog::BalanceTabDialog(btnIndex mode, std::vector<Person> personVec,
 	connect(btnOK, &QPushButton::clicked, this, &QDialog::accept);
 	connect(btnCancel, &QPushButton::clicked, this, &QDialog::reject);
 
-	// Mindestbreite vorgeben, damit adjustSize() nicht zu schmal berechnet
 	setMinimumWidth(520);
 	adjustSize();
 }

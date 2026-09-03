@@ -30,7 +30,7 @@ private:
 	QDate dateBefore;
 	QDate dateAfter				= QDate::currentDate();
 
-	void addEntry(btnIndex mode);
+	void addEntry(BtnIndex mode);
 
 	BalanceService& balanceService;
 	PersonRepository* personRepo;

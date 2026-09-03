@@ -28,7 +28,7 @@ class BalanceTabDialog : public QDialog
 {
 	Q_OBJECT
 public:
-	BalanceTabDialog(btnIndex mode, std::vector<Person> personVec, QWidget* parent);
+	BalanceTabDialog(BtnIndex mode, std::vector<Person> personVec, QWidget* parent);
 	dlgInputs& getInputs() const;
 private:
 	QLineEdit*		edtDescription;
