@@ -9,9 +9,9 @@ public:
 	DebtRepoInMem() = default;
 	virtual ~DebtRepoInMem() = default;
 
-	virtual int64_t addEntry(const DebtEntry& entry) override;
+	virtual int64_t addEntry(const entry::Debt& entry) override;
 	virtual double getTotal(int64_t personID) const override;
-	virtual std::vector<DebtEntryRemaining> getOutstandingEntries(int64_t personID) const override;
+	virtual std::vector<entry::DebtRemaining> getOutstandingEntries(int64_t personID, FilterType filter) const override;
 private:
-	std::vector<DebtEntry> entries;
+	std::vector<entry::Debt> entries;
 };

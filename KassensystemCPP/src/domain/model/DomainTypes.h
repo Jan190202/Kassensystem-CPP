@@ -9,3 +9,8 @@ enum class OverpaymentDisposition
 {
 	Credit, Tip
 };
+
+enum class FilterType
+{
+	IncludeFullyPaid, OmitFullyPaid
+};

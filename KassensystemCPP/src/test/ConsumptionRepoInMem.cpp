@@ -3,11 +3,11 @@
 
 #include <QDebug>
 
-int64_t ConsumptionRepoInMem::addEntry(const ConsumptionEntry& entry)
+int64_t ConsumptionRepoInMem::addEntry(const entry::Consumption& entry)
 {
 	data.push_back(entry);
 
-	qInfo() << "ConsumptionEntry added! Entries: ";
+	qInfo() << "entry::Consumption added! Entries: ";
 	for (auto& entry : data)
 	{
 		qInfo()
@@ -23,9 +23,9 @@ int64_t ConsumptionRepoInMem::addEntry(const ConsumptionEntry& entry)
 	return 0;
 }
 
-std::vector<ConsumptionEntry> ConsumptionRepoInMem::getEntries(int64_t personID) const
+std::vector<entry::Consumption> ConsumptionRepoInMem::getEntries(int64_t personID) const
 {
-	std::vector<ConsumptionEntry> filteredData = {};
+	std::vector<entry::Consumption> filteredData = {};
 
 	for (auto& entry : data)
 	{

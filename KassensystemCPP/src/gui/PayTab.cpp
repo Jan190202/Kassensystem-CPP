@@ -15,6 +15,7 @@
 #include <QSizePolicy>
 #include <QTableWidget>
 #include <QVBoxLayout>
+#include <QColor>
 
 
 PayTab::PayTab(const LowerButtonBundle& lowerButtons, PaymentService& paymentService, PersonRepository* personRepo, QWidget* parent) 
@@ -163,7 +164,7 @@ void PayTab::initialize()
 
 	connect(btnUseCredit, &QPushButton::clicked, this, [&]()
 		{
-			// TBD
+			useCredit();
 		});
 
 	connect(fullPaymentCheckBox, &QCheckBox::checkStateChanged, this, [&](Qt::CheckState state)
@@ -197,7 +198,7 @@ void PayTab::nameChanged()
 	due = total - paid;
 
 	// refresh table
-	// TBD
+	refreshTable(personID);
 
 	// refresh labels
 	totalNumLabel->setText(QtUtils::toCurrencyFormat(total));
@@ -245,4 +246,79 @@ void PayTab::apply()
 void PayTab::save()
 {
 
+}
+
+void PayTab::useCredit()
+{
+
+}
+
+void PayTab::refreshTable(int64_t personID)
+{
+	std::vector<entry::Consumption> cEntries = paymentService.getConsumptionEntries(personID);
+	std::vector<entry::DebtRemaining> drEntries = paymentService.getOutstandingEntries(personID, FilterType::IncludeFullyPaid);
+
+	// create items and add them to table
+	int rowCount = drEntries.size();
+	int columnCount = 6;
+
+	tblConsumption->setRowCount(rowCount);
+	tblConsumption->setColumnCount(columnCount);
+	tblConsumption->setHorizontalHeaderLabels(QtUtils::strVecToQStrList({ "Monat", "Bezahlt/Gesamt (€)", "Bier (0.5l)", "Bier (0.4l)", "Wasser", "Softdrinks"}));
+
+	QColor rowColor;
+	for (size_t row = 0; row < drEntries.size(); row++)
+	{
+		const entry::DebtRemaining& drEntry = drEntries.at(row);
+
+		if (drEntry.remaining > 1e-9)
+			rowColor = QColor(Qt::GlobalColor::red);
+		else
+			rowColor = QColor(Qt::GlobalColor::green);
+
+		// find corresponding consumption info, if avalable
+		std::optional<entry::Consumption> cEntryMatching;
+		for (auto& cEntry : cEntries)
+		{
+			if (cEntry.debtEntryID = drEntry.debtEntryID)
+			{
+				cEntryMatching = cEntry;
+				break;
+			}
+		}
+
+		QTableWidgetItem* dateItem = new QTableWidgetItem(QtUtils::extractMonth(drEntry.date));
+		QTableWidgetItem* infoItem = new QTableWidgetItem(QString::number(drEntry.amount-drEntry.remaining, 'f', 2) + QString::fromStdString("/") + QString::number(drEntry.amount, 'f', 2));
+
+		QTableWidgetItem* beer05Item;
+		QTableWidgetItem* beer04Item;
+		QTableWidgetItem* softdrinksItem;
+		QTableWidgetItem* waterItem;
+
+		if (cEntryMatching.has_value())
+		{
+			beer05Item		= new QTableWidgetItem(QString::number(cEntryMatching.value().nBeer05));
+			beer04Item		= new QTableWidgetItem(QString::number(cEntryMatching.value().nBeer04));
+			softdrinksItem	= new QTableWidgetItem(QString::number(cEntryMatching.value().nSoftdrinks));
+			waterItem		= new QTableWidgetItem(QString::number(cEntryMatching.value().nWater));
+		}
+		else
+		{
+			auto content = QString::fromStdString("unb.");
+
+			beer05Item		= new QTableWidgetItem(content);
+			beer04Item		= new QTableWidgetItem(content);
+			softdrinksItem	= new QTableWidgetItem(content);
+			waterItem		= new QTableWidgetItem(content);
+		}
+
+		tblConsumption->setItem(row, 0, dateItem);
+		tblConsumption->setItem(row, 1, infoItem);
+		tblConsumption->setItem(row, 2, beer05Item);
+		tblConsumption->setItem(row, 3, beer04Item);
+		tblConsumption->setItem(row, 4, softdrinksItem);
+		tblConsumption->setItem(row, 5, waterItem);
+
+		//for (int col = 0; col < columnCount; col++) tblConsumption->item(row, col)->setBackground(rowColor);
+	}
 }

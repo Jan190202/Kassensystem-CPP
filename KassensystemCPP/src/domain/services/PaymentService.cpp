@@ -1,13 +1,13 @@
 #include "PaymentService.h"
 
-PaymentService::PaymentService(PaymentRepository* paymentRepo, CreditRepository* creditRepo, DebtRepository* debtRepo, BalanceRepository* balanceRepo, PersonRepository* personRepo)
-	: paymentRepo(paymentRepo), creditRepo(creditRepo), debtRepo(debtRepo), balanceRepo(balanceRepo), personRepo(personRepo) {}
+PaymentService::PaymentService(PaymentRepository* paymentRepo, CreditRepository* creditRepo, DebtRepository* debtRepo, ConsumptionRepository* consumptionRepo, BalanceRepository* balanceRepo, PersonRepository* personRepo)
+	: paymentRepo(paymentRepo), creditRepo(creditRepo), debtRepo(debtRepo), consumptionRepo(consumptionRepo), balanceRepo(balanceRepo), personRepo(personRepo) {}
 
 void PaymentService::addPayment(const PaymentRequest& request)
 {
 	if (request.amount < 1e-9) return;
 
-	PaymentEntry entry{
+	entry::Payment entry{
 		.paymentEntryID = 0,
 		.personID = request.personID,
 		.date = request.date,
@@ -32,6 +32,60 @@ void PaymentService::addPayment(const PaymentRequest& request)
 	}
 }
 
+double PaymentService::addPaymentAllocation(int64_t paymentEntryID, int64_t personID, double amount, QDate date)
+{
+	std::vector<entry::DebtRemaining> remainingDebtEntries = debtRepo->getOutstandingEntries(personID, FilterType::OmitFullyPaid);
+	
+	double amountLeft = amount;
+	for (auto& entryRem : remainingDebtEntries)
+	{
+		if (amountLeft < 1e-9) break;
+
+		double appliedToCurrentEntry = std::min(amountLeft, entryRem.remaining);
+
+		amountLeft -= appliedToCurrentEntry;
+
+		entry::PaymentAllocation aEntry{ 
+			.paymentAllocationEntryID = 0, 
+			.entryID = entryRem.debtEntryID, 
+			.paymentID = paymentEntryID, 
+			.date = date, 
+			.amount = appliedToCurrentEntry };
+
+		paymentRepo->addAllocationEntry(aEntry);
+	}
+
+	return amountLeft;
+}
+
+int64_t PaymentService::addCredit(int64_t personID, double amount, QDate date, std::string description)
+{
+	return creditRepo->addEntry(
+		entry::Credit{ 
+			.creditEntryID = 0, 
+			.personID = personID, 
+			.date = date, 
+			.amount = amount, 
+			.description = description}
+			);
+}
+
+int64_t PaymentService::addTip(int64_t personID, double amount, QDate date)
+{
+	return balanceRepo->addEntry(
+		entry::Balance{ 
+		.balanceEntryID = 0, 
+		.type = BalanceType::Earning, 
+		.description = "Trinkgeld", 
+		.amount = amount, 
+		.date = date, 
+		.comment = "", 
+		.personID = personID }
+		);
+}
+
+
+// TBD: get rid of passthrough functions
 double PaymentService::getPaidAmount(int64_t personID) const
 {
 	return paymentRepo->getPaidAmount(personID);
@@ -47,54 +101,12 @@ double PaymentService::getCreditAmount(int64_t personID) const
 	return creditRepo->getCredit(personID);
 }
 
-double PaymentService::addPaymentAllocation(int64_t paymentEntryID, int64_t personID, double amount, QDate date)
+std::vector<entry::Consumption> PaymentService::getConsumptionEntries(int64_t personID)
 {
-	std::vector<DebtEntryRemaining> remainingDebtEntries = debtRepo->getOutstandingEntries(personID);
-	
-	double amountLeft = amount;
-	for (auto& entryRem : remainingDebtEntries)
-	{
-		if (amountLeft < 1e-9) break;
-
-		double appliedToCurrentEntry = std::min(amountLeft, entryRem.remaining);
-
-		amountLeft -= appliedToCurrentEntry;
-
-		PaymentAllocationEntry aEntry{ 
-			.paymentAllocationEntryID = 0, 
-			.entryID = entryRem.entryID, 
-			.paymentID = paymentEntryID, 
-			.date = date, 
-			.amount = appliedToCurrentEntry };
-
-		paymentRepo->addAllocationEntry(aEntry);
-	}
-
-	return amountLeft;
+	return consumptionRepo->getEntries(personID);
 }
 
-int64_t PaymentService::addCredit(int64_t personID, double amount, QDate date, std::string description)
+std::vector<entry::DebtRemaining> PaymentService::getOutstandingEntries(int64_t personID, FilterType filter)
 {
-	return creditRepo->addEntry(
-		CreditEntry{ 
-			.creditEntryID = 0, 
-			.personID = personID, 
-			.date = date, 
-			.amount = amount, 
-			.description = description}
-			);
-}
-
-int64_t PaymentService::addTip(int64_t personID, double amount, QDate date)
-{
-	return balanceRepo->addEntry(
-		BalanceEntry{ 
-		.BalanceEntryID = 0, 
-		.type = BalanceType::Earning, 
-		.description = "Trinkgeld", 
-		.amount = amount, 
-		.date = date, 
-		.comment = "", 
-		.personID = personID }
-		);
+	return debtRepo->getOutstandingEntries(personID, filter);
 }

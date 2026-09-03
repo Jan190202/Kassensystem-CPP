@@ -49,14 +49,14 @@ void ConsumptionService::addConsumption(const ConsumptionRequest& request)
 	}
 
 	// add debt and consumption entry
-	DebtEntry dEntry{ .debtEntryID = 0, .personID = personID, .date = request.date, .amount = amount};
+	entry::Debt dEntry{ .debtEntryID = 0, .personID = personID, .date = request.date, .amount = amount};
 	int64_t dEntryID = debtRepo->addEntry(dEntry);
 
-	ConsumptionEntry cEntry{ .consumptionEntryID = 0, .debtEntryID = dEntryID, .nBeer05 = request.nBeer05 , .nBeer04 = request.nBeer04, .nSoftdrinks = request.nSoftdrinks, .nWater = request.nWater };
+	entry::Consumption cEntry{ .consumptionEntryID = 0, .debtEntryID = dEntryID, .nBeer05 = request.nBeer05 , .nBeer04 = request.nBeer04, .nSoftdrinks = request.nSoftdrinks, .nWater = request.nWater };
 	int64_t cEntryID = consumptionRepo->addEntry(cEntry);
 }
 
-std::vector<ConsumptionEntry> ConsumptionService::getEntries(int personID) const
+std::vector<entry::Consumption> ConsumptionService::getEntries(int personID) const
 {
 	return consumptionRepo->getEntries(personID);
 }

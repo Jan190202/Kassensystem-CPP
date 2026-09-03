@@ -10,8 +10,8 @@ public:
 	CreditRepoInMem() = default;
 	virtual ~CreditRepoInMem() = default;
 
-	virtual int64_t addEntry(const CreditEntry&) override;
+	virtual int64_t addEntry(const entry::Credit&) override;
 	virtual double getCredit(int64_t personID) const override;
 private:
-	std::vector<CreditEntry> entries = {};
+	std::vector<entry::Credit> entries = {};
 };

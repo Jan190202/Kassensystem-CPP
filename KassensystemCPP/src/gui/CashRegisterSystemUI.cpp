@@ -47,7 +47,7 @@ void CashRegisterSystemUI::initUi(const ServiceBundle& services)
 	tabSelector->addTab(tabs.at(static_cast<int>(TabIndex::Add)), tr("Einträge hinzufügen"));
 	tabSelector->addTab(tabs.at(static_cast<int>(TabIndex::Balance)), tr("Abteilungsbilanz bearbeiten"));
 	
-	TabIndex initialTab = TabIndex::Add; // initialize first tab
+	TabIndex initialTab = TabIndex::Pay; // initialize first tab
 	changeTab(initialTab);
 	tabSelector->setCurrentIndex(static_cast<int>(initialTab));
 

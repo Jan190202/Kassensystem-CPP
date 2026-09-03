@@ -28,7 +28,7 @@ public:
 	void addConsumption(const ConsumptionRequest& request);
 	
 	double calculateDebt(const ConsumptionRequest&) const;
-	std::vector<ConsumptionEntry> getEntries(int personID) const;
+	std::vector<entry::Consumption> getEntries(int personID) const;
 private:
 
 	std::expected< PersonStringSpecifiers, NameValidationError > isValidNameFormat(const std::string& nameRequest);

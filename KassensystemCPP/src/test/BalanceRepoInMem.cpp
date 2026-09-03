@@ -3,16 +3,16 @@
 
 #include <QDebug>
 
-int64_t BalanceRepoInMem::addEntry(const BalanceEntry& entry)
+int64_t BalanceRepoInMem::addEntry(const entry::Balance& entry)
 {
 	entries.push_back(entry);
 
-	qInfo() << "BalanceEntry added! Entries: ";
+	qInfo() << "entry::Balance added! Entries: ";
 	for (auto& entry : entries)
 	{
 		qInfo()
 			<< " amount:" << entry.amount
-			<< " balanceEntryID:" << entry.BalanceEntryID
+			<< " balanceEntryID:" << entry.balanceEntryID
 			<< " type:" << static_cast<int>(entry.type)
 			<< " comment:" << entry.comment
 			<< " date:" << entry.date

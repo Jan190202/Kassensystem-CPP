@@ -8,7 +8,7 @@ class PaymentRepository
 public:
 	PaymentRepository() = default;
 	virtual ~PaymentRepository() = default;
-	virtual int64_t addPaymentEntry(const PaymentEntry&) = 0;
-	virtual int64_t addAllocationEntry(const PaymentAllocationEntry&) = 0;
+	virtual int64_t addPaymentEntry(const entry::Payment&) = 0;
+	virtual int64_t addAllocationEntry(const entry::PaymentAllocation&) = 0;
 	virtual double getPaidAmount(int64_t personID) const = 0;
 };

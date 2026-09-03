@@ -2,11 +2,11 @@
 
 #include <QDebug>
 
-int64_t PaymentRepoInMem::addPaymentEntry(const PaymentEntry& entry)
+int64_t PaymentRepoInMem::addPaymentEntry(const entry::Payment& entry)
 {
 	paymentEntries.emplace_back(entry);
 
-	qInfo() << "PaymentEntry added! Entries: ";
+	qInfo() << "entry::Payment added! Entries: ";
 	for (auto& entry : paymentEntries)
 	{
 		qInfo()
@@ -20,11 +20,11 @@ int64_t PaymentRepoInMem::addPaymentEntry(const PaymentEntry& entry)
 	return 0;
 }
 
-int64_t PaymentRepoInMem::addAllocationEntry(const PaymentAllocationEntry& entry)
+int64_t PaymentRepoInMem::addAllocationEntry(const entry::PaymentAllocation& entry)
 {
 	paymentAllocationEntries.emplace_back(entry);
 
-	qInfo() << "PaymentAllocationEntry added! Entries: ";
+	qInfo() << "entry::PaymentAllocation added! Entries: ";
 	for (auto& entry : paymentAllocationEntries)
 	{
 		qInfo()

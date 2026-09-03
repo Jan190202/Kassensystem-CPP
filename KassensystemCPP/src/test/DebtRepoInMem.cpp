@@ -2,11 +2,11 @@
 
 #include <QDebug>
 
-int64_t DebtRepoInMem::addEntry(const DebtEntry& entry)
+int64_t DebtRepoInMem::addEntry(const entry::Debt& entry)
 {
 	entries.push_back(entry);
 
-	qInfo() << "DebtEntry added! Entries: ";
+	qInfo() << "entry::Debt added! Entries: ";
 	for (auto& entry : entries)
 	{
 		qInfo()
@@ -31,22 +31,23 @@ double DebtRepoInMem::getTotal(int64_t personID) const
 	return amount;
 }
 
-std::vector<DebtEntryRemaining> DebtRepoInMem::getOutstandingEntries(int64_t personID) const
+std::vector<entry::DebtRemaining> DebtRepoInMem::getOutstandingEntries(int64_t personID, FilterType filter) const
 {
-	std::vector<DebtEntryRemaining> filteredEntries = {};
+	std::vector<entry::DebtRemaining> filteredEntries = {};
 
 	for (auto& entry : entries)
 	{
-		if (true) // implementation later using SQL and lookup in other tables
-		{
-			DebtEntryRemaining entryRem;
-			entryRem.entryID = entry.debtEntryID; 
-			entryRem.date = entry.date; 
-			entryRem.amount = entry.amount; 
-			entryRem.remaining = entry.amount; // implementation later using SQL 
+		double remaining = entry.amount; // implementation later using SQL 
 
-			filteredEntries.push_back(entryRem);
-		}
+		if (filter == FilterType::OmitFullyPaid && remaining < 1e-9) continue;
+		
+		entry::DebtRemaining entryRem;
+		entryRem.debtEntryID = entry.debtEntryID;
+		entryRem.date = entry.date;
+		entryRem.amount = entry.amount;
+		entryRem.remaining = remaining; 
+
+		filteredEntries.push_back(entryRem);
 	}
 
 	return filteredEntries;

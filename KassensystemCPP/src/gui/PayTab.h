@@ -41,4 +41,6 @@ private:
 private: // temp values
 	double total{}, paid{}, due{}, credit{};
 	void nameChanged();
+	void useCredit();
+	void refreshTable(int64_t personID);
 };

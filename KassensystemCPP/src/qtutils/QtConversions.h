@@ -5,6 +5,7 @@
 #include <QList>
 #include <QString>
 #include <QObject>
+#include <QDate>
 #include <domain/model/Entities.h>
 
 namespace QtUtils
@@ -28,4 +29,6 @@ namespace QtUtils
 	}
 
 	QString toCurrencyFormat(double value);
+
+	QString extractMonth(QDate);
 }

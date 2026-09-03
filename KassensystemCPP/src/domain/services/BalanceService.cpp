@@ -21,8 +21,8 @@ int64_t BalanceService::addEntry(const BalanceRequest& request)
 		personID = -1;
 	}
 	
-	BalanceEntry entry{
-		.BalanceEntryID = 0,
+	entry::Balance entry{
+		.balanceEntryID = 0,
 		.type = request.type,
 		.description = request.description,
 		.amount = request.amount,
@@ -52,7 +52,7 @@ double BalanceService::getTotalSpendings() const
 int64_t BalanceService::addCredit(int64_t personID, double amount, QDate date, std::string description)
 {
 	return creditRepo->addEntry(
-		CreditEntry{ 
+		entry::Credit{ 
 			.creditEntryID = 0, 
 			.personID = personID, 
 			.date = date, 

@@ -2,11 +2,11 @@
 
 #include <QDebug>
 
-int64_t CreditRepoInMem::addEntry(const CreditEntry& entry)
+int64_t CreditRepoInMem::addEntry(const entry::Credit& entry)
 {
 	entries.emplace_back(entry);
 
-	qInfo() << "CreditEntry added! Entries: ";
+	qInfo() << "entry::Credit added! Entries: ";
 	for (auto& entry : entries)
 	{
 		qInfo()
