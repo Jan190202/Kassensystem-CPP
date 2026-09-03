@@ -30,24 +30,24 @@ int64_t PaymentRepoInMem::addAllocationEntry(const entry::PaymentAllocation& ent
 		qInfo()
 			<< " amount:" << entry.amount
 			<< " date:" << entry.date
-			<< " entryID:" << entry.entryID
+			<< " debtEntryID:" << entry.debtEntryID
 			<< " paymentAllocationID:" << entry.paymentAllocationEntryID
-			<< " paymentID:" << entry.paymentID;
+			<< " paymentEntryID:" << entry.paymentEntryID;
 	}
 	return 0;
 }
 
-double PaymentRepoInMem::getPaidAmount(int64_t personID) const
-{
-	double paidAmount = 0;
-	
-	for (auto& entry : paymentEntries)
-	{
-		if (entry.personID == personID)
-		{
-			paidAmount += entry.amount;
-		}
-	}
-
-	return paidAmount;
-}
+//double PaymentRepoInMem::getPaidAmount(int64_t personID) const
+//{
+//	double paidAmount = 0;
+//	
+//	for (auto& entry : paymentEntries)
+//	{
+//		if (entry.personID == personID)
+//		{
+//			paidAmount += entry.amount;
+//		}
+//	}
+//
+//	return paidAmount;
+//}

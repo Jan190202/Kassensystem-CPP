@@ -29,5 +29,5 @@ double CreditRepoInMem::getCredit(int64_t personID) const
 			return entry.amount;
 		}
 	}
-	return -1;
+	return 0;
 }

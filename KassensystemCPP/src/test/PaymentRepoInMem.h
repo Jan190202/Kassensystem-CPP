@@ -12,7 +12,7 @@ public:
 
 	virtual int64_t addPaymentEntry(const entry::Payment&) override;
 	virtual int64_t addAllocationEntry(const entry::PaymentAllocation&) override;
-	virtual double getPaidAmount(int64_t personID) const override;
+	//virtual double getPaidAmount(int64_t personID) const override;
 
 private:
 	std::vector<entry::Payment> paymentEntries = {};

@@ -29,12 +29,12 @@ void PayTab::initialize()
 
 	// overview
 	auto* totalTextLabel	= new QLabel(tr("Gesamt"), this);
-	auto* paidTextLabel		= new QLabel(tr("Bezahlt"), this);
+	auto* paidTextLabel		= new QLabel(tr("Beglichen"), this);
 	auto* dueTextLabel		= new QLabel(tr("Ausstehend"), this);
 	auto* creditTextLabel	= new QLabel(tr("Guthaben"), this);
 
 	totalNumLabel	= new QLabel(QtUtils::toCurrencyFormat(0.0), this);
-	paidNumLabel	= new QLabel(QtUtils::toCurrencyFormat(0.0), this);
+	settledNumLabel	= new QLabel(QtUtils::toCurrencyFormat(0.0), this);
 	dueNumLabel		= new QLabel(QtUtils::toCurrencyFormat(0.0), this);
 	creditNumLabel	= new QLabel(QtUtils::toCurrencyFormat(0.0), this);
 
@@ -45,7 +45,7 @@ void PayTab::initialize()
 		};
 
 	configureAmountLabel(totalNumLabel);
-	configureAmountLabel(paidNumLabel);
+	configureAmountLabel(settledNumLabel);
 	configureAmountLabel(dueNumLabel);
 	configureAmountLabel(creditNumLabel);
 
@@ -98,7 +98,7 @@ void PayTab::initialize()
 	summaryLayout->setLabelAlignment(Qt::AlignLeft | Qt::AlignVCenter);
 
 	summaryLayout->addRow(totalTextLabel, totalNumLabel);
-	summaryLayout->addRow(paidTextLabel, paidNumLabel);
+	summaryLayout->addRow(paidTextLabel, settledNumLabel);
 	summaryLayout->addRow(dueTextLabel, dueNumLabel);
 
 	auto* creditLayout = new QHBoxLayout();
@@ -193,16 +193,16 @@ void PayTab::nameChanged()
 	int64_t personID = nameSelect->currentData().toLongLong();
 
 	total = paymentService.getTotalAmount(personID);
-	paid = paymentService.getPaidAmount(personID);
+	settled = paymentService.getSettledAmount(personID);
+	due = paymentService.getDueAmount(personID);
 	credit = paymentService.getCreditAmount(personID);
-	due = total - paid;
 
 	// refresh table
 	refreshTable(personID);
 
 	// refresh labels
 	totalNumLabel->setText(QtUtils::toCurrencyFormat(total));
-	paidNumLabel->setText(QtUtils::toCurrencyFormat(paid));
+	settledNumLabel->setText(QtUtils::toCurrencyFormat(settled));
 	dueNumLabel->setText(QtUtils::toCurrencyFormat(due));
 	creditNumLabel->setText(QtUtils::toCurrencyFormat(credit));
 
@@ -255,6 +255,8 @@ void PayTab::useCredit()
 
 void PayTab::refreshTable(int64_t personID)
 {
+	tblConsumption->clearContents();
+	
 	std::vector<entry::Consumption> cEntries = paymentService.getConsumptionEntries(personID);
 	std::vector<entry::DebtRemaining> drEntries = paymentService.getOutstandingEntries(personID, FilterType::IncludeFullyPaid);
 
@@ -276,7 +278,7 @@ void PayTab::refreshTable(int64_t personID)
 		else
 			rowColor = QColor(Qt::GlobalColor::green);
 
-		// find corresponding consumption info, if avalable
+		// find corresponding consumption info, if available
 		std::optional<entry::Consumption> cEntryMatching;
 		for (auto& cEntry : cEntries)
 		{

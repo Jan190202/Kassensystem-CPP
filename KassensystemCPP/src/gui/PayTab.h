@@ -25,7 +25,7 @@ public:
 private:
 	QComboBox*		nameSelect			= nullptr;
 	QLabel*			totalNumLabel		= nullptr;
-	QLabel*			paidNumLabel		= nullptr;
+	QLabel*			settledNumLabel		= nullptr;
 	QLabel*			dueNumLabel			= nullptr;
 	QLabel*			creditNumLabel		= nullptr;
 	QPushButton*	btnUseCredit		= nullptr;
@@ -39,7 +39,7 @@ private:
 	PersonRepository* personRepo;
 	const LowerButtonBundle& lowerButtons;
 private: // temp values
-	double total{}, paid{}, due{}, credit{};
+	double total{}, settled{}, due{}, credit{};
 	void nameChanged();
 	void useCredit();
 	void refreshTable(int64_t personID);

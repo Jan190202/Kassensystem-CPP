@@ -47,8 +47,8 @@ double PaymentService::addPaymentAllocation(int64_t paymentEntryID, int64_t pers
 
 		entry::PaymentAllocation aEntry{ 
 			.paymentAllocationEntryID = 0, 
-			.entryID = entryRem.debtEntryID, 
-			.paymentID = paymentEntryID, 
+			.debtEntryID = entryRem.debtEntryID, 
+			.paymentEntryID = paymentEntryID, 
 			.date = date, 
 			.amount = appliedToCurrentEntry };
 
@@ -86,9 +86,9 @@ int64_t PaymentService::addTip(int64_t personID, double amount, QDate date)
 
 
 // TBD: get rid of passthrough functions
-double PaymentService::getPaidAmount(int64_t personID) const
+double PaymentService::getSettledAmount(int64_t personID) const
 {
-	return paymentRepo->getPaidAmount(personID);
+	return debtRepo->getSettled(personID);
 }
 
 double PaymentService::getTotalAmount(int64_t personID) const
@@ -99,6 +99,11 @@ double PaymentService::getTotalAmount(int64_t personID) const
 double PaymentService::getCreditAmount(int64_t personID) const
 {
 	return creditRepo->getCredit(personID);
+}
+
+double PaymentService::getDueAmount(int64_t personID) const
+{
+	return debtRepo->getDue(personID);
 }
 
 std::vector<entry::Consumption> PaymentService::getConsumptionEntries(int64_t personID)

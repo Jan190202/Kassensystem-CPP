@@ -53,8 +53,8 @@ namespace entry
 	struct PaymentAllocation
 	{
 		int64_t paymentAllocationEntryID;
-		int64_t entryID;
-		int64_t paymentID;
+		int64_t debtEntryID;
+		int64_t paymentEntryID;
 		QDate date;
 		double amount;
 	};
