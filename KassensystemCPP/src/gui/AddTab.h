@@ -20,7 +20,8 @@ public:
 	AddTab(const LowerButtonBundle& lowerButtons, ConsumptionService& consumptionService, PersonRepository* personRepo, QWidget* parent = nullptr);
 	virtual void initialize() override;
 	virtual void refresh() override;
-
+	virtual void apply() override;
+	virtual void save() override;
 private slots:
 	void addEntry();
 
@@ -35,8 +36,6 @@ private:
 	void removeEntry(AddTabEntry* entry);
 	void clearEntries();
 	void shiftEntries();
-	void apply();
-	void save();
 
 	ConsumptionService& consumptionService;
 	PersonRepository* personRepo;

@@ -213,15 +213,36 @@ void PayTab::nameChanged()
 
 void PayTab::refresh()
 {
+	// refresh name list (clear and rebuild from database), in case it was altered
+	// try to keed name loaded before
+	// refresh tab for current name
+
+	int64_t oldID = nameSelect->currentData().toLongLong();
+
 	nameSelect->clear();
 	
 	std::vector<Person> personVec = personRepo->getAll();
 	QList<QString> nameList = QtUtils::personVecToQStrList(personVec, &Person::getFullSpecifier);
+	
+	std::optional<int> indexForOldID;
 	for (size_t i = 0; i < personVec.size(); i++)
-		nameSelect->addItem(
-			nameList.at(i),
-			personVec.at(i).getID()
-		);
+	{
+		int64_t itemID = personVec.at(i).getID();
+		nameSelect->addItem(nameList.at(i), itemID);
+		if (itemID == oldID) indexForOldID = i;
+	}
 
+	if (indexForOldID.has_value()) nameSelect->setCurrentIndex(indexForOldID.value());
+			
 	nameChanged();
+}
+
+void PayTab::apply()
+{
+
+}
+
+void PayTab::save()
+{
+
 }

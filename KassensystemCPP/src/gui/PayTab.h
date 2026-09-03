@@ -20,6 +20,8 @@ public:
 	PayTab(const LowerButtonBundle& lowerButtons, PaymentService& paymentService, PersonRepository* personRepo, QWidget* parent = nullptr);
 	virtual void initialize() override;
 	virtual void refresh() override;
+	virtual void apply() override;
+	virtual void save() override;
 private:
 	QComboBox*		nameSelect			= nullptr;
 	QLabel*			totalNumLabel		= nullptr;

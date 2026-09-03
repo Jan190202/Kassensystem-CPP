@@ -176,7 +176,12 @@ void BalanceTab::refresh()
 	// TBD: refresh tables and labels
 }
 
-void BalanceTab::collectResults()
+void BalanceTab::apply()
 {
-	qInfo() << "CollectResults called";
+
+}
+
+void BalanceTab::save()
+{
+
 }

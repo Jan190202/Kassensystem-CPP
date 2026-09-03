@@ -15,6 +15,8 @@ public:
 	BalanceTab(const LowerButtonBundle& lowerButtons, BalanceService& balanceService, PersonRepository* personRepo, QWidget* parent = nullptr);
 	virtual void initialize() override;
 	virtual void refresh() override;
+	virtual void apply() override;
+	virtual void save() override;
 private:
 	QTableWidget* tblSpendings	= nullptr;
 	QTableWidget* tblEarnings	= nullptr;
@@ -35,6 +37,4 @@ private:
 	BalanceService& balanceService;
 	PersonRepository* personRepo;
 	const LowerButtonBundle& lowerButtons;
-private slots:
-	void collectResults();
 };

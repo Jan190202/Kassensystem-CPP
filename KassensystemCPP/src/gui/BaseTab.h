@@ -9,4 +9,6 @@ public:
 	virtual ~BaseTab() = default;
 	virtual void initialize() = 0;
 	virtual void refresh() = 0;
+	virtual void apply() = 0;
+	virtual void save() = 0;
 };
