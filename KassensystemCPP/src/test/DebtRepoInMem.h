@@ -1,12 +1,13 @@
 #pragma once
 
 #include "domain/repoInterface/DebtRepository.h"
+#include "domain/repoInterface/PaymentRepository.h"
 #include <vector>
 
 class DebtRepoInMem : public DebtRepository
 {
 public:
-	DebtRepoInMem() = default;
+	DebtRepoInMem(PaymentRepository* paymentRepo);
 	virtual ~DebtRepoInMem() = default;
 
 	virtual int64_t addEntry(entry::Debt entry) override;
@@ -16,4 +17,7 @@ public:
 	virtual std::vector<entry::DebtRemaining> getOutstandingEntries(int64_t personID, FilterType filter) const override;
 private:
 	std::vector<entry::Debt> entries;
+	double getAllocatedPayments(int64_t debtEntryID) const;
+
+	PaymentRepository* paymentRepo;
 };

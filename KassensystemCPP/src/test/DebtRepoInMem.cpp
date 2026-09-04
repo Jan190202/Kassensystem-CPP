@@ -3,6 +3,8 @@
 
 #include <QDebug>
 
+DebtRepoInMem::DebtRepoInMem(PaymentRepository* paymentRepo) : paymentRepo(paymentRepo) {}
+
 int64_t DebtRepoInMem::addEntry(entry::Debt entry)
 {
 	std::vector<int64_t> usedIDs(entries.size());
@@ -64,7 +66,7 @@ std::vector<entry::DebtRemaining> DebtRepoInMem::getOutstandingEntries(int64_t p
 	{
 		if (entry.personID == personID)
 		{
-			double remaining = entry.amount; // implementation later using SQL 
+			double remaining = entry.amount - getAllocatedPayments(entry.debtEntryID);
 
 			if (filter == FilterType::OmitFullyPaid && remaining < 1e-9) continue;
 
@@ -79,4 +81,15 @@ std::vector<entry::DebtRemaining> DebtRepoInMem::getOutstandingEntries(int64_t p
 	}
 
 	return filteredEntries;
+}
+
+double DebtRepoInMem::getAllocatedPayments(int64_t debtEntryID) const
+{
+	std::vector<entry::PaymentAllocation> allocEntries = paymentRepo->getAllocEntries(debtEntryID);
+
+	double allocatedPayments{};
+	for (auto& entry : allocEntries)
+		allocatedPayments += entry.amount;
+
+	return allocatedPayments;
 }

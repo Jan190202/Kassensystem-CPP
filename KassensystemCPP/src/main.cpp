@@ -27,9 +27,10 @@ int main(int argc, char* argv[])
 	BalanceRepository* baRep		= new BalanceRepoInMem();
 	ConsumptionRepository* coRep	= new ConsumptionRepoInMem();
 	CreditRepository* crRep			= new CreditRepoInMem();
-	DebtRepository* deRep			= new DebtRepoInMem();
 	PaymentRepository* paRep		= new PaymentRepoInMem();
 	PersonRepository* peRep			= new PersonRepoInMem();
+	DebtRepository* deRep			= new DebtRepoInMem(paRep);
+
 
 	BalanceService			baSer(baRep, crRep, peRep);
 	ConsumptionService		coSer(coRep, deRep, peRep);
@@ -37,29 +38,29 @@ int main(int argc, char* argv[])
 
 	// domain testing
 	int64_t p1ID = peRep->addEntry("Tim", "Ebert").getID();
-	int64_t p2ID = peRep->addEntry("Alfons", "Strauss").getID();
+	//int64_t p2ID = peRep->addEntry("Alfons", "Strauss").getID();
 
 	ConsumptionRequest cReq4{ .personInput = p1ID, .date = QDate::currentDate(), .nBeer05 = 6, .nBeer04 = 9, .nSoftdrinks = 3, .nWater = 1, .otherExpense = 1.4 };
-	ConsumptionRequest cReq1{ .personInput = "Dieter Armen", .date = QDate::currentDate(), .nBeer05 = 1, .nBeer04 = 2, .nSoftdrinks = 3, .nWater = 1, .otherExpense = 1.4 };
-	ConsumptionRequest cReq2{ .personInput = "Maja Apfel",	 .date = QDate::currentDate(), .nBeer05 = 2, .nBeer04 = 2, .nSoftdrinks = 5, .nWater = 5, .otherExpense = 3.1 };
-	ConsumptionRequest cReq3{ .personInput = "Max Birne",    .date = QDate::currentDate(), .nBeer05 = 0, .nBeer04 = 1, .nSoftdrinks = 0, .nWater = 0, .otherExpense = 1 };
+	//ConsumptionRequest cReq1{ .personInput = "Dieter Armen", .date = QDate::currentDate(), .nBeer05 = 1, .nBeer04 = 2, .nSoftdrinks = 3, .nWater = 1, .otherExpense = 1.4 };
+	//ConsumptionRequest cReq2{ .personInput = "Maja Apfel",	 .date = QDate::currentDate(), .nBeer05 = 2, .nBeer04 = 2, .nSoftdrinks = 5, .nWater = 5, .otherExpense = 3.1 };
+	//ConsumptionRequest cReq3{ .personInput = "Max Birne",    .date = QDate::currentDate(), .nBeer05 = 0, .nBeer04 = 1, .nSoftdrinks = 0, .nWater = 0, .otherExpense = 1 };
 
-	BalanceRequest bReq1{ .type = BalanceType::Spending, .description = "", .amount = 11, .date = QDate::currentDate(), .comment = "", .coveringPersonID = std::nullopt };
-	BalanceRequest bReq2{ .type = BalanceType::Earning,  .description = "", .amount = 200, .date = QDate::currentDate(), .comment = "", .coveringPersonID = std::nullopt };
-	BalanceRequest bReq3{ .type = BalanceType::Spending, .description = "", .amount = 13, .date = QDate::currentDate(), .comment = "", .coveringPersonID = p2ID };
+	//BalanceRequest bReq1{ .type = BalanceType::Spending, .description = "", .amount = 11, .date = QDate::currentDate(), .comment = "", .coveringPersonID = std::nullopt };
+	//BalanceRequest bReq2{ .type = BalanceType::Earning,  .description = "", .amount = 200, .date = QDate::currentDate(), .comment = "", .coveringPersonID = std::nullopt };
+	//BalanceRequest bReq3{ .type = BalanceType::Spending, .description = "", .amount = 13, .date = QDate::currentDate(), .comment = "", .coveringPersonID = p2ID };
 
 	PaymentRequest pEntry1{ .personID = p1ID, .date = QDate::currentDate(), .amount = 20, .overpaymentType = OverpaymentDisposition::Credit };
 	PaymentRequest pEntry2{ .personID = p1ID, .date = QDate::currentDate(), .amount = 800, .overpaymentType = OverpaymentDisposition::Tip };
 
 
-	coSer.addConsumption(cReq1);
-	coSer.addConsumption(cReq2);
-	coSer.addConsumption(cReq3);
+	//coSer.addConsumption(cReq1);
+	//coSer.addConsumption(cReq2);
+	//coSer.addConsumption(cReq3);
 	coSer.addConsumption(cReq4);
 
-	baSer.addEntry(bReq1);
-	baSer.addEntry(bReq2);
-	baSer.addEntry(bReq3);
+	//baSer.addEntry(bReq1);
+	//baSer.addEntry(bReq2);
+	//baSer.addEntry(bReq3);
 
 	paSer.addPayment(pEntry1);
 	paSer.addPayment(pEntry2);
