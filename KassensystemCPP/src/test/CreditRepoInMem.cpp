@@ -1,9 +1,15 @@
 #include "CreditRepoInMem.h"
+#include "IDGenerator.h"
 
 #include <QDebug>
 
-int64_t CreditRepoInMem::addEntry(const entry::Credit& entry)
+int64_t CreditRepoInMem::addEntry(entry::Credit entry)
 {
+	std::vector<int64_t> usedIDs(entries.size());
+	for (size_t i = 0; i < entries.size(); i++)
+		usedIDs.at(i) = entries.at(i).creditEntryID;
+	entry.creditEntryID = idgen::getID(usedIDs);
+
 	entries.emplace_back(entry);
 
 	qInfo() << "entry::Credit added! Entries: ";
@@ -17,7 +23,7 @@ int64_t CreditRepoInMem::addEntry(const entry::Credit& entry)
 			<< " personID:" << entry.personID;
 	}
 
-	return 0;
+	return entry.creditEntryID;
 }
 
 double CreditRepoInMem::getCredit(int64_t personID) const

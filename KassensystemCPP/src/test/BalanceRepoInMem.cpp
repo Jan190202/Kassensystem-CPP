@@ -1,10 +1,17 @@
 #include "BalanceRepoInMem.h"
+#include "IDGenerator.h"
+
 #include <vector>
 
 #include <QDebug>
 
-int64_t BalanceRepoInMem::addEntry(const entry::Balance& entry)
+int64_t BalanceRepoInMem::addEntry(entry::Balance entry)
 {
+	std::vector<int64_t> usedIDs(entries.size());
+	for (size_t i = 0; i < entries.size(); i++)
+		usedIDs.at(i) = entries.at(i).balanceEntryID;
+	entry.balanceEntryID = idgen::getID(usedIDs);
+	
 	entries.push_back(entry);
 
 	qInfo() << "entry::Balance added! Entries: ";
@@ -19,7 +26,7 @@ int64_t BalanceRepoInMem::addEntry(const entry::Balance& entry)
 			<< " description:" << entry.description
 			<< " personID:" << entry.personID;
 	}
-	return 0;
+	return entry.balanceEntryID;
 }
 
 double BalanceRepoInMem::getTotalEarnings() const

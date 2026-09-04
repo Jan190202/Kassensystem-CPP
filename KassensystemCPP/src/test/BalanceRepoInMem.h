@@ -10,9 +10,9 @@ public:
 	BalanceRepoInMem() = default;
 	virtual ~BalanceRepoInMem() = default;
 
-	virtual int64_t addEntry(const entry::Balance&);
-	virtual double getTotalEarnings() const;
-	virtual double getTotalSpendings() const;
+	virtual int64_t addEntry(entry::Balance) override;
+	virtual double getTotalEarnings() const override;
+	virtual double getTotalSpendings() const override;
 private:
 	std::vector<entry::Balance> entries{};
 };

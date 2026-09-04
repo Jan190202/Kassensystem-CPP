@@ -10,8 +10,8 @@ public:
 	PaymentRepoInMem() = default;
 	virtual ~PaymentRepoInMem() = default;
 
-	virtual int64_t addPaymentEntry(const entry::Payment&) override;
-	virtual int64_t addAllocationEntry(const entry::PaymentAllocation&) override;
+	virtual int64_t addPaymentEntry(entry::Payment) override;
+	virtual int64_t addAllocationEntry(entry::PaymentAllocation) override;
 	//virtual double getPaidAmount(int64_t personID) const override;
 
 private:

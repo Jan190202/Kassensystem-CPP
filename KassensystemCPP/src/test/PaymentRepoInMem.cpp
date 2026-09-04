@@ -1,9 +1,15 @@
 #include "PaymentRepoInMem.h"
+#include "IDGenerator.h"
 
 #include <QDebug>
 
-int64_t PaymentRepoInMem::addPaymentEntry(const entry::Payment& entry)
+int64_t PaymentRepoInMem::addPaymentEntry(entry::Payment entry)
 {
+	std::vector<int64_t> usedIDs(paymentEntries.size());
+	for (size_t i = 0; i < paymentEntries.size(); i++)
+		usedIDs.at(i) = paymentEntries.at(i).paymentEntryID;
+	entry.paymentEntryID = idgen::getID(usedIDs);
+
 	paymentEntries.emplace_back(entry);
 
 	qInfo() << "entry::Payment added! Entries: ";
@@ -17,11 +23,15 @@ int64_t PaymentRepoInMem::addPaymentEntry(const entry::Payment& entry)
 			<< " personID:" << entry.personID;
 	}
 
-	return 0;
+	return entry.paymentEntryID;
 }
 
-int64_t PaymentRepoInMem::addAllocationEntry(const entry::PaymentAllocation& entry)
+int64_t PaymentRepoInMem::addAllocationEntry(entry::PaymentAllocation entry)
 {
+	std::vector<int64_t> usedIDs(paymentAllocationEntries.size());
+	for (size_t i = 0; i < paymentAllocationEntries.size(); i++)
+		usedIDs.at(i) = paymentAllocationEntries.at(i).paymentAllocationEntryID;
+	entry.paymentAllocationEntryID = idgen::getID(usedIDs);
 	paymentAllocationEntries.emplace_back(entry);
 
 	qInfo() << "entry::PaymentAllocation added! Entries: ";
@@ -34,7 +44,7 @@ int64_t PaymentRepoInMem::addAllocationEntry(const entry::PaymentAllocation& ent
 			<< " paymentAllocationID:" << entry.paymentAllocationEntryID
 			<< " paymentEntryID:" << entry.paymentEntryID;
 	}
-	return 0;
+	return entry.paymentAllocationEntryID;
 }
 
 //double PaymentRepoInMem::getPaidAmount(int64_t personID) const
