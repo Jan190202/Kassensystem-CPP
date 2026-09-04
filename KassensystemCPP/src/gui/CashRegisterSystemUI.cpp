@@ -15,7 +15,7 @@
 CashRegisterSystemUI::CashRegisterSystemUI(const ServiceBundle& services, QWidget* parent) : QMainWindow(parent)
 {
 	setWindowTitle(tr("Kassensystem"));
-	resize(800, 600);
+	resize(1000, 600);
 	initUi(services);
 }
 

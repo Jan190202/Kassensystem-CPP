@@ -309,7 +309,7 @@ void PayTab::refreshTable(int64_t personID)
 		}
 
 		QTableWidgetItem* dateItem = new QTableWidgetItem(QtUtils::extractMonth(drEntry.date));
-		QTableWidgetItem* infoItem = new QTableWidgetItem(QString::number(drEntry.amount-drEntry.remaining, 'f', 2) + QString::fromStdString("/") + QString::number(drEntry.amount, 'f', 2));
+		QTableWidgetItem* infoItem = new QTableWidgetItem(QString::number(drEntry.amount-drEntry.remaining, 'f', 2) + QString::fromStdString(" / ") + QString::number(drEntry.amount, 'f', 2));
 
 		QTableWidgetItem* beer05Item;
 		QTableWidgetItem* beer04Item;
@@ -333,6 +333,13 @@ void PayTab::refreshTable(int64_t personID)
 			waterItem		= new QTableWidgetItem(content);
 		}
 
+		dateItem		->setTextAlignment(Qt::AlignHCenter | Qt::AlignVCenter);
+		infoItem		->setTextAlignment(Qt::AlignHCenter | Qt::AlignVCenter);
+		beer05Item		->setTextAlignment(Qt::AlignHCenter | Qt::AlignVCenter);
+		beer04Item		->setTextAlignment(Qt::AlignHCenter | Qt::AlignVCenter);
+		softdrinksItem	->setTextAlignment(Qt::AlignHCenter | Qt::AlignVCenter);
+		waterItem		->setTextAlignment(Qt::AlignHCenter | Qt::AlignVCenter);
+
 		tblConsumption->setItem(row, 0, dateItem);
 		tblConsumption->setItem(row, 1, infoItem);
 		tblConsumption->setItem(row, 2, beer05Item);
@@ -342,4 +349,6 @@ void PayTab::refreshTable(int64_t personID)
 
 		for (int col = 0; col < columnCount; col++) tblConsumption->item(row, col)->setBackground(rowColor);
 	}
+
+	tblConsumption->resizeColumnsToContents();
 }
