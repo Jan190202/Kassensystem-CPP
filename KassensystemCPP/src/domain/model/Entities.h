@@ -12,7 +12,8 @@ namespace entry
 		BalanceType type;
 		std::string description;
 		double amount;
-		QDate date;
+		QDate dateBooked;
+		QDate dateAdded;
 		std::string comment;
 		int64_t personID;
 	};

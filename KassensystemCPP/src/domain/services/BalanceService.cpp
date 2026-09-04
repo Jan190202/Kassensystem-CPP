@@ -26,14 +26,15 @@ int64_t BalanceService::addEntry(const BalanceRequest& request)
 		.type = request.type,
 		.description = request.description,
 		.amount = request.amount,
-		.date = request.date,
+		.dateBooked = request.date,
+		.dateAdded = QDate::currentDate(),
 		.comment = request.comment,
 		.personID = personID
 	};
 
 	if (entry.personID >= 0 && entry.type == BalanceType::Spending)
 	{
-		addCredit(entry.personID, entry.amount, entry.date, "Abteilungsausgabe übernommen");
+		addCredit(entry.personID, entry.amount, entry.dateBooked, "Abteilungsausgabe übernommen");
 	}
 	
 	return balanceRepo->addEntry(entry);
@@ -59,4 +60,9 @@ int64_t BalanceService::addCredit(int64_t personID, double amount, QDate date, s
 			.amount = amount, 
 			.description = description }
 			);
+}
+
+std::vector<entry::Balance> BalanceService::getEntries(BalanceType type) const
+{
+	return balanceRepo->getEntries(type);
 }

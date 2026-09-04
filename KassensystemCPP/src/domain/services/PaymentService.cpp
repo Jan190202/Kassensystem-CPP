@@ -78,7 +78,8 @@ int64_t PaymentService::addTip(int64_t personID, double amount, QDate date)
 		.type = BalanceType::Earning, 
 		.description = "Trinkgeld", 
 		.amount = amount, 
-		.date = date, 
+		.dateBooked = date, 
+		.dateAdded = QDate::currentDate(),
 		.comment = "", 
 		.personID = personID }
 		);

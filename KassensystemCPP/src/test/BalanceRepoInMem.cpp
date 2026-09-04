@@ -22,7 +22,8 @@ int64_t BalanceRepoInMem::addEntry(entry::Balance entry)
 			<< " balanceEntryID:" << entry.balanceEntryID
 			<< " type:" << static_cast<int>(entry.type)
 			<< " comment:" << entry.comment
-			<< " date:" << entry.date
+			<< " dateBooked:" << entry.dateBooked
+			<< " dateAdded:" << entry.dateAdded
 			<< " description:" << entry.description
 			<< " personID:" << entry.personID;
 	}
@@ -57,4 +58,18 @@ double BalanceRepoInMem::getTotalSpendings() const
 	}
 
 	return totalSpendings;
+}
+
+std::vector<entry::Balance> BalanceRepoInMem::getEntries(BalanceType type) const
+{
+	if (type == BalanceType::All) return entries;
+	
+	std::vector<entry::Balance> filteredEntries;
+
+	for (auto& entry : entries)
+	{
+		if (entry.type == type) filteredEntries.push_back(entry);
+	}
+
+	return filteredEntries;
 }

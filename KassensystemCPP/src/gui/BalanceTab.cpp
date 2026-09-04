@@ -148,6 +148,8 @@ void BalanceTab::initialize()
 	mainLayout->addLayout(tableLayout, 1);
 	mainLayout->addLayout(summaryLayout);
 
+	refresh();
+
 	connect(btnAddEarning,  &QPushButton::clicked, this, [=]() {BalanceTab::addEntry(BtnIndex::AddEarning); });
 	connect(btnAddSpending, &QPushButton::clicked, this, [=]() {BalanceTab::addEntry(BtnIndex::AddSpending); });
 }
@@ -173,15 +175,55 @@ void BalanceTab::addEntry(BtnIndex mode)
 
 void BalanceTab::refresh()
 {
-	// TBD: refresh tables and labels
+	// refresh tables
+	std::vector<QTableWidget*> tables = { tblEarnings, tblSpendings };
+	std::vector<BalanceType> types = { BalanceType::Earning, BalanceType::Spending };
+
+	for (size_t i = 0; i < tables.size(); i++) 
+	{
+		QTableWidget* table = tables.at(i);
+		BalanceType type = types.at(i);
+
+		table->clearContents();
+		std::vector<entry::Balance> bEntries = balanceService.getEntries(type);
+		int rowCount = bEntries.size();
+		int colCount = 3; // description, amount, dateBooked
+
+		table->setRowCount(rowCount);
+		table->setColumnCount(colCount);
+		table->setHorizontalHeaderLabels(QtUtils::strVecToQStrList({ "Beschreibung", "Betrag (€)", "Datum" }));
+
+		for (size_t row = 0; row < bEntries.size(); row++) 
+		{
+			const entry::Balance& bEntry = bEntries.at(row);
+
+			QTableWidgetItem* descriptionItem = new QTableWidgetItem(QString::fromStdString(bEntry.description));
+			QTableWidgetItem* amountItem = new QTableWidgetItem(QString::number(bEntry.amount, 'f', 2));
+			QTableWidgetItem* dateItem = new QTableWidgetItem(bEntry.dateBooked.toString());
+
+			descriptionItem->setTextAlignment(Qt::AlignHCenter | Qt::AlignVCenter);
+			amountItem->setTextAlignment(Qt::AlignHCenter | Qt::AlignVCenter);
+			dateItem->setTextAlignment(Qt::AlignHCenter | Qt::AlignVCenter);
+
+			table->setItem(row, 0, descriptionItem);
+			table->setItem(row, 1, amountItem);
+			table->setItem(row, 2, dateItem);
+		}
+
+		table->resizeColumnsToContents();
+	}
+
+	// refresh labels
+	// TBD
 }
 
 void BalanceTab::apply()
 {
-
+	// TBD
 }
 
 void BalanceTab::save()
 {
-
+	apply();
+	// TBD
 }

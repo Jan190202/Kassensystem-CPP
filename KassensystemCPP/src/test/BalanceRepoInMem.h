@@ -13,6 +13,7 @@ public:
 	virtual int64_t addEntry(entry::Balance) override;
 	virtual double getTotalEarnings() const override;
 	virtual double getTotalSpendings() const override;
+	virtual std::vector<entry::Balance> getEntries(BalanceType) const override;
 private:
 	std::vector<entry::Balance> entries{};
 };
