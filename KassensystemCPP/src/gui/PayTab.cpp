@@ -152,19 +152,12 @@ void PayTab::initialize()
 
 	connect(lowerButtons.btnApply, &QPushButton::clicked, this, [&]()
 		{
-			PaymentRequest request{
-				.personID = nameSelect->currentData().toLongLong(),
-				.date = QDate::currentDate(),
-				.amount = paymentSpinBox->value(),
-				.overpaymentType = btnSurplusToCredit->isChecked() ? OverpaymentDisposition::Credit : OverpaymentDisposition::Tip
-			};
-
-			paymentService.addPayment(request);
+			apply();
 		});
 
 	connect(btnUseCredit, &QPushButton::clicked, this, [&]()
 		{
-			useCredit();
+			redeemCredit();
 		});
 
 	connect(fullPaymentCheckBox, &QCheckBox::checkStateChanged, this, [&](Qt::CheckState state)
@@ -206,10 +199,11 @@ void PayTab::nameChanged()
 	dueNumLabel->setText(QtUtils::toCurrencyFormat(due));
 	creditNumLabel->setText(QtUtils::toCurrencyFormat(credit));
 
-	// reinit checkboxes and buttons
+	// reinit checkboxes, buttons, spinbox
 	credit > 1e-9 ? btnUseCredit->setEnabled(true) : btnUseCredit->setEnabled(false);
 	btnSurplusToCredit->setChecked(true);
 	fullPaymentCheckBox->setChecked(false);
+	paymentSpinBox->setValue(0.0);
 }
 
 void PayTab::refresh()
@@ -240,17 +234,40 @@ void PayTab::refresh()
 
 void PayTab::apply()
 {
+	PaymentRequest request{
+		.personID = nameSelect->currentData().toLongLong(),
+		.date = QDate::currentDate(),
+		.amount = paymentSpinBox->value(),
+		.overpaymentType = btnSurplusToCredit->isChecked() ? OverpaymentDisposition::Credit : OverpaymentDisposition::Tip
+	};
 
+	paymentService.addPayment(request);
+
+	refresh();
 }
 
 void PayTab::save()
 {
-
+	apply();
+	// TBD
 }
 
-void PayTab::useCredit()
+void PayTab::redeemCredit()
 {
+	int64_t personID = nameSelect->currentData().toLongLong();
+	
+	paymentService.resetCredit(personID);
 
+	PaymentRequest request{
+		.personID = personID,
+		.date = QDate::currentDate(),
+		.amount = credit,
+		.overpaymentType = OverpaymentDisposition::Credit
+	};
+
+	paymentService.addPayment(request);
+
+	refresh();
 }
 
 void PayTab::refreshTable(int64_t personID)
@@ -273,10 +290,12 @@ void PayTab::refreshTable(int64_t personID)
 	{
 		const entry::DebtRemaining& drEntry = drEntries.at(row);
 
-		if (drEntry.remaining > 1e-9)
-			rowColor = QColor(Qt::GlobalColor::red);
+		if (std::abs(drEntry.remaining - drEntry.amount) < 1e-9)		// not paid at all
+			rowColor = QColor(Qt::GlobalColor::darkRed);
+		else if (drEntry.remaining > 1e-9)					// partially paid
+			rowColor = QColor(Qt::GlobalColor::darkYellow); 
 		else
-			rowColor = QColor(Qt::GlobalColor::green);
+			rowColor = QColor(Qt::GlobalColor::darkGreen);	// full paid
 
 		// find corresponding consumption info, if available
 		std::optional<entry::Consumption> cEntryMatching;
@@ -321,6 +340,6 @@ void PayTab::refreshTable(int64_t personID)
 		tblConsumption->setItem(row, 4, softdrinksItem);
 		tblConsumption->setItem(row, 5, waterItem);
 
-		//for (int col = 0; col < columnCount; col++) tblConsumption->item(row, col)->setBackground(rowColor);
+		for (int col = 0; col < columnCount; col++) tblConsumption->item(row, col)->setBackground(rowColor);
 	}
 }

@@ -28,12 +28,23 @@ int64_t CreditRepoInMem::addEntry(entry::Credit entry)
 
 double CreditRepoInMem::getCredit(int64_t personID) const
 {
+	double credit{};
+	
 	for (auto& entry : entries)
 	{
 		if (entry.personID == personID)
 		{
-			return entry.amount;
+			credit += entry.amount;
 		}
 	}
-	return 0;
+	return credit;
+}
+
+void CreditRepoInMem::resetCredit(int64_t personID)
+{
+	// usage: std::erase_if(container, predicate) where predicate can be a lambda taking an entry and returns true/false (remove/keep)
+	std::erase_if(entries, [=](const auto& entry)
+		{
+			return entry.personID == personID;
+		});
 }

@@ -115,3 +115,8 @@ std::vector<entry::DebtRemaining> PaymentService::getOutstandingEntries(int64_t 
 {
 	return debtRepo->getOutstandingEntries(personID, filter);
 }
+
+void PaymentService::resetCredit(int64_t personID)
+{
+	creditRepo->resetCredit(personID);
+}

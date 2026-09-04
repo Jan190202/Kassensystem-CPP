@@ -1,6 +1,8 @@
 #include "QtConversions.h"
 #include <algorithm>
 
+#include <QDebug>
+
 namespace QtUtils
 {
 	QList<QString> strVecToQStrList(const std::vector<std::string>& vec)
@@ -22,21 +24,21 @@ namespace QtUtils
 	QString extractMonth(QDate date)
 	{
 		std::string m;
-		
+
 		switch (date.month())
 		{
-			case 1: m = "Januar";
-			case 2: m = "Februar";
-			case 3: m = "März";
-			case 4: m = "April";
-			case 5: m = "Mai";
-			case 6: m = "Juni";
-			case 7: m = "Juli";
-			case 8: m = "August";
-			case 9: m = "September";
-			case 10: m = "Oktober";
-			case 11: m = "November";
-			case 12: m = "Dezember";
+			case 1: m = "Januar"; break;
+			case 2: m = "Februar"; break;
+			case 3: m = "März"; break;
+			case 4: m = "April"; break;
+			case 5: m = "Mai"; break;
+			case 6: m = "Juni"; break;
+			case 7: m = "Juli"; break;
+			case 8: m = "August"; break;
+			case 9: m = "September"; break;
+			case 10: m = "Oktober"; break;
+			case 11: m = "November"; break;
+			case 12: m = "Dezember"; break;
 		}
 
 		return QString::fromStdString(m);

@@ -11,4 +11,5 @@ public:
 
 	virtual int64_t addEntry(entry::Credit) = 0;
 	virtual double getCredit(int64_t personID) const = 0;
+	virtual void resetCredit(int64_t personID) = 0;
 };

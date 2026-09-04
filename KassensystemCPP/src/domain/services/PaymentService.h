@@ -16,6 +16,7 @@ public:
 	PaymentService(PaymentRepository*, CreditRepository*, DebtRepository*, ConsumptionRepository*, BalanceRepository*, PersonRepository*);
 	
 	void addPayment(const PaymentRequest& request);
+	void resetCredit(int64_t personID);
 	double getSettledAmount(int64_t personID) const;
 	double getTotalAmount(int64_t personID) const;
 	double getDueAmount(int64_t personID) const;
