@@ -53,7 +53,7 @@ double DebtRepoInMem::getDue(int64_t personID) const
 double DebtRepoInMem::getSettled(int64_t personID) const
 {
 	double settled{ 0 };
-	for (auto& entry : getOutstandingEntries(personID, FilterType::OmitFullyPaid))
+	for (auto& entry : getOutstandingEntries(personID, FilterType::IncludeFullyPaid))
 		settled += entry.amount - entry.remaining;
 	return settled;
 }
