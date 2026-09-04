@@ -1,8 +1,8 @@
 #include "PersonRepoInMem.h"
+#include "IDGenerator.h"
 
 #include <string>
 #include <vector>
-#include <random>
 
 #include <QDebug>
 
@@ -22,7 +22,10 @@ std::expected<Person,std::string> PersonRepoInMem::findEntry(int64_t personID)
 
 Person PersonRepoInMem::addEntry(const std::string& firstName, const std::string& lastName, const std::string& nickName, const std::string& info)
 {
-	int64_t id = getUniqueID();
+	std::vector<int64_t> usedIDs(entries.size());
+	for (size_t i = 0; i < entries.size(); i++)
+		usedIDs.at(i) = entries.at(i).getID();
+	int64_t id = idgen::getID(usedIDs);
 
 	Person person{ firstName, lastName, id, nickName, info };
 	entries.push_back(person);
@@ -36,32 +39,6 @@ Person PersonRepoInMem::addEntry(const std::string& firstName, const std::string
 	}
 
 	return person;
-}
-
-int64_t PersonRepoInMem::getUniqueID()
-{
-	while (true)
-	{
-		std::random_device rd;
-		std::mt19937 gen(rd());
-		std::uniform_int_distribution<int64_t> distrib(1, 100);
-		int64_t id = distrib(gen);
-
-		if (isUnique(id)) return id;
-	}
-	
-}
-
-bool PersonRepoInMem::isUnique(int64_t id)
-{
-	for (auto& entry : entries)
-	{
-		if (entry.getID() == id)
-		{
-			return false;
-		}
-	}
-	return true;
 }
 
 std::vector<Person> PersonRepoInMem::getAll() const
