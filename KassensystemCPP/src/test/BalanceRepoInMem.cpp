@@ -1,8 +1,6 @@
 #include "BalanceRepoInMem.h"
 #include "IDGenerator.h"
 
-#include <vector>
-
 #include <QDebug>
 
 int64_t BalanceRepoInMem::addEntry(entry::Balance entry)
@@ -72,4 +70,22 @@ std::vector<entry::Balance> BalanceRepoInMem::getEntries(BalanceType type) const
 	}
 
 	return filteredEntries;
+}
+
+std::expected<std::reference_wrapper<const entry::Balance>, GetEntryException> BalanceRepoInMem::getEntry(std::string description) const
+{
+	const entry::Balance* foundEntry = nullptr;
+
+	for (auto& entry : entries)
+	{
+		if (entry.description == description)
+		{
+			if (foundEntry) return std::unexpected(GetEntryException::MultipleEntriesFound);
+
+			foundEntry = &entry;
+		}
+	}
+
+	if (foundEntry) return std::ref(*foundEntry);
+	else return std::unexpected(GetEntryException::EntryNotFound);
 }

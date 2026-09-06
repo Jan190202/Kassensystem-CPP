@@ -14,3 +14,8 @@ enum class FilterType
 {
 	IncludeFullyPaid, OmitFullyPaid
 };
+
+enum class GetEntryException
+{
+	EntryNotFound, MultipleEntriesFound
+};

@@ -1,5 +1,7 @@
 #include "PaymentService.h"
 
+#include <expected>
+
 PaymentService::PaymentService(PaymentRepository* paymentRepo, CreditRepository* creditRepo, DebtRepository* debtRepo, ConsumptionRepository* consumptionRepo, BalanceRepository* balanceRepo, PersonRepository* personRepo)
 	: paymentRepo(paymentRepo), creditRepo(creditRepo), debtRepo(debtRepo), consumptionRepo(consumptionRepo), balanceRepo(balanceRepo), personRepo(personRepo) {}
 
@@ -23,10 +25,10 @@ void PaymentService::addPayment(const PaymentRequest& request)
 		switch (entry.overpaymentType)
 		{
 		case OverpaymentDisposition::Credit:
-			addCredit(entry.personID, entry.amount, entry.date, "Guthaben durch Einzahlung/Überbezahlung");
+			addCredit(entry.personID, overpaymentAmount, entry.date, "Guthaben durch Einzahlung/Überbezahlung");
 			break;
 		case OverpaymentDisposition::Tip:
-			addTip(entry.personID, entry.amount, entry.date);
+			addTip(entry.personID, overpaymentAmount, entry.date);
 			break;
 		}
 	}
@@ -72,11 +74,22 @@ int64_t PaymentService::addCredit(int64_t personID, double amount, QDate date, s
 
 int64_t PaymentService::addTip(int64_t personID, double amount, QDate date)
 {
+	//std::string tipDescription = "Trinkgeld bei Schuldenbegleichung";
+	//double existingTips{};
+
+	//auto tipEntry = balanceRepo->getEntry(tipDescription);
+	//
+	//if (tipEntry.has_value())
+	//{
+	//	existingTips += tipEntry.value().amount;
+	//	balanceRepo->removeEntry(tipEntry.value().balanceEntryID);
+	//}
+
 	return balanceRepo->addEntry(
 		entry::Balance{ 
 		.balanceEntryID = 0, 
 		.type = BalanceType::Earning, 
-		.description = "Trinkgeld", 
+		.description = "Trinkgeld bei Schuldenbegleichung",
 		.amount = amount, 
 		.dateBooked = date, 
 		.dateAdded = QDate::currentDate(),

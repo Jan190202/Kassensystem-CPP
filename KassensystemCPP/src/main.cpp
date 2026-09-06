@@ -46,9 +46,9 @@ int main(int argc, char* argv[])
 	//ConsumptionRequest cReq2{ .personInput = "Maja Apfel",	 .date = QDate::currentDate(), .nBeer05 = 2, .nBeer04 = 2, .nSoftdrinks = 5, .nWater = 5, .otherExpense = 3.1 };
 	//ConsumptionRequest cReq3{ .personInput = "Max Birne",    .date = QDate::currentDate(), .nBeer05 = 0, .nBeer04 = 1, .nSoftdrinks = 0, .nWater = 0, .otherExpense = 1 };
 
-	BalanceRequest bReq1{ .type = BalanceType::Spending, .description = "", .amount = 11, .date = QDate::currentDate(), .comment = "", .coveringPersonID = std::nullopt };
-	BalanceRequest bReq2{ .type = BalanceType::Earning,  .description = "", .amount = 200, .date = QDate::currentDate(), .comment = "", .coveringPersonID = std::nullopt };
-	BalanceRequest bReq3{ .type = BalanceType::Spending, .description = "", .amount = 13, .date = QDate::currentDate(), .comment = "", .coveringPersonID = p2ID };
+	BalanceRequest bReq1{ .type = BalanceType::Spending, .description = "Eintrag 1", .amount = 11, .date = QDate::currentDate(), .comment = "", .coveringPersonID = std::nullopt };
+	BalanceRequest bReq2{ .type = BalanceType::Earning,  .description = "Eintrag 2", .amount = 200, .date = QDate::currentDate(), .comment = "", .coveringPersonID = std::nullopt };
+	BalanceRequest bReq3{ .type = BalanceType::Spending, .description = "Eintrag 3", .amount = 13, .date = QDate::currentDate(), .comment = "", .coveringPersonID = p2ID };
 
 	PaymentRequest pEntry1{ .personID = p1ID, .date = QDate::currentDate(), .amount = 20, .overpaymentType = OverpaymentDisposition::Credit };
 	PaymentRequest pEntry2{ .personID = p1ID, .date = QDate::currentDate(), .amount = 80, .overpaymentType = OverpaymentDisposition::Tip };
