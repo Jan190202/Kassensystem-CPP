@@ -32,7 +32,7 @@ int64_t BalanceService::addEntry(const BalanceRequest& request)
 		.personID = personID
 	};
 
-	if (entry.personID >= 0 && entry.type == BalanceType::Spending)
+	if (request.coveringPersonID.has_value() && entry.type == BalanceType::Spending)
 	{
 		addCredit(entry.personID, entry.amount, entry.dateBooked, "Abteilungsausgabe übernommen");
 	}

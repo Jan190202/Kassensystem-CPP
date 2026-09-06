@@ -156,12 +156,14 @@ void BalanceTab::initialize()
 
 void BalanceTab::addEntry(BtnIndex mode)
 {
+	dlgInputs inputs;
+
 	std::vector<Person> personVec = personRepo->getAll();
 	auto* inputDialog = new BalanceTabDialog(mode, personVec, this);
 	if (inputDialog->exec() == QDialog::Accepted)
 	{
 		// inputs given and OK pressed
-		dlgInputs inputs = inputDialog->getInputs();
+		inputs = inputDialog->getInputs();
 		qInfo() << inputs.description;
 		qInfo() << inputs.coveringPersonID.has_value();
 		if (inputs.coveringPersonID.has_value())
@@ -170,7 +172,19 @@ void BalanceTab::addEntry(BtnIndex mode)
 		}
 		qInfo() << inputs.comment;
 	}
-	else {} // cancel pressed
+	else { return; } // cancel pressed
+
+	balanceService.addEntry(
+		BalanceRequest{
+			.type = mode==BtnIndex::AddEarning ? BalanceType::Earning : BalanceType::Spending,
+			.description = inputs.description,
+			.amount = inputs.amount,
+			.date = inputs.date,
+			.comment = inputs.comment,
+			.coveringPersonID = inputs.coveringPersonID
+		});
+
+	refresh();
 } 
 
 void BalanceTab::refresh()

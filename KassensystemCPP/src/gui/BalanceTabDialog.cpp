@@ -144,7 +144,7 @@ dlgInputs& BalanceTabDialog::getInputs() const
 {
 	static dlgInputs inputs;
 	inputs.description = edtDescription->text().toStdString();
-	inputs.cost = edtCost->value();
+	inputs.amount = edtCost->value();
 	inputs.date = edtDate->date();
 	inputs.comment = edtComment->toPlainText().toStdString();
 

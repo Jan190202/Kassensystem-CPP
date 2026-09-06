@@ -18,7 +18,7 @@ class QComboBox;
 struct dlgInputs
 {
 	std::string description;
-	double cost;
+	double amount;
 	QDate date;
 	std::string comment;
 	std::optional<int64_t> coveringPersonID;
