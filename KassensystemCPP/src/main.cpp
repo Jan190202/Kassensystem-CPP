@@ -85,4 +85,7 @@ int main(int argc, char* argv[])
 * - apply (save) button only active when changes were made
 * - new button: sync -> save saves to local copy of database, sync pushes it to remote
 * - add little calculator in balanceTab for cash counting
+* - add buttons in PayTab: "Redeem All Credits", "Export Debts (CSV/CopyToClipboard/URL)"
+* - add info-icons in BalanceTab (clickable/tooltip) -> get details on report calculation
+* - add new tab for manual database changes (dropDown for which repository + QTableView)
 */ 

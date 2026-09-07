@@ -19,7 +19,7 @@ public:
 	int64_t addEntry(const BalanceRequest&);
 	std::vector<entry::Balance> getEntries(BalanceType) const;
 
-	RegisterFinancialReport getReport() const;
+	registerFinancials::Report getReport() const;
 private:
 	int64_t addCredit(int64_t personID, double amount, QDate date, std::string description);
 

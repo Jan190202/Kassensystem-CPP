@@ -70,17 +70,21 @@ namespace entry
 	};
 }
 
-struct RegisterFinancialState
+namespace registerFinancials
 {
-	QDate date;
-	double cash, savings, ownCash, foreignCash;
-};
+	struct State
+	{
+		QDate date;
+		double cash, savings, ownCash, foreignCash;
+	};
 
-struct RegisterFinancialReport
-{
-	RegisterFinancialState stateBefore, stateDiff, stateAfter;
-	double totalEarnings, totalSpendings;
-};
+	struct Report
+	{
+		registerFinancials::State stateBefore, stateAfter;
+		double savingsDiff, cashDiff;
+		double totalEarnings, totalSpendings;
+	};
+}
 
 class Person
 {

@@ -229,7 +229,7 @@ void BalanceTab::refresh()
 	}
 
 	// refresh labels
-	RegisterFinancialReport report = balanceService.getReport();
+	const registerFinancials::Report report = balanceService.getReport();
 
 	lEarnings			->setText(QtUtils::toCurrencyFormat(report.totalEarnings));
 	lSpendings			->setText(QtUtils::toCurrencyFormat(report.totalSpendings));
@@ -239,8 +239,8 @@ void BalanceTab::refresh()
 	lSavingsBefore		->setText(QtUtils::toCurrencyFormat(report.stateBefore.savings));
 	lForeignBefore		->setText(QtUtils::toCurrencyFormat(report.stateBefore.foreignCash));
 
-	lSavingsDifference	->setText(QtUtils::toCurrencyFormat(report.stateDiff.savings));
-	lCashDifference		->setText(QtUtils::toCurrencyFormat(report.stateDiff.cash));
+	lSavingsDifference	->setText(QtUtils::toCurrencyFormat(report.savingsDiff));
+	lCashDifference		->setText(QtUtils::toCurrencyFormat(report.cashDiff));
 
 	afterBox			->setTitle(formatHeader(report.stateAfter.date));
 	lSavingsAfter		->setText(QtUtils::toCurrencyFormat(report.stateAfter.savings));

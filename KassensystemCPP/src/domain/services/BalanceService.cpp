@@ -54,7 +54,7 @@ std::vector<entry::Balance> BalanceService::getEntries(BalanceType type) const
 	return balanceRepo->getEntries(type);
 }
 
-RegisterFinancialReport BalanceService::getReport() const
+registerFinancials::Report BalanceService::getReport() const
 {
 	// calculations
 	double totalEarnings = balanceRepo->getTotalEarnings();
@@ -68,25 +68,21 @@ RegisterFinancialReport BalanceService::getReport() const
 	double currentForeignCash = 0; // TBD
 
 	// struct construction
-	RegisterFinancialState stateBefore = financialStateBefore::read();
+	registerFinancials::State stateBefore = financialStateBefore::read();
 
-	RegisterFinancialState stateDiff{
-		.cash = cashDiff,
-		.savings = savingsDiff,
-	};
-
-	RegisterFinancialState stateAfter{
+	registerFinancials::State stateAfter{
 	.date = QDate::currentDate(),
-	.cash = stateBefore.cash + stateDiff.cash,
-	.savings = stateBefore.savings + stateDiff.savings,
-	.ownCash = stateBefore.cash + stateDiff.cash - currentForeignCash,
+	.cash = stateBefore.cash + cashDiff,
+	.savings = stateBefore.savings + savingsDiff,
+	.ownCash = stateBefore.cash + cashDiff - currentForeignCash,
 	.foreignCash = currentForeignCash
 	};
 
-	RegisterFinancialReport report{
+	registerFinancials::Report report{
 		.stateBefore = stateBefore,
-		.stateDiff = stateDiff,
 		.stateAfter = stateAfter,
+		.savingsDiff = savingsDiff,
+		.cashDiff = cashDiff,
 		.totalEarnings = totalEarnings,
 		.totalSpendings = totalSpendings
 	};
