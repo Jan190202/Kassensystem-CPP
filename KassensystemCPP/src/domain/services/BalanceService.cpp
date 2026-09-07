@@ -61,11 +61,11 @@ registerFinancials::Report BalanceService::getReport() const
 	double totalSpendings = balanceRepo->getTotalSpendings();
 
 	double savingsDiff = totalEarnings - totalSpendings;
-	double totalDebt = debtRepo->getTotal();
+	double totalDebt = debtRepo->getTotal(FinancialShare::All);
 	double totalCredit = creditRepo->getTotal();
 	double cashDiff = savingsDiff - totalDebt + totalCredit;
 
-	double currentForeignCash = 0; // TBD
+	double currentForeignCash = debtRepo->getTotal(FinancialShare::Foreign);
 
 	// struct construction
 	registerFinancials::State stateBefore = financialStateBefore::read();

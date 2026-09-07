@@ -19,3 +19,8 @@ enum class GetEntryException
 {
 	EntryNotFound, MultipleEntriesFound
 };
+
+enum class FinancialShare
+{
+	All, Foreign, Own
+};

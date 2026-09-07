@@ -11,7 +11,7 @@ public:
 	virtual ~DebtRepoInMem() = default;
 
 	virtual int64_t addEntry(entry::Debt entry) override;
-	virtual double getTotal() const override;
+	virtual double getTotal(FinancialShare share) const override;
 	virtual double getTotal(int64_t personID) const override;
 	virtual double getDue(int64_t personID) const override;
 	virtual double getSettled(int64_t personID) const override;

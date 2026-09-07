@@ -32,6 +32,7 @@ namespace entry
 		int64_t personID;
 		QDate date;
 		double amount;
+		double foreignShare = 0.85;
 	};
 
 	struct DebtRemaining

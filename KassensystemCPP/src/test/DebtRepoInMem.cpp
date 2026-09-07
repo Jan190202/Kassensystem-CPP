@@ -42,13 +42,27 @@ double DebtRepoInMem::getTotal(int64_t personID) const
 	return amount;
 }
 
-double DebtRepoInMem::getTotal() const
+double DebtRepoInMem::getTotal(FinancialShare share) const
 {
 	double amount = 0;
 
+	double currentShare = 1;
 	for (auto& entry : entries)
 	{
-		amount += entry.amount;
+		switch (share)
+		{
+		case FinancialShare::All:
+			currentShare = 1;
+			break;
+		case FinancialShare::Foreign:
+			currentShare = entry.foreignShare;
+			break;
+		case FinancialShare::Own:
+			currentShare = 1 - entry.foreignShare;
+			break;
+		}
+
+		amount += entry.amount * currentShare;
 	}
 
 	return amount;
