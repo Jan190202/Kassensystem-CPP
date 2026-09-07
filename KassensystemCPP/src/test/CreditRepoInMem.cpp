@@ -40,6 +40,18 @@ double CreditRepoInMem::getCredit(int64_t personID) const
 	return credit;
 }
 
+double CreditRepoInMem::getTotal() const
+{
+	double credit{};
+
+	for (auto& entry : entries)
+	{
+		credit += entry.amount;
+	}
+
+	return credit;
+}
+
 void CreditRepoInMem::resetCredit(int64_t personID)
 {
 	// usage: std::erase_if(container, predicate) where predicate can be a lambda taking an entry and returns true/false (remove/keep)

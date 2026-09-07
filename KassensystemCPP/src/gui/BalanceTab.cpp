@@ -21,9 +21,6 @@ BalanceTab::BalanceTab(const LowerButtonBundle& lowerButtons, BalanceService& ba
 
 void BalanceTab::initialize()
 {
-	// temporary
-	dateBefore = QDate(2000, 1, 1);
-
 	// buttons
 	auto* btnAddEarning		= new QPushButton(tr("+ Einnahme"), this);
 	auto* btnAddSpending	= new QPushButton(tr("+ Ausgabe"), this);
@@ -44,6 +41,9 @@ void BalanceTab::initialize()
 	lSavingsDifference	= new QLabel(QtUtils::toCurrencyFormat(0.0), this);
 	lSavingsAfter		= new QLabel(QtUtils::toCurrencyFormat(0.0), this);
 
+	lForeignBefore		= new QLabel(QtUtils::toCurrencyFormat(0.0), this);
+	lForeignAfter		= new QLabel(QtUtils::toCurrencyFormat(0.0), this);
+
 	lEarnings			= new QLabel(QtUtils::toCurrencyFormat(0.0), this);
 	lSpendings			= new QLabel(QtUtils::toCurrencyFormat(0.0), this);
 
@@ -59,6 +59,8 @@ void BalanceTab::initialize()
 	configureAmount(lSavingsBefore);
 	configureAmount(lSavingsDifference);
 	configureAmount(lSavingsAfter);
+	configureAmount(lForeignBefore);
+	configureAmount(lForeignAfter);
 	configureAmount(lEarnings);
 	configureAmount(lSpendings);
 
@@ -95,16 +97,15 @@ void BalanceTab::initialize()
 	spendingsLayout->addLayout(spendingsFooterLayout);
 
 	// before
-	auto* beforeBox = new QGroupBox(
-		tr("Stand %1").arg(dateBefore.toString(QStringLiteral("dd.MM.yyyy"))),
-		this);
-
+	beforeBox = new QGroupBox(this);
+	
 	auto* beforeLayout = new QFormLayout(beforeBox);
 	beforeLayout->setContentsMargins(12, 16, 12, 12);
 	beforeLayout->setHorizontalSpacing(16);
 	beforeLayout->setVerticalSpacing(7);
 	beforeLayout->addRow(tr("Bestand:"), lSavingsBefore);
 	beforeLayout->addRow(tr("Bar:"), lCashBefore);
+	beforeLayout->addRow(tr("davon Fremdanteil:"), lForeignBefore);
 
 	// difference
 	auto* differenceBox = new QGroupBox(tr("Differenz"), this);
@@ -117,9 +118,8 @@ void BalanceTab::initialize()
 	differenceLayout->addRow(tr("Bar:"), lCashDifference);
 
 	// after
-	auto* afterBox = new QGroupBox(
-		tr("Stand %1").arg(dateAfter.toString(QStringLiteral("dd.MM.yyyy"))),
-		this);
+	afterBox = new QGroupBox(this);
+	afterBox->setTitle(formatHeader(QDate()));
 
 	auto* afterLayout = new QFormLayout(afterBox);
 	afterLayout->setContentsMargins(12, 16, 12, 12);
@@ -127,6 +127,7 @@ void BalanceTab::initialize()
 	afterLayout->setVerticalSpacing(7);
 	afterLayout->addRow(tr("Bestand:"), lSavingsAfter);
 	afterLayout->addRow(tr("Bar:"), lCashAfter);
+	afterLayout->addRow(tr("davon Fremdanteil:"), lForeignAfter);
 
 	// main layout
 	auto* tableLayout = new QHBoxLayout();
@@ -228,7 +229,23 @@ void BalanceTab::refresh()
 	}
 
 	// refresh labels
-	// TBD
+	RegisterFinancialReport report = balanceService.getReport();
+
+	lEarnings			->setText(QtUtils::toCurrencyFormat(report.totalEarnings));
+	lSpendings			->setText(QtUtils::toCurrencyFormat(report.totalSpendings));
+
+	beforeBox			->setTitle(formatHeader(report.stateBefore.date));
+	lCashBefore			->setText(QtUtils::toCurrencyFormat(report.stateBefore.cash));
+	lSavingsBefore		->setText(QtUtils::toCurrencyFormat(report.stateBefore.savings));
+	lForeignBefore		->setText(QtUtils::toCurrencyFormat(report.stateBefore.foreignCash));
+
+	lSavingsDifference	->setText(QtUtils::toCurrencyFormat(report.stateDiff.savings));
+	lCashDifference		->setText(QtUtils::toCurrencyFormat(report.stateDiff.cash));
+
+	afterBox			->setTitle(formatHeader(report.stateAfter.date));
+	lSavingsAfter		->setText(QtUtils::toCurrencyFormat(report.stateAfter.savings));
+	lCashAfter			->setText(QtUtils::toCurrencyFormat(report.stateAfter.cash));
+	lForeignAfter		->setText(QtUtils::toCurrencyFormat(report.stateAfter.foreignCash));
 }
 
 void BalanceTab::apply()
@@ -240,4 +257,9 @@ void BalanceTab::save()
 {
 	apply();
 	// TBD
+}
+
+QString BalanceTab::formatHeader(const QDate& date) const
+{
+	return tr("Stand %1").arg(date.toString(QStringLiteral("dd.MM.yyyy")));
 }

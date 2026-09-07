@@ -31,9 +31,8 @@ int main(int argc, char* argv[])
 	PersonRepository* peRep			= new PersonRepoInMem();
 	DebtRepository* deRep			= new DebtRepoInMem(paRep);
 
-
-	BalanceService			baSer(baRep, crRep, peRep);
 	ConsumptionService		coSer(coRep, deRep, peRep);
+	BalanceService			baSer(baRep, crRep, deRep, peRep);
 	PaymentService			paSer(paRep, crRep, deRep, coRep, baRep, peRep);
 
 	// domain testing
@@ -80,3 +79,10 @@ int main(int argc, char* argv[])
 
 	return app.exec();
 }
+
+/*
+* Ideas:
+* - apply (save) button only active when changes were made
+* - new button: sync -> save saves to local copy of database, sync pushes it to remote
+* - add little calculator in balanceTab for cash counting
+*/ 

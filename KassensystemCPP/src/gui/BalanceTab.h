@@ -7,6 +7,7 @@
 
 class QTableWidget;
 class QLabel;
+class QGroupBox;
 
 class BalanceTab : public BaseTab
 {
@@ -21,18 +22,20 @@ private:
 	QTableWidget* tblSpendings	= nullptr;
 	QTableWidget* tblEarnings	= nullptr;
 	QLabel* lCashBefore			= nullptr;
+	QLabel* lForeignBefore		= nullptr;
 	QLabel* lCashDifference		= nullptr;
 	QLabel* lCashAfter			= nullptr;
 	QLabel* lSavingsBefore		= nullptr;
 	QLabel* lSavingsDifference	= nullptr;
 	QLabel* lSavingsAfter		= nullptr;
+	QLabel* lForeignAfter		= nullptr;
 	QLabel* lEarnings			= nullptr;
 	QLabel* lSpendings			= nullptr;
-
-	QDate dateBefore;
-	QDate dateAfter				= QDate::currentDate();
+	QGroupBox* beforeBox		= nullptr;
+	QGroupBox* afterBox			= nullptr;
 
 	void addEntry(BtnIndex mode);
+	QString formatHeader(const QDate& date) const;
 
 	BalanceService& balanceService;
 	PersonRepository* personRepo;

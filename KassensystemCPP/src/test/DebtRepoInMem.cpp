@@ -42,6 +42,18 @@ double DebtRepoInMem::getTotal(int64_t personID) const
 	return amount;
 }
 
+double DebtRepoInMem::getTotal() const
+{
+	double amount = 0;
+
+	for (auto& entry : entries)
+	{
+		amount += entry.amount;
+	}
+
+	return amount;
+}
+
 double DebtRepoInMem::getDue(int64_t personID) const
 {
 	double due{ 0 };

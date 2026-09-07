@@ -1,13 +1,10 @@
 #include "BalanceService.h"
+#include "domain/model/FinancialStateBefore.h"
 
 #include <optional>
 
-BalanceService::BalanceService(BalanceRepository* balanceRepo, CreditRepository* creditRepo, PersonRepository* personRepo)
-{
-	this->balanceRepo = balanceRepo;
-	this->creditRepo = creditRepo;
-	this->personRepo = personRepo;
-}
+BalanceService::BalanceService(BalanceRepository* balanceRepo, CreditRepository* creditRepo, DebtRepository* debtRepo, PersonRepository* personRepo) 
+	: balanceRepo(balanceRepo), creditRepo(creditRepo), debtRepo(debtRepo), personRepo(personRepo) {}
 
 int64_t BalanceService::addEntry(const BalanceRequest& request)
 {
@@ -40,16 +37,6 @@ int64_t BalanceService::addEntry(const BalanceRequest& request)
 	return balanceRepo->addEntry(entry);
 }
 
-double BalanceService::getTotalEarnings() const
-{
-	return balanceRepo->getTotalEarnings();
-}
-
-double BalanceService::getTotalSpendings() const
-{
-	return balanceRepo->getTotalSpendings();
-}
-
 int64_t BalanceService::addCredit(int64_t personID, double amount, QDate date, std::string description)
 {
 	return creditRepo->addEntry(
@@ -65,4 +52,44 @@ int64_t BalanceService::addCredit(int64_t personID, double amount, QDate date, s
 std::vector<entry::Balance> BalanceService::getEntries(BalanceType type) const
 {
 	return balanceRepo->getEntries(type);
+}
+
+RegisterFinancialReport BalanceService::getReport() const
+{
+	// calculations
+	double totalEarnings = balanceRepo->getTotalEarnings();
+	double totalSpendings = balanceRepo->getTotalSpendings();
+
+	double savingsDiff = totalEarnings - totalSpendings;
+	double totalDebt = debtRepo->getTotal();
+	double totalCredit = creditRepo->getTotal();
+	double cashDiff = savingsDiff - totalDebt + totalCredit;
+
+	double currentForeignCash = 0; // TBD
+
+	// struct construction
+	RegisterFinancialState stateBefore = financialStateBefore::read();
+
+	RegisterFinancialState stateDiff{
+		.cash = cashDiff,
+		.savings = savingsDiff,
+	};
+
+	RegisterFinancialState stateAfter{
+	.date = QDate::currentDate(),
+	.cash = stateBefore.cash + stateDiff.cash,
+	.savings = stateBefore.savings + stateDiff.savings,
+	.ownCash = stateBefore.cash + stateDiff.cash - currentForeignCash,
+	.foreignCash = currentForeignCash
+	};
+
+	RegisterFinancialReport report{
+		.stateBefore = stateBefore,
+		.stateDiff = stateDiff,
+		.stateAfter = stateAfter,
+		.totalEarnings = totalEarnings,
+		.totalSpendings = totalSpendings
+	};
+
+	return report;
 }

@@ -70,6 +70,18 @@ namespace entry
 	};
 }
 
+struct RegisterFinancialState
+{
+	QDate date;
+	double cash, savings, ownCash, foreignCash;
+};
+
+struct RegisterFinancialReport
+{
+	RegisterFinancialState stateBefore, stateDiff, stateAfter;
+	double totalEarnings, totalSpendings;
+};
+
 class Person
 {
 public:
