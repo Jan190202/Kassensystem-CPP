@@ -51,7 +51,6 @@ double PaymentService::addPaymentAllocation(int64_t paymentEntryID, int64_t pers
 			.paymentAllocationEntryID = 0, 
 			.debtEntryID = entryRem.debtEntryID, 
 			.paymentEntryID = paymentEntryID, 
-			.date = date, 
 			.amount = appliedToCurrentEntry };
 
 		paymentRepo->addAllocationEntry(aEntry);

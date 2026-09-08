@@ -57,7 +57,6 @@ namespace entry
 		int64_t paymentAllocationEntryID;
 		int64_t debtEntryID;
 		int64_t paymentEntryID;
-		QDate date;
 		double amount;
 	};
 
@@ -68,6 +67,21 @@ namespace entry
 		QDate date;
 		double amount;
 		std::string description;
+	};
+
+	struct Settlement
+	{
+		int64_t settlementID;
+		QDate date;
+		double amount;
+	};
+
+	struct SettlementAllocation
+	{
+		int64_t settlementAllocationID;
+		int64_t debtEntryID;
+		int64_t settlementID;
+		double amount;
 	};
 }
 

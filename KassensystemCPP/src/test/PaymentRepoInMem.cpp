@@ -39,7 +39,6 @@ int64_t PaymentRepoInMem::addAllocationEntry(entry::PaymentAllocation entry)
 	{
 		qInfo()
 			<< " amount:" << entry.amount
-			<< " date:" << entry.date
 			<< " debtEntryID:" << entry.debtEntryID
 			<< " paymentAllocationID:" << entry.paymentAllocationEntryID
 			<< " paymentEntryID:" << entry.paymentEntryID;
