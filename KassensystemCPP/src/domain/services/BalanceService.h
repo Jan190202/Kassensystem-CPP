@@ -20,6 +20,8 @@ public:
 	std::vector<entry::Balance> getEntries(BalanceType) const;
 
 	registerFinancials::Report getReport() const;
+
+	void settleForeignShare();
 private:
 	int64_t addCredit(int64_t personID, double amount, QDate date, std::string description);
 

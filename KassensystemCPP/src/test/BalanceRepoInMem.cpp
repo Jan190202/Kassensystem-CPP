@@ -28,39 +28,41 @@ int64_t BalanceRepoInMem::addEntry(entry::Balance entry)
 	return entry.balanceEntryID;
 }
 
-double BalanceRepoInMem::getTotalEarnings() const
-{
-	double totalEarnings = 0;
-
-	for (auto& entry : entries)
-	{
-		if (entry.type == BalanceType::Earning)
-		{
-			totalEarnings += entry.amount;
-		}
-	}
-
-	return totalEarnings;
-}
-
-double BalanceRepoInMem::getTotalSpendings() const
-{
-	double totalSpendings = 0;
-
-	for (auto& entry : entries)
-	{
-		if (entry.type == BalanceType::Spending)
-		{
-			totalSpendings += entry.amount;
-		}
-	}
-
-	return totalSpendings;
-}
+//double BalanceRepoInMem::getTotalEarnings() const
+//{
+//	double totalEarnings = 0;
+//
+//	for (auto& entry : entries)
+//	{
+//		if (entry.type == BalanceType::Earning)
+//		{
+//			totalEarnings += entry.amount;
+//		}
+//	}
+//
+//	return totalEarnings;
+//}
+//
+//double BalanceRepoInMem::getTotalSpendings() const
+//{
+//	double totalSpendings = 0;
+//
+//	for (auto& entry : entries)
+//	{
+//		if (entry.type == BalanceType::Spending)
+//		{
+//			totalSpendings += entry.amount;
+//		}
+//	}
+//
+//	return totalSpendings;
+//}
 
 std::vector<entry::Balance> BalanceRepoInMem::getEntries(BalanceType type) const
 {
-	if (type == BalanceType::All) return entries;
+	if (type == BalanceType::EarningAndSpending) return entries;
+
+	if (type == BalanceType::EarningAndSupplement) type = BalanceType::Earning;
 	
 	std::vector<entry::Balance> filteredEntries;
 

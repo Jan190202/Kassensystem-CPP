@@ -2,7 +2,7 @@
 
 enum class BalanceType
 {
-	Earning, Spending, All
+	Earning, EarningAndSupplement, Spending, EarningAndSpending // supplements: drink sales, rounding error at payForeignShare()
 };
 
 enum class OverpaymentDisposition

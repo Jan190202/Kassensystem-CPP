@@ -51,14 +51,40 @@ int64_t BalanceService::addCredit(int64_t personID, double amount, QDate date, s
 
 std::vector<entry::Balance> BalanceService::getEntries(BalanceType type) const
 {
-	return balanceRepo->getEntries(type);
+	auto entries = balanceRepo->getEntries(type);
+
+	if (type == BalanceType::EarningAndSupplement)
+	{
+		entries.push_back(
+			entry::Balance{
+				.type = BalanceType::Earning,
+				.description = "Einnahmen durch Getränkeverkäufe",
+				.amount = debtRepo->getTotal(FinancialShare::Own),
+				.dateBooked = QDate::currentDate()
+			});
+
+		entries.push_back(
+			entry::Balance{
+				.type = BalanceType::Earning,
+				.description = "Rundungsfehler bei Abrechnung (kum.)",
+				.amount = 0, //settlementRepo->getTotalRounding(),
+				.dateBooked = QDate::currentDate()
+			});
+	}
+	
+	return entries;
 }
 
 registerFinancials::Report BalanceService::getReport() const
 {
 	// calculations
-	double totalEarnings = balanceRepo->getTotalEarnings();
-	double totalSpendings = balanceRepo->getTotalSpendings();
+	double totalEarnings{};
+	auto entries = getEntries(BalanceType::EarningAndSupplement);
+	for (const auto& entry : entries) totalEarnings += entry.amount;
+		
+	double totalSpendings{};
+	entries = getEntries(BalanceType::Spending);
+	for (const auto& entry : entries) totalSpendings += entry.amount;
 
 	double savingsDiff = totalEarnings - totalSpendings;
 	double totalDebt = debtRepo->getTotal(FinancialShare::All);
@@ -88,4 +114,9 @@ registerFinancials::Report BalanceService::getReport() const
 	};
 
 	return report;
+}
+
+void BalanceService::settleForeignShare()
+{
+	// settlementRepo->settleForeignShare();
 }

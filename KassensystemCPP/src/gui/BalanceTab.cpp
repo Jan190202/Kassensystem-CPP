@@ -118,6 +118,8 @@ void BalanceTab::initialize()
 	differenceLayout->addRow(tr("Bar:"), lCashDifference);
 
 	// after
+	auto* btnSettleForeign = new QPushButton("Refresh");
+
 	afterBox = new QGroupBox(this);
 	afterBox->setTitle(formatHeader(QDate()));
 
@@ -127,7 +129,13 @@ void BalanceTab::initialize()
 	afterLayout->setVerticalSpacing(7);
 	afterLayout->addRow(tr("Bestand:"), lSavingsAfter);
 	afterLayout->addRow(tr("Bar:"), lCashAfter);
-	afterLayout->addRow(tr("davon Fremdanteil:"), lForeignAfter);
+	
+	auto* foreignAfterLayout = new QHBoxLayout();
+	foreignAfterLayout->setContentsMargins(0, 0, 0, 0);
+	foreignAfterLayout->setSpacing(8);
+	foreignAfterLayout->addWidget(lForeignAfter);
+	foreignAfterLayout->addWidget(btnSettleForeign);
+	afterLayout->addRow(tr("davon Fremdanteil:"), foreignAfterLayout);
 
 	// main layout
 	auto* tableLayout = new QHBoxLayout();
@@ -153,6 +161,7 @@ void BalanceTab::initialize()
 
 	connect(btnAddEarning,  &QPushButton::clicked, this, [=]() {BalanceTab::addEntry(BtnIndex::AddEarning); });
 	connect(btnAddSpending, &QPushButton::clicked, this, [=]() {BalanceTab::addEntry(BtnIndex::AddSpending); });
+	connect(btnSettleForeign, &QPushButton::clicked, this, [=]() {balanceService.settleForeignShare(); });
 }
 
 void BalanceTab::addEntry(BtnIndex mode)
@@ -190,14 +199,27 @@ void BalanceTab::addEntry(BtnIndex mode)
 
 void BalanceTab::refresh()
 {
-	// refresh tables
-	std::vector<QTableWidget*> tables = { tblEarnings, tblSpendings };
-	std::vector<BalanceType> types = { BalanceType::Earning, BalanceType::Spending };
+	const registerFinancials::Report report = balanceService.getReport();
+	
+	refreshTables(report);
+	refreshLables(report);
+}
 
-	for (size_t i = 0; i < tables.size(); i++) 
+void BalanceTab::refreshTables(registerFinancials::Report) const
+{
+	using TableAllocation = std::pair<QTableWidget*, BalanceType>;
+	std::vector<TableAllocation> allocVec;
+	allocVec.reserve(2);
+
+	allocVec.emplace_back(tblEarnings, BalanceType::EarningAndSupplement );
+	allocVec.emplace_back(tblSpendings, BalanceType::Spending );
+	
+	
+	// populate both tables with entries saved in balanceRepo
+	for (size_t i = 0; i < allocVec.size(); i++)
 	{
-		QTableWidget* table = tables.at(i);
-		BalanceType type = types.at(i);
+		QTableWidget* table = allocVec.at(i).first;
+		BalanceType type = allocVec.at(i).second;
 
 		table->clearContents();
 		std::vector<entry::Balance> bEntries = balanceService.getEntries(type);
@@ -208,17 +230,17 @@ void BalanceTab::refresh()
 		table->setColumnCount(colCount);
 		table->setHorizontalHeaderLabels(QtUtils::strVecToQStrList({ "Beschreibung", "Betrag (€)", "Datum" }));
 
-		for (size_t row = 0; row < bEntries.size(); row++) 
+		for (size_t row = 0; row < bEntries.size(); row++)
 		{
 			const entry::Balance& bEntry = bEntries.at(row);
 
 			QTableWidgetItem* descriptionItem = new QTableWidgetItem(QString::fromStdString(bEntry.description));
 			QTableWidgetItem* amountItem = new QTableWidgetItem(QString::number(bEntry.amount, 'f', 2));
-			QTableWidgetItem* dateItem = new QTableWidgetItem(bEntry.dateBooked.toString());
+			QTableWidgetItem* dateItem = new QTableWidgetItem(bEntry.dateBooked.toString(QStringLiteral("dd.MM.yyyy")));
 
-			descriptionItem->setTextAlignment(Qt::AlignHCenter | Qt::AlignVCenter);
-			amountItem->setTextAlignment(Qt::AlignHCenter | Qt::AlignVCenter);
-			dateItem->setTextAlignment(Qt::AlignHCenter | Qt::AlignVCenter);
+			//descriptionItem->setTextAlignment(Qt::AlignHCenter | Qt::AlignVCenter);
+			//amountItem->setTextAlignment(Qt::AlignHCenter | Qt::AlignVCenter);
+			//dateItem->setTextAlignment(Qt::AlignHCenter | Qt::AlignVCenter);
 
 			table->setItem(row, 0, descriptionItem);
 			table->setItem(row, 1, amountItem);
@@ -227,25 +249,25 @@ void BalanceTab::refresh()
 
 		table->resizeColumnsToContents();
 	}
+}
 
-	// refresh labels
-	const registerFinancials::Report report = balanceService.getReport();
+void BalanceTab::refreshLables(registerFinancials::Report report) const
+{
+	lEarnings->setText(QtUtils::toCurrencyFormat(report.totalEarnings));
+	lSpendings->setText(QtUtils::toCurrencyFormat(report.totalSpendings));
 
-	lEarnings			->setText(QtUtils::toCurrencyFormat(report.totalEarnings));
-	lSpendings			->setText(QtUtils::toCurrencyFormat(report.totalSpendings));
+	beforeBox->setTitle(formatHeader(report.stateBefore.date));
+	lCashBefore->setText(QtUtils::toCurrencyFormat(report.stateBefore.cash));
+	lSavingsBefore->setText(QtUtils::toCurrencyFormat(report.stateBefore.savings));
+	lForeignBefore->setText(QtUtils::toCurrencyFormat(report.stateBefore.foreignCash));
 
-	beforeBox			->setTitle(formatHeader(report.stateBefore.date));
-	lCashBefore			->setText(QtUtils::toCurrencyFormat(report.stateBefore.cash));
-	lSavingsBefore		->setText(QtUtils::toCurrencyFormat(report.stateBefore.savings));
-	lForeignBefore		->setText(QtUtils::toCurrencyFormat(report.stateBefore.foreignCash));
+	lSavingsDifference->setText(QtUtils::toCurrencyFormat(report.savingsDiff));
+	lCashDifference->setText(QtUtils::toCurrencyFormat(report.cashDiff));
 
-	lSavingsDifference	->setText(QtUtils::toCurrencyFormat(report.savingsDiff));
-	lCashDifference		->setText(QtUtils::toCurrencyFormat(report.cashDiff));
-
-	afterBox			->setTitle(formatHeader(report.stateAfter.date));
-	lSavingsAfter		->setText(QtUtils::toCurrencyFormat(report.stateAfter.savings));
-	lCashAfter			->setText(QtUtils::toCurrencyFormat(report.stateAfter.cash));
-	lForeignAfter		->setText(QtUtils::toCurrencyFormat(report.stateAfter.foreignCash));
+	afterBox->setTitle(formatHeader(report.stateAfter.date));
+	lSavingsAfter->setText(QtUtils::toCurrencyFormat(report.stateAfter.savings));
+	lCashAfter->setText(QtUtils::toCurrencyFormat(report.stateAfter.cash));
+	lForeignAfter->setText(QtUtils::toCurrencyFormat(report.stateAfter.foreignCash));
 }
 
 void BalanceTab::apply()

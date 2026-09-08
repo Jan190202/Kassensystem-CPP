@@ -36,6 +36,8 @@ private:
 
 	void addEntry(BtnIndex mode);
 	QString formatHeader(const QDate& date) const;
+	void refreshTables(registerFinancials::Report) const;
+	void refreshLables(registerFinancials::Report) const;
 
 	BalanceService& balanceService;
 	PersonRepository* personRepo;
