@@ -39,6 +39,7 @@ private:
 	QString formatHeader(const QDate& date) const;
 	void refreshTables(registerFinancials::Report) const;
 	void refreshLables(registerFinancials::Report) const;
+	void addSettlement();
 
 	BalanceService& balanceService;
 	PersonRepository* personRepo;

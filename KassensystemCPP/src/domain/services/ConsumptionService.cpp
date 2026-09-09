@@ -9,10 +9,8 @@ ConsumptionService::ConsumptionService(ConsumptionRepository* consumptionRepo, D
 
 void ConsumptionService::addConsumption(const request::Consumption& request)
 {
-	// skip zero-entries
 	double amount = calculateDebt(request);
-	if (amount < 1e-9) return; 
-
+	
 	// find or create Person entry
 	int64_t personID{};
 	if (std::holds_alternative<std::string>(request.personInput)) // new name, no avaliable ID
@@ -30,14 +28,15 @@ void ConsumptionService::addConsumption(const request::Consumption& request)
 		}
 		else
 		{
+			using enum validityError::Name;
 			std::string debugString;
 
 			switch (result.error())
 			{
-			case NameValidationError::FirstOrLastNameMissing: debugString = "FirstOrLastNameMissing"; break;
-			case NameValidationError::UnbalancedParentheses: debugString = "UnbalancedParentheses"; break;
-			case NameValidationError::InvalidNicknameFormat: debugString = "InvalidNicknameFormat"; break;
-			case NameValidationError::TooManyComponents: debugString = "TooManyComponents"; break;
+			case FirstOrLastNameMissing: debugString = "FirstOrLastNameMissing"; break;
+			case UnbalancedParentheses: debugString = "UnbalancedParentheses"; break;
+			case InvalidNicknameFormat: debugString = "InvalidNicknameFormat"; break;
+			case TooManyComponents: debugString = "TooManyComponents"; break;
 			}
 			
 			qDebug() << "Error Code " << static_cast<int>(result.error()) << ": " << debugString;
@@ -71,8 +70,10 @@ double ConsumptionService::calculateDebt(const request::Consumption& request) co
 		request.otherExpense;
 }
 
-std::expected< PersonStringSpecifiers, NameValidationError > ConsumptionService::isValidNameFormat(const std::string& nameRequest)
+std::expected< PersonStringSpecifiers, validityError::Name > ConsumptionService::isValidNameFormat(const std::string& nameRequest) const
 {
+	using enum validityError::Name;
+	
 	PersonStringSpecifiers result;
 
 	std::string trimmedRequest = std::regex_replace(nameRequest, std::regex(R"(^\s+|\s+$)"), "");
@@ -92,9 +93,9 @@ std::expected< PersonStringSpecifiers, NameValidationError > ConsumptionService:
 
 		if (openCount != closeCount)
 		{
-			return std::unexpected(NameValidationError::UnbalancedParentheses);
+			return std::unexpected(UnbalancedParentheses);
 		}
-		return std::unexpected(NameValidationError::TooManyComponents);
+		return std::unexpected(TooManyComponents);
 	}
 
 	std::string namePart = baseMatches[1].str();
@@ -104,7 +105,7 @@ std::expected< PersonStringSpecifiers, NameValidationError > ConsumptionService:
 	// detect closing parenthesis without an opening one (lands inside namePart)
 	if (!hasParentheses && trimmedRequest.find(')') != std::string::npos)
 	{
-		return std::unexpected(NameValidationError::UnbalancedParentheses);
+		return std::unexpected(UnbalancedParentheses);
 	}
 
 	// parse first and last name
@@ -115,9 +116,9 @@ std::expected< PersonStringSpecifiers, NameValidationError > ConsumptionService:
 		std::regex oneWordCheck(R"(^\s*\w+\s*$)");
 		if (std::regex_match(namePart, oneWordCheck))  // namePattern has exactly one word
 		{
-			return std::unexpected(NameValidationError::FirstOrLastNameMissing);
+			return std::unexpected(FirstOrLastNameMissing);
 		}
-		return std::unexpected(NameValidationError::TooManyComponents); // namePattern has more than two words
+		return std::unexpected(TooManyComponents); // namePattern has more than two words
 	}
 
 	result.firstName = nameMatches[1].str(); // first capture group (\w+)
@@ -161,9 +162,36 @@ std::expected< PersonStringSpecifiers, NameValidationError > ConsumptionService:
 			}
 			else // broken quotes, e.g. ("X, Y)
 			{
-				return std::unexpected(NameValidationError::InvalidNicknameFormat);
+				return std::unexpected(InvalidNicknameFormat);
 			}
 		}
 	}
 	return result;
+}
+
+std::expected<void, validityError::Code> ConsumptionService::isRequestValid(const request::Consumption& request) const
+{
+	using namespace validityError;
+
+	// check amounts < 0
+	if (request.nBeer04 < 0 || request.nBeer05 < 0 || request.nSoftdrinks < 0 || request.nWater < 0 || request.otherExpense + 1e-9 < 0) 
+		return std::unexpected(Consumption::SomeEntriesSmallerThanZero);
+
+	// check zero-entry;
+	if (calculateDebt(request) < 1e-9)
+		return std::unexpected(Consumption::EmptyConsumptionEntries);
+
+	// check date <= today
+	if (request.date > QDate::currentDate()) 
+		return std::unexpected(Date::DateLaterThanCurrentDate);
+
+	// check name format
+	if (std::holds_alternative<std::string>(request.personInput))
+	{
+		const auto nameValidity = isValidNameFormat(std::get<std::string>(request.personInput));
+		if (!nameValidity.has_value())
+			return std::unexpected(nameValidity.error());
+	}
+
+	return {};
 }

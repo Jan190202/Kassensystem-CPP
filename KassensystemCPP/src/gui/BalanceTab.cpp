@@ -162,40 +162,7 @@ void BalanceTab::initialize()
 
 	connect(btnAddEarning,  &QPushButton::clicked, this, [=]() {BalanceTab::addEntry(BtnIndex::AddEarning); });
 	connect(btnAddSpending, &QPushButton::clicked, this, [=]() {BalanceTab::addEntry(BtnIndex::AddSpending); });
-	connect(btnSettleForeign, &QPushButton::clicked, this, [=]() 
-		{
-			const double minValue = 0.0;
-			const double maxValue = balanceService.getReport().stateAfter.foreignCash;
-			const double initValue = maxValue;
-			const int decimals = 2;
-
-			QInputDialog dialog(this);
-			dialog.setWindowTitle(QStringLiteral("Fremdanteil begleichen"));
-			dialog.setLabelText(QString::fromStdString("Betrag (" + Utils::eurSymbol() + "):"));
-
-			dialog.setDoubleRange(minValue, maxValue);
-			dialog.setDoubleDecimals(decimals);
-			dialog.setDoubleValue(initValue);
-
-			QSize size = dialog.sizeHint();
-			size.setWidth(qMax(size.width(), 200));
-			dialog.resize(size);
-
-			if (dialog.exec() != QDialog::Accepted)
-				return;
-
-			const double settledAmount = dialog.doubleValue();
-
-			if (settledAmount == 0)
-				return;
-			
-			AddSettlementException exc = balanceService.addSettlement(
-				request::Settlement{
-					.amount = settledAmount
-				}); 
-
-			refresh();
-		});
+	connect(btnSettleForeign, &QPushButton::clicked, this, [=]() {BalanceTab::addSettlement(); });
 }
 
 void BalanceTab::addEntry(BtnIndex mode)
@@ -318,4 +285,47 @@ void BalanceTab::save()
 QString BalanceTab::formatHeader(const QDate& date) const
 {
 	return QStringLiteral("Stand %1").arg(date.toString(QStringLiteral("dd.MM.yyyy")));
+}
+
+void BalanceTab::addSettlement()
+{
+	const double minValue = 0.0;
+	const double maxValue = balanceService.getReport().stateAfter.foreignCash; // TBD: get directly from repo
+	const double initValue = maxValue;
+	const int decimals = 2;
+
+	QInputDialog dialog(this);
+	dialog.setWindowTitle(QStringLiteral("Fremdanteil begleichen"));
+	dialog.setLabelText(QString::fromStdString("Betrag (" + Utils::eurSymbol() + "):"));
+
+	dialog.setDoubleRange(minValue, maxValue);
+	dialog.setDoubleDecimals(decimals);
+	dialog.setDoubleValue(initValue);
+
+	QSize size = dialog.sizeHint();
+	size.setWidth(qMax(size.width(), 200));
+	dialog.resize(size);
+
+	if (dialog.exec() != QDialog::Accepted)
+		return;
+
+	const double settledAmount = dialog.doubleValue();
+
+	if (settledAmount == 0)
+		return;
+
+	auto returnMsg = balanceService.addSettlement(
+		request::Settlement{
+			.amount = settledAmount
+		});
+
+	switch (returnMsg) // currently not needed; can be used for error presentation like an error dialog if needed
+	{
+	case AddSettlementException::None: break;
+	case AddSettlementException::AmountZero: break;
+	case AddSettlementException::AmountNegative: break;
+	case AddSettlementException::AmountGreaterThanTotalForeignShare: break;
+	}
+
+	refresh();
 }

@@ -14,6 +14,7 @@
 #include <QSizePolicy>
 #include <QVBoxLayout>
 #include <QSpacerItem>
+#include <QMessageBox>
 
 #include <algorithm>
 #include <string>
@@ -167,13 +168,12 @@ void AddTab::shiftEntries()
 
 void AddTab::apply()
 {
-	while (!entries.empty())
-	{
-		AddTabEntry* entry = entries.back();
-		ConsumptionInputs inputs = entry->getEntryInputs();
-		removeEntry(entry);
+	const std::vector<AddTabEntry*> snapshot = entries; // stable copy of pointers for safe entry removal in loop
 
-		// get last day of month
+	for (auto* entry : snapshot)
+	{
+		ConsumptionInputs inputs = entry->getEntryInputs();
+
 		QDate setDate = monthSelection->date();
 		int nDays = setDate.daysInMonth();
 		int setDays = setDate.day();
@@ -188,7 +188,17 @@ void AddTab::apply()
 			.nWater = inputs.nWater,
 			.otherExpense = inputs.otherExpense };
 
-		consumptionService.addConsumption(request);
+		const auto requestValidity = consumptionService.isRequestValid(request);
+
+		if (requestValidity.has_value())
+		{
+			removeEntry(entry);
+			consumptionService.addConsumption(request);
+		}
+		else
+		{
+			handleInputValidityError(requestValidity.error());
+		}
 	}
 }
 
@@ -197,4 +207,71 @@ void AddTab::save()
 	apply();
 	//consumptionService->save();
 	//consumptionService->sync();
+}
+
+void AddTab::handleInputValidityError(const validityError::Code& errorCode) const
+{
+	using namespace validityError;
+
+	QString errorQStr;
+	if (std::holds_alternative<Name>(errorCode))
+	{
+		errorQStr += QStringLiteral("Name: ");
+		switch (std::get<Name>(errorCode))
+		{
+		case Name::FirstOrLastNameMissing:
+		{
+			errorQStr += QStringLiteral("Vor- oder Nachname fehlt");
+			break;
+		}
+		case Name::InvalidNicknameFormat:
+		{
+			errorQStr += QStringLiteral("Fehlerhafter Spitzname");
+			break;
+		}
+		case Name::TooManyComponents:
+		{
+			errorQStr += QStringLiteral("Zu viele Komponenten");
+			break;
+		}
+		case Name::UnbalancedParentheses:
+		{
+			errorQStr += QStringLiteral("Fehlerhafte Klammerung");
+			break;
+		}
+		}
+		errorQStr += QStringLiteral("\nSyntax: Vorname Nachname ([\"Spitzname\"], [Info])");
+	}
+	else if (std::holds_alternative<Date>(errorCode))
+	{
+		errorQStr += QStringLiteral("Datum: ");
+		switch (std::get<Date>(errorCode))
+		{
+		case Date::DateLaterThanCurrentDate:
+		{
+			errorQStr += QStringLiteral("Zukünftiges Datum eingegeben");
+			break;
+		}
+		}
+	}
+	else if (std::holds_alternative<Consumption>(errorCode))
+	{
+		errorQStr += QStringLiteral("Verbrauch: ");
+		switch (std::get<Consumption>(errorCode))
+		{
+		case Consumption::EmptyConsumptionEntries:
+		{
+			errorQStr += QStringLiteral("Kein Verbrauch eingegeben");
+			break;
+		}
+		case Consumption::SomeEntriesSmallerThanZero:
+		{
+			errorQStr += QStringLiteral("Teilweise negative Verbräuche");
+			break;
+		}
+		}
+	}
+
+	auto* errorDlg = new QMessageBox(QMessageBox::Warning, QStringLiteral("Fehler"), errorQStr);
+	errorDlg->exec();
 }

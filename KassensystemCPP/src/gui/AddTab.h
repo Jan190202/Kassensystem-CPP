@@ -5,6 +5,7 @@
 #include "GuiTypes.h"
 
 #include <vector>
+#include <variant>
 
 class AddTabEntry;
 class QDateEdit;
@@ -15,7 +16,6 @@ class QVBoxLayout;
 class AddTab : public BaseTab
 {
 	Q_OBJECT
-
 public:
 	AddTab(const LowerButtonBundle& lowerButtons, ConsumptionService& consumptionService, PersonRepository* personRepo, QWidget* parent = nullptr);
 	virtual void initialize() override;
@@ -36,6 +36,7 @@ private:
 	void removeEntry(AddTabEntry* entry);
 	void clearEntries();
 	void shiftEntries();
+	void handleInputValidityError(const validityError::Code& errorCode) const;
 
 	ConsumptionService& consumptionService;
 	PersonRepository* personRepo;

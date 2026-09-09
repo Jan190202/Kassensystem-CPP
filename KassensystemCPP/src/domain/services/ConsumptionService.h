@@ -7,31 +7,50 @@
 #include "domain/repoInterface/PersonRepository.h"
 #include <vector>
 #include <expected>
+#include <variant>
+
+namespace validityError
+{
+	enum Name
+	{
+		FirstOrLastNameMissing,
+		UnbalancedParentheses,
+		InvalidNicknameFormat,
+		TooManyComponents
+	};
+
+	enum Date
+	{
+		DateLaterThanCurrentDate
+	};
+
+	enum Consumption
+	{
+		SomeEntriesSmallerThanZero,
+		EmptyConsumptionEntries
+	};
+
+	using Code = std::variant<Name, Date, Consumption>;
+}
 
 struct PersonStringSpecifiers
 {
 	std::string firstName, lastName, nickName, info;
 };
 
-enum NameValidationError
-{
-	FirstOrLastNameMissing,
-	UnbalancedParentheses,
-	InvalidNicknameFormat,
-	TooManyComponents
-};
 
 class ConsumptionService
 {
 public:
 	ConsumptionService(ConsumptionRepository* consumptionRepo, DebtRepository* debtRepo, PersonRepository* personRepo);
+
+	std::expected<void,validityError::Code> isRequestValid(const request::Consumption& request) const;
 	void addConsumption(const request::Consumption& request);
-	
 	double calculateDebt(const request::Consumption&) const;
 	std::vector<entry::Consumption> getEntries(int personID) const;
 private:
 
-	std::expected< PersonStringSpecifiers, NameValidationError > isValidNameFormat(const std::string& nameRequest);
+	std::expected< PersonStringSpecifiers, validityError::Name > isValidNameFormat(const std::string& nameRequest) const;
 
 	ConsumptionRepository* consumptionRepo;
 	DebtRepository* debtRepo;
