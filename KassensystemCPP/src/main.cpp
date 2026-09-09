@@ -14,6 +14,7 @@
 #include "test/ConsumptionRepoInMem.h"
 #include "test/CreditRepoInMem.h"
 #include "test/DebtRepoInMem.h"
+#include "test/SettlementRepoInMem.h"
 #include "test/PaymentRepoInMem.h"
 #include "test/PersonRepoInMem.h"
 
@@ -29,10 +30,12 @@ int main(int argc, char* argv[])
 	CreditRepository* crRep			= new CreditRepoInMem();
 	PaymentRepository* paRep		= new PaymentRepoInMem();
 	PersonRepository* peRep			= new PersonRepoInMem();
-	DebtRepository* deRep			= new DebtRepoInMem(paRep);
+	SettlementRepository* seRep		= new SettlementRepoInMem();
+	DebtRepository* deRep			= new DebtRepoInMem(paRep, seRep);
+
 
 	ConsumptionService		coSer(coRep, deRep, peRep);
-	BalanceService			baSer(baRep, crRep, deRep, peRep);
+	BalanceService			baSer(baRep, crRep, deRep, peRep, seRep);
 	PaymentService			paSer(paRep, crRep, deRep, coRep, baRep, peRep);
 
 	// domain testing

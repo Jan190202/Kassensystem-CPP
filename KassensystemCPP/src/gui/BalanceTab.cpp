@@ -13,6 +13,7 @@
 #include <QTableWidget>
 #include <QVBoxLayout>
 #include <string>
+#include <QInputDialog>
 
 #include <QDebug>
 
@@ -161,7 +162,24 @@ void BalanceTab::initialize()
 
 	connect(btnAddEarning,  &QPushButton::clicked, this, [=]() {BalanceTab::addEntry(BtnIndex::AddEarning); });
 	connect(btnAddSpending, &QPushButton::clicked, this, [=]() {BalanceTab::addEntry(BtnIndex::AddSpending); });
-	connect(btnSettleForeign, &QPushButton::clicked, this, [=]() {balanceService.settleForeignShare(); });
+	connect(btnSettleForeign, &QPushButton::clicked, this, [=]() 
+		{
+			bool ok{};
+			double settledAmount{};
+
+			double initValue = 0.0;
+			double minValue = 0.0;
+			double maxValue = std::ceil(balanceService.getReport().stateAfter.foreignCash);
+			int decimals = 2;
+			settledAmount = QInputDialog::getDouble(this, tr("Beglichenen Betrag eingeben"),
+				tr("Betrag (€):"), initValue, minValue, maxValue, decimals, &ok);
+			if (!ok || settledAmount == 0)
+				return;
+			
+			balanceService.settleForeignShare(settledAmount); 
+
+			refresh();
+		});
 }
 
 void BalanceTab::addEntry(BtnIndex mode)

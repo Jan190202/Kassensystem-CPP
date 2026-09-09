@@ -35,7 +35,7 @@ namespace entry
 		double foreignShare = 0.85;
 	};
 
-	struct DebtRemaining
+	struct Outstanding
 	{
 		int64_t debtEntryID;
 		QDate date;

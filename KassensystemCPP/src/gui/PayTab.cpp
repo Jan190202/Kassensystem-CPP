@@ -275,7 +275,7 @@ void PayTab::refreshTable(int64_t personID)
 	tblConsumption->clearContents();
 	
 	std::vector<entry::Consumption> cEntries = paymentService.getConsumptionEntries(personID);
-	std::vector<entry::DebtRemaining> drEntries = paymentService.getOutstandingEntries(personID, FilterType::IncludeFullyPaid);
+	std::vector<entry::Outstanding> drEntries = paymentService.getPaymentOutstandingEntries(personID, FilterType::IncludeFullyPaid);
 
 	// create items and add them to table
 	int rowCount = drEntries.size();
@@ -288,7 +288,7 @@ void PayTab::refreshTable(int64_t personID)
 	QColor rowColor;
 	for (size_t row = 0; row < drEntries.size(); row++)
 	{
-		const entry::DebtRemaining& drEntry = drEntries.at(row);
+		const entry::Outstanding& drEntry = drEntries.at(row);
 
 		if (std::abs(drEntry.remaining - drEntry.amount) < 1e-9)		// not paid at all
 			rowColor = QColor(Qt::GlobalColor::darkRed);

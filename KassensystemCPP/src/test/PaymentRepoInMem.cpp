@@ -50,7 +50,7 @@ std::vector<entry::PaymentAllocation> PaymentRepoInMem::getAllocEntries(int64_t 
 {
 	std::vector<entry::PaymentAllocation> filteredEntries{};
 
-	for (auto& allocEntry : paymentAllocationEntries)
+	for (const auto& allocEntry : paymentAllocationEntries)
 	{
 		if (allocEntry.debtEntryID == debtEntryID)
 			filteredEntries.push_back(allocEntry);
@@ -58,18 +58,3 @@ std::vector<entry::PaymentAllocation> PaymentRepoInMem::getAllocEntries(int64_t 
 
 	return filteredEntries;
 }
-
-//double PaymentRepoInMem::getPaidAmount(int64_t personID) const
-//{
-//	double paidAmount = 0;
-//	
-//	for (auto& entry : paymentEntries)
-//	{
-//		if (entry.personID == personID)
-//		{
-//			paidAmount += entry.amount;
-//		}
-//	}
-//
-//	return paidAmount;
-//}

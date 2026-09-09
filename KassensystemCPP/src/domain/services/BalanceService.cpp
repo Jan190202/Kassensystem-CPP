@@ -3,8 +3,8 @@
 
 #include <optional>
 
-BalanceService::BalanceService(BalanceRepository* balanceRepo, CreditRepository* creditRepo, DebtRepository* debtRepo, PersonRepository* personRepo) 
-	: balanceRepo(balanceRepo), creditRepo(creditRepo), debtRepo(debtRepo), personRepo(personRepo) {}
+BalanceService::BalanceService(BalanceRepository* balanceRepo, CreditRepository* creditRepo, DebtRepository* debtRepo, PersonRepository* personRepo, SettlementRepository* settlementRepo) 
+	: balanceRepo(balanceRepo), creditRepo(creditRepo), debtRepo(debtRepo), personRepo(personRepo), settlementRepo(settlementRepo) {}
 
 int64_t BalanceService::addEntry(const BalanceRequest& request)
 {
@@ -63,13 +63,13 @@ std::vector<entry::Balance> BalanceService::getEntries(BalanceType type) const
 				.dateBooked = QDate::currentDate()
 			});
 
-		entries.push_back(
-			entry::Balance{
-				.type = BalanceType::Earning,
-				.description = "Rundungsfehler bei Abrechnung (kum.)",
-				.amount = 0, //settlementRepo->getTotalRounding(),
-				.dateBooked = QDate::currentDate()
-			});
+		//entries.push_back(
+		//	entry::Balance{
+		//		.type = BalanceType::Earning,
+		//		.description = "Rundungsfehler bei Abrechnung (kum.)",
+		//		.amount = 0, //settlementRepo->getTotalRounding(),
+		//		.dateBooked = QDate::currentDate()
+		//	});
 	}
 	
 	return entries;
@@ -116,7 +116,7 @@ registerFinancials::Report BalanceService::getReport() const
 	return report;
 }
 
-void BalanceService::settleForeignShare()
+void BalanceService::settleForeignShare(double settledAmount)
 {
-	// settlementRepo->settleForeignShare();
+	debtRepo->getSettlementOutstandingEntries(FilterType::OmitFullyPaid);
 }

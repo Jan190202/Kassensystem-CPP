@@ -36,7 +36,7 @@ void PaymentService::addPayment(const PaymentRequest& request)
 
 double PaymentService::addPaymentAllocation(int64_t paymentEntryID, int64_t personID, double amount, QDate date)
 {
-	std::vector<entry::DebtRemaining> remainingDebtEntries = debtRepo->getOutstandingEntries(personID, FilterType::OmitFullyPaid);
+	std::vector<entry::Outstanding> remainingDebtEntries = debtRepo->getPaymentOutstandingEntries(personID, FilterType::OmitFullyPaid);
 	
 	double amountLeft = amount;
 	for (auto& entryRem : remainingDebtEntries)
@@ -124,9 +124,9 @@ std::vector<entry::Consumption> PaymentService::getConsumptionEntries(int64_t pe
 	return consumptionRepo->getEntries(personID);
 }
 
-std::vector<entry::DebtRemaining> PaymentService::getOutstandingEntries(int64_t personID, FilterType filter)
+std::vector<entry::Outstanding> PaymentService::getPaymentOutstandingEntries(int64_t personID, FilterType filter)
 {
-	return debtRepo->getOutstandingEntries(personID, filter);
+	return debtRepo->getPaymentOutstandingEntries(personID, filter);
 }
 
 void PaymentService::resetCredit(int64_t personID)

@@ -22,3 +22,16 @@ int64_t SettlementRepoInMem::addSettlementAllocationEntry(entry::SettlementAlloc
 	settlementAllocationEntries.push_back(entry);
 	return entry.settlementAllocationID;
 }
+
+std::vector<entry::SettlementAllocation> SettlementRepoInMem::getAllocEntries(int64_t debtEntryID) const
+{
+	std::vector<entry::SettlementAllocation> filteredEntries{};
+
+	for (const auto& allocEntry : settlementAllocationEntries)
+	{
+		if (allocEntry.debtEntryID == debtEntryID)
+			filteredEntries.push_back(allocEntry);
+	}
+
+	return filteredEntries;
+}

@@ -22,7 +22,7 @@ public:
 	double getDueAmount(int64_t personID) const;
 	double getCreditAmount(int64_t personID) const;
 	std::vector<entry::Consumption> getConsumptionEntries(int64_t personID);
-	std::vector<entry::DebtRemaining> getOutstandingEntries(int64_t personID, FilterType filter);
+	std::vector<entry::Outstanding> getPaymentOutstandingEntries(int64_t personID, FilterType filter);
 private:
 	double addPaymentAllocation(int64_t paymentEntryID, int64_t personID, double amount, QDate date);
 	int64_t addTip(int64_t personID, double amount, QDate date);

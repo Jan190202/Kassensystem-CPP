@@ -3,7 +3,8 @@
 
 #include <QDebug>
 
-DebtRepoInMem::DebtRepoInMem(PaymentRepository* paymentRepo) : paymentRepo(paymentRepo) {}
+DebtRepoInMem::DebtRepoInMem(PaymentRepository* paymentRepo, SettlementRepository* settlementRepo) 
+	: paymentRepo(paymentRepo), settlementRepo(settlementRepo) {}
 
 int64_t DebtRepoInMem::addEntry(entry::Debt entry)
 {
@@ -71,7 +72,7 @@ double DebtRepoInMem::getTotal(FinancialShare share) const
 double DebtRepoInMem::getDue(int64_t personID) const
 {
 	double due{ 0 };
-	for (auto& entry : getOutstandingEntries(personID, FilterType::OmitFullyPaid))
+	for (auto& entry : getPaymentOutstandingEntries(personID, FilterType::OmitFullyPaid))
 		due+=entry.remaining;
 	return due;
 }
@@ -79,14 +80,14 @@ double DebtRepoInMem::getDue(int64_t personID) const
 double DebtRepoInMem::getSettled(int64_t personID) const
 {
 	double settled{ 0 };
-	for (auto& entry : getOutstandingEntries(personID, FilterType::IncludeFullyPaid))
+	for (auto& entry : getPaymentOutstandingEntries(personID, FilterType::IncludeFullyPaid))
 		settled += entry.amount - entry.remaining;
 	return settled;
 }
 
-std::vector<entry::DebtRemaining> DebtRepoInMem::getOutstandingEntries(int64_t personID, FilterType filter) const
+std::vector<entry::Outstanding> DebtRepoInMem::getPaymentOutstandingEntries(int64_t personID, FilterType filter) const
 {
-	std::vector<entry::DebtRemaining> filteredEntries = {};
+	std::vector<entry::Outstanding> filteredEntries = {};
 
 	for (auto& entry : entries)
 	{
@@ -96,14 +97,36 @@ std::vector<entry::DebtRemaining> DebtRepoInMem::getOutstandingEntries(int64_t p
 
 			if (filter == FilterType::OmitFullyPaid && remaining < 1e-9) continue;
 
-			entry::DebtRemaining entryRem;
-			entryRem.debtEntryID = entry.debtEntryID;
-			entryRem.date = entry.date;
-			entryRem.amount = entry.amount;
-			entryRem.remaining = remaining;
+			entry::Outstanding entryOut;
+			entryOut.debtEntryID = entry.debtEntryID;
+			entryOut.date = entry.date;
+			entryOut.amount = entry.amount;
+			entryOut.remaining = remaining;
 
-			filteredEntries.push_back(entryRem);
+			filteredEntries.push_back(entryOut);
 		}
+	}
+
+	return filteredEntries;
+}
+
+std::vector<entry::Outstanding> DebtRepoInMem::getSettlementOutstandingEntries(FilterType filter) const
+{
+	std::vector<entry::Outstanding> filteredEntries = {};
+
+	for (const auto& entry : entries)
+	{
+		double remaining = entry.foreignShare * entry.amount -  getAllocatedSettlements(entry.debtEntryID);
+
+		if (filter == FilterType::OmitFullyPaid && remaining < 1e-9) continue;
+
+		entry::Outstanding entryOut;
+		entryOut.debtEntryID = entry.debtEntryID;
+		entryOut.date = entry.date;
+		entryOut.amount = entry.amount;
+		entryOut.remaining = remaining;
+
+		filteredEntries.push_back(entryOut);
 	}
 
 	return filteredEntries;
@@ -118,4 +141,15 @@ double DebtRepoInMem::getAllocatedPayments(int64_t debtEntryID) const
 		allocatedPayments += entry.amount;
 
 	return allocatedPayments;
+}
+
+double DebtRepoInMem::getAllocatedSettlements(int64_t debtEntryID) const
+{
+	std::vector<entry::SettlementAllocation> allocEntries = settlementRepo->getAllocEntries(debtEntryID);
+
+	double allocatedSettlements{};
+	for (auto& entry : allocEntries)
+		allocatedSettlements += entry.amount;
+
+	return allocatedSettlements;
 }

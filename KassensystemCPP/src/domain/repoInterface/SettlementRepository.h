@@ -13,4 +13,6 @@ public:
 
 	virtual int64_t addSettlementEntry(entry::Settlement) = 0;
 	virtual int64_t addSettlementAllocationEntry(entry::SettlementAllocation) = 0;
+
+	virtual std::vector<entry::SettlementAllocation> getAllocEntries(int64_t debtEntryID) const = 0;
 };
