@@ -25,6 +25,12 @@
 
 int main(int argc, char* argv[])
 {
+	QApplication app(argc, argv);
+
+
+
+
+
 	BalanceRepository* baRep		= new BalanceRepoInMem();
 	ConsumptionRepository* coRep	= new ConsumptionRepoInMem();
 	CreditRepository* crRep			= new CreditRepoInMem();
@@ -72,13 +78,11 @@ int main(int argc, char* argv[])
 
 
 
-	// GUI Testing
-	QApplication app(argc, argv);
-	auto services = ServiceBundle{ .paymentService = paSer, .consumptionService = coSer, .balanceService = baSer, .personRepo = peRep};
+
+
+	auto services = ServiceBundle{ .paymentService = paSer, .consumptionService = coSer, .balanceService = baSer, .personRepo = peRep };
 	CashRegisterSystemUI sysUI(services);
 	sysUI.show();
-
-
 
 	return app.exec();
 }

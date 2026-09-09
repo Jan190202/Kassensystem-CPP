@@ -62,11 +62,15 @@ std::vector<entry::Consumption> ConsumptionService::getEntries(int personID) con
 
 double ConsumptionService::calculateDebt(const request::Consumption& request) const
 {
+	using namespace priceList;
+	
+	Entries entries = read();
+	
 	return
-		PriceList::beer04		* request.nBeer04 +
-		PriceList::beer05		* request.nBeer05 +
-		PriceList::water		* request.nWater  +
-		PriceList::softdrink	* request.nSoftdrinks + 
+		entries.beer04			* request.nBeer04 +
+		entries.beer05			* request.nBeer05 +
+		entries.water			* request.nWater +
+		entries.softdrink		* request.nSoftdrinks +
 		request.otherExpense;
 }
 

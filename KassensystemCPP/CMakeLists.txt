@@ -19,6 +19,14 @@ target_include_directories(KassensystemCPP PRIVATE src)
 
 target_compile_features(KassensystemCPP PRIVATE cxx_std_23)
 
+# find and copy data (json-files, ...) into build folder
+add_custom_command(
+    TARGET KassensystemCPP POST_BUILD
+    COMMAND ${CMAKE_COMMAND} -E copy_directory
+        "${CMAKE_CURRENT_SOURCE_DIR}/data"
+        "$<TARGET_FILE_DIR:KassensystemCPP>/data"
+)
+
 # Qt-Integration
 find_package(Qt6 REQUIRED COMPONENTS Widgets)
 
