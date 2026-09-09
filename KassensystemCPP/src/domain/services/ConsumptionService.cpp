@@ -7,7 +7,7 @@
 ConsumptionService::ConsumptionService(ConsumptionRepository* consumptionRepo, DebtRepository* debtRepo, PersonRepository* personRepo)
 	: consumptionRepo(consumptionRepo), debtRepo(debtRepo), personRepo(personRepo) {}
 
-void ConsumptionService::addConsumption(const ConsumptionRequest& request)
+void ConsumptionService::addConsumption(const request::Consumption& request)
 {
 	// skip zero-entries
 	double amount = calculateDebt(request);
@@ -61,7 +61,7 @@ std::vector<entry::Consumption> ConsumptionService::getEntries(int personID) con
 	return consumptionRepo->getEntries(personID);
 }
 
-double ConsumptionService::calculateDebt(const ConsumptionRequest& request) const
+double ConsumptionService::calculateDebt(const request::Consumption& request) const
 {
 	return
 		PriceList::beer04		* request.nBeer04 +

@@ -9,6 +9,9 @@ int64_t SettlementRepoInMem::addSettlementEntry(entry::Settlement entry)
 	entry.settlementID = idgen::getID(usedIDs);
 	
 	settlementEntries.push_back(entry);
+
+	qInfo() << entry;
+
 	return entry.settlementID;
 }
 
@@ -20,6 +23,9 @@ int64_t SettlementRepoInMem::addSettlementAllocationEntry(entry::SettlementAlloc
 	entry.settlementAllocationID = idgen::getID(usedIDs);
 
 	settlementAllocationEntries.push_back(entry);
+
+	qInfo() << entry;
+
 	return entry.settlementAllocationID;
 }
 

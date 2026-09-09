@@ -16,9 +16,9 @@ namespace QtUtils
 		return listQ;
 	}
 
-	QString toCurrencyFormat(double value)
+	QString toCurrencyFormat(double value, int decimals)
 	{
-		return QObject::tr("%1 \u20AC").arg(QString::number(value, 'f', 2));
+		return QStringLiteral("%1 \u20AC").arg(QString::number(value, 'f', decimals));
 	}
 
 	QString extractMonth(QDate date)
@@ -42,5 +42,10 @@ namespace QtUtils
 		}
 
 		return QString::fromStdString(m);
+	}
+
+	QString eurSymbol()
+	{
+		return QStringLiteral("\u20AC");
 	}
 }

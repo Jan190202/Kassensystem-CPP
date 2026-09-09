@@ -15,7 +15,8 @@ public:
 	virtual double getTotal(FinancialShare share) const override;
 	virtual double getTotal(int64_t personID) const override;
 	virtual double getDue(int64_t personID) const override;
-	virtual double getSettled(int64_t personID) const override;
+	virtual double getDue() const override;
+	virtual double getPaid(int64_t personID) const override;
 	virtual std::vector<entry::Outstanding> getPaymentOutstandingEntries(int64_t personID, FilterType filter) const override;
 	virtual std::vector<entry::Outstanding> getSettlementOutstandingEntries(FilterType filter) const override;
 private:

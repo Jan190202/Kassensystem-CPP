@@ -42,18 +42,18 @@ int main(int argc, char* argv[])
 	int64_t p1ID = peRep->addEntry("Tim", "Ebert").getID();
 	int64_t p2ID = peRep->addEntry("Alfons", "Strauss").getID();
 
-	ConsumptionRequest cReq4{ .personInput = p1ID, .date = QDate::currentDate(), .nBeer05 = 6, .nBeer04 = 9, .nSoftdrinks = 3, .nWater = 1, .otherExpense = 1.4 };
-	ConsumptionRequest cReq5{ .personInput = p1ID, .date = QDate::currentDate(), .nBeer05 = 60, .nBeer04 = 9, .nSoftdrinks = 3, .nWater = 1, .otherExpense = 1.4 };
-	//ConsumptionRequest cReq1{ .personInput = "Dieter Armen", .date = QDate::currentDate(), .nBeer05 = 1, .nBeer04 = 2, .nSoftdrinks = 3, .nWater = 1, .otherExpense = 1.4 };
-	//ConsumptionRequest cReq2{ .personInput = "Maja Apfel",	 .date = QDate::currentDate(), .nBeer05 = 2, .nBeer04 = 2, .nSoftdrinks = 5, .nWater = 5, .otherExpense = 3.1 };
-	//ConsumptionRequest cReq3{ .personInput = "Max Birne",    .date = QDate::currentDate(), .nBeer05 = 0, .nBeer04 = 1, .nSoftdrinks = 0, .nWater = 0, .otherExpense = 1 };
+	request::Consumption cReq4{ .personInput = p1ID, .date = QDate::currentDate(), .nBeer05 = 6, .nBeer04 = 9, .nSoftdrinks = 3, .nWater = 1, .otherExpense = 1.4 };
+	request::Consumption cReq5{ .personInput = p1ID, .date = QDate::currentDate(), .nBeer05 = 60, .nBeer04 = 9, .nSoftdrinks = 3, .nWater = 1, .otherExpense = 1.4 };
+	//request::Consumption cReq1{ .personInput = "Dieter Armen", .date = QDate::currentDate(), .nBeer05 = 1, .nBeer04 = 2, .nSoftdrinks = 3, .nWater = 1, .otherExpense = 1.4 };
+	//request::Consumption cReq2{ .personInput = "Maja Apfel",	 .date = QDate::currentDate(), .nBeer05 = 2, .nBeer04 = 2, .nSoftdrinks = 5, .nWater = 5, .otherExpense = 3.1 };
+	//request::Consumption cReq3{ .personInput = "Max Birne",    .date = QDate::currentDate(), .nBeer05 = 0, .nBeer04 = 1, .nSoftdrinks = 0, .nWater = 0, .otherExpense = 1 };
 
-	BalanceRequest bReq1{ .type = BalanceType::Spending, .description = "Eintrag 1", .amount = 11, .date = QDate::currentDate(), .comment = "", .coveringPersonID = std::nullopt };
-	BalanceRequest bReq2{ .type = BalanceType::Earning,  .description = "Eintrag 2", .amount = 200, .date = QDate::currentDate(), .comment = "", .coveringPersonID = std::nullopt };
-	BalanceRequest bReq3{ .type = BalanceType::Spending, .description = "Eintrag 3", .amount = 13, .date = QDate::currentDate(), .comment = "", .coveringPersonID = p2ID };
+	request::Balance bReq1{ .type = BalanceType::Spending, .description = "Eintrag 1", .amount = 11, .date = QDate::currentDate(), .comment = "", .coveringPersonID = std::nullopt };
+	request::Balance bReq2{ .type = BalanceType::Earning,  .description = "Eintrag 2", .amount = 200, .date = QDate::currentDate(), .comment = "", .coveringPersonID = std::nullopt };
+	request::Balance bReq3{ .type = BalanceType::Spending, .description = "Eintrag 3", .amount = 13, .date = QDate::currentDate(), .comment = "", .coveringPersonID = p2ID };
 
-	PaymentRequest pEntry1{ .personID = p1ID, .date = QDate::currentDate(), .amount = 20, .overpaymentType = OverpaymentDisposition::Credit };
-	PaymentRequest pEntry2{ .personID = p1ID, .date = QDate::currentDate(), .amount = 80, .overpaymentType = OverpaymentDisposition::Tip };
+	request::Payment pEntry1{ .personID = p1ID, .date = QDate::currentDate(), .amount = 20, .overpaymentType = OverpaymentDisposition::Credit };
+	request::Payment pEntry2{ .personID = p1ID, .date = QDate::currentDate(), .amount = 80, .overpaymentType = OverpaymentDisposition::Tip };
 
 
 	//coSer.addConsumption(cReq1);

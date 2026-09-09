@@ -6,7 +6,7 @@
 BalanceService::BalanceService(BalanceRepository* balanceRepo, CreditRepository* creditRepo, DebtRepository* debtRepo, PersonRepository* personRepo, SettlementRepository* settlementRepo) 
 	: balanceRepo(balanceRepo), creditRepo(creditRepo), debtRepo(debtRepo), personRepo(personRepo), settlementRepo(settlementRepo) {}
 
-int64_t BalanceService::addEntry(const BalanceRequest& request)
+int64_t BalanceService::addEntry(const request::Balance& request)
 {
 	int64_t personID{};
 	if (request.coveringPersonID.has_value())
@@ -91,7 +91,7 @@ registerFinancials::Report BalanceService::getReport() const
 	double totalCredit = creditRepo->getTotal();
 	double cashDiff = savingsDiff - totalDebt + totalCredit;
 
-	double currentForeignCash = debtRepo->getTotal(FinancialShare::Foreign);
+	double currentForeignCash = debtRepo->getDue();
 
 	// struct construction
 	registerFinancials::State stateBefore = financialStateBefore::read();
@@ -116,7 +116,58 @@ registerFinancials::Report BalanceService::getReport() const
 	return report;
 }
 
-void BalanceService::settleForeignShare(double settledAmount)
+AddSettlementException BalanceService::addSettlement(request::Settlement request)
 {
+	if (request.amount < 0) 
+		return AddSettlementException::AmountNegative;
+	if (request.amount < 1e-9) 
+		return AddSettlementException::AmountZero;
+	if (request.amount - debtRepo->getDue() > 1e-9)
+		return AddSettlementException::AmountGreaterThanTotalForeignShare;
+
+	entry::Settlement entry{
+		.settlementID = 0,
+		.date = QDate::currentDate(),
+		.amount = request.amount,
+	};
+
+	int64_t settlementEntryID = settlementRepo->addSettlementEntry(entry);
+
+	double overpaymentAmount = addSettlementAllocation(settlementEntryID, entry.amount);
+
+	if (overpaymentAmount > 1e-9)
+	{
+		// case currently caught with AddSettlementException::AmountGreaterThantTotalForeignShare
+		// if settlement in advance (or up-rounding) intended later, implement here
+	}
+
 	debtRepo->getSettlementOutstandingEntries(FilterType::OmitFullyPaid);
+
+	return AddSettlementException::None;
+}
+
+double BalanceService::addSettlementAllocation(int64_t settlementEntryID, double amount)
+{
+	std::vector<entry::Outstanding> remainingDebtEntries = debtRepo->getSettlementOutstandingEntries(FilterType::OmitFullyPaid);
+
+	double amountLeft = amount;
+	for (const auto& entryRem : remainingDebtEntries)
+	{
+		if (amountLeft < 1e-9) break;
+
+		double appliedToCurrentEntry = std::min(amountLeft, entryRem.remaining);
+
+		amountLeft -= appliedToCurrentEntry;
+
+		entry::SettlementAllocation aEntry{
+			.settlementAllocationID = 0,
+			.debtEntryID = entryRem.debtEntryID,
+			.settlementID = settlementEntryID,
+			.amount = appliedToCurrentEntry 
+		};
+
+		settlementRepo->addSettlementAllocationEntry(aEntry);
+	}
+
+	return amountLeft;
 }

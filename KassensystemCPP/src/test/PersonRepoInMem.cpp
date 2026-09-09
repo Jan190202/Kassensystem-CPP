@@ -30,13 +30,7 @@ Person PersonRepoInMem::addEntry(const std::string& firstName, const std::string
 	Person person{ firstName, lastName, id, nickName, info };
 	entries.push_back(person);
 
-	qInfo() << "PersonEntry added! Entries: ";
-	for (auto& entry : entries)
-	{
-		qInfo()
-			<< " ID:" << entry.getID()
-			<< " name:" << entry.getFullSpecifier();
-	}
+	qInfo() << person;
 
 	return person;
 }

@@ -25,9 +25,9 @@ class ConsumptionService
 {
 public:
 	ConsumptionService(ConsumptionRepository* consumptionRepo, DebtRepository* debtRepo, PersonRepository* personRepo);
-	void addConsumption(const ConsumptionRequest& request);
+	void addConsumption(const request::Consumption& request);
 	
-	double calculateDebt(const ConsumptionRequest&) const;
+	double calculateDebt(const request::Consumption&) const;
 	std::vector<entry::Consumption> getEntries(int personID) const;
 private:
 

@@ -15,7 +15,7 @@ class PaymentService
 public:
 	PaymentService(PaymentRepository*, CreditRepository*, DebtRepository*, ConsumptionRepository*, BalanceRepository*, PersonRepository*);
 	
-	void addPayment(const PaymentRequest& request);
+	void addPayment(const request::Payment& request);
 	void resetCredit(int64_t personID);
 	double getSettledAmount(int64_t personID) const;
 	double getTotalAmount(int64_t personID) const;
@@ -24,7 +24,7 @@ public:
 	std::vector<entry::Consumption> getConsumptionEntries(int64_t personID);
 	std::vector<entry::Outstanding> getPaymentOutstandingEntries(int64_t personID, FilterType filter);
 private:
-	double addPaymentAllocation(int64_t paymentEntryID, int64_t personID, double amount, QDate date);
+	double addPaymentAllocation(int64_t paymentEntryID, int64_t personID, double amount);
 	int64_t addTip(int64_t personID, double amount, QDate date);
 	int64_t addCredit(int64_t personID, double amount, QDate date, std::string description);
 

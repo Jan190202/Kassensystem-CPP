@@ -28,7 +28,9 @@ namespace QtUtils
 		return listQ;
 	}
 
-	QString toCurrencyFormat(double value);
+	QString toCurrencyFormat(double value, int decimals = 2);
+
+	QString eurSymbol();
 
 	QString extractMonth(QDate);
 }

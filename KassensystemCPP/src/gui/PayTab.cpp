@@ -28,10 +28,10 @@ void PayTab::initialize()
 	nameSelect->setEditable(false);
 
 	// overview
-	auto* totalTextLabel	= new QLabel(tr("Gesamt"), this);
-	auto* paidTextLabel		= new QLabel(tr("Beglichen"), this);
-	auto* dueTextLabel		= new QLabel(tr("Ausstehend"), this);
-	auto* creditTextLabel	= new QLabel(tr("Guthaben"), this);
+	auto* totalTextLabel	= new QLabel(QStringLiteral("Gesamt"), this);
+	auto* paidTextLabel		= new QLabel(QStringLiteral("Beglichen"), this);
+	auto* dueTextLabel		= new QLabel(QStringLiteral("Ausstehend"), this);
+	auto* creditTextLabel	= new QLabel(QStringLiteral("Guthaben"), this);
 
 	totalNumLabel	= new QLabel(QtUtils::toCurrencyFormat(0.0), this);
 	settledNumLabel	= new QLabel(QtUtils::toCurrencyFormat(0.0), this);
@@ -53,7 +53,7 @@ void PayTab::initialize()
 	dueFont.setBold(true);
 	dueNumLabel->setFont(dueFont);
 
-	btnUseCredit = new QPushButton(tr("Refresh"), this);
+	btnUseCredit = new QPushButton(QStringLiteral("Refresh"), this);
 	btnUseCredit->setEnabled(false);
 
 	// payment
@@ -61,16 +61,16 @@ void PayTab::initialize()
 	paymentSpinBox->setDecimals(2);
 	paymentSpinBox->setMinimum(0.0);
 	paymentSpinBox->setMaximum(999999.99);
-	paymentSpinBox->setSuffix(tr(" €"));
+	paymentSpinBox->setSuffix(QStringLiteral(" ") + QtUtils::eurSymbol());
 	paymentSpinBox->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
 
-	fullPaymentCheckBox = new QCheckBox(tr("Ausstand übernehmen"), this);
+	fullPaymentCheckBox = new QCheckBox(QStringLiteral("Ausstand übernehmen"), this);
 
 	// surplus
-	btnSurplusToCredit = new QRadioButton(tr("als Guthaben"), this);
+	btnSurplusToCredit = new QRadioButton(QStringLiteral("als Guthaben"), this);
 	btnSurplusToCredit->setChecked(true);
 
-	btnSurplusToTip = new QRadioButton(tr("als Trinkgeld"), this);
+	btnSurplusToTip = new QRadioButton(QStringLiteral("als Trinkgeld"), this);
 
 	auto* surplusGroup = new QButtonGroup(this);
 	surplusGroup->addButton(btnSurplusToCredit);
@@ -85,12 +85,12 @@ void PayTab::initialize()
 	leftLayout->setContentsMargins(0, 0, 0, 0);
 	leftLayout->setSpacing(14);
 
-	auto* customerBox = new QGroupBox(tr("Person"), this);
+	auto* customerBox = new QGroupBox(QStringLiteral("Person"), this);
 	auto* customerLayout = new QVBoxLayout(customerBox);
 	customerLayout->setContentsMargins(12, 14, 12, 12);
 	customerLayout->addWidget(nameSelect);
 
-	auto* summaryBox = new QGroupBox(tr("Übersicht"), this);
+	auto* summaryBox = new QGroupBox(QStringLiteral("Übersicht"), this);
 	auto* summaryLayout = new QFormLayout(summaryBox);
 	summaryLayout->setContentsMargins(12, 14, 12, 12);
 	summaryLayout->setHorizontalSpacing(16);
@@ -109,7 +109,7 @@ void PayTab::initialize()
 
 	summaryLayout->addRow(creditTextLabel, creditLayout);
 
-	auto* paymentBox = new QGroupBox(tr("Zahlung erfassen"), this);
+	auto* paymentBox = new QGroupBox(QStringLiteral("Zahlung erfassen"), this);
 	auto* paymentLayout = new QVBoxLayout(paymentBox);
 	paymentLayout->setContentsMargins(12, 14, 12, 12);
 	paymentLayout->setSpacing(10);
@@ -117,12 +117,12 @@ void PayTab::initialize()
 	auto* amountLayout = new QFormLayout();
 	amountLayout->setContentsMargins(0, 0, 0, 0);
 	amountLayout->setHorizontalSpacing(16);
-	amountLayout->addRow(tr("Betrag"), paymentSpinBox);
+	amountLayout->addRow(QStringLiteral("Betrag"), paymentSpinBox);
 
 	paymentLayout->addLayout(amountLayout);
 	paymentLayout->addWidget(fullPaymentCheckBox);
 
-	auto* surplusBox = new QGroupBox(tr("Überschuss behandeln"), this);
+	auto* surplusBox = new QGroupBox(QStringLiteral("Überschuss behandeln"), this);
 	auto* surplusLayout = new QHBoxLayout(surplusBox);
 	surplusLayout->setContentsMargins(12, 14, 12, 12);
 	surplusLayout->setSpacing(18);
@@ -234,7 +234,7 @@ void PayTab::refresh()
 
 void PayTab::apply()
 {
-	PaymentRequest request{
+	request::Payment request{
 		.personID = nameSelect->currentData().toLongLong(),
 		.date = QDate::currentDate(),
 		.amount = paymentSpinBox->value(),
@@ -258,7 +258,7 @@ void PayTab::redeemCredit()
 	
 	paymentService.resetCredit(personID);
 
-	PaymentRequest request{
+	request::Payment request{
 		.personID = personID,
 		.date = QDate::currentDate(),
 		.amount = credit,
@@ -283,7 +283,7 @@ void PayTab::refreshTable(int64_t personID)
 
 	tblConsumption->setRowCount(rowCount);
 	tblConsumption->setColumnCount(columnCount);
-	tblConsumption->setHorizontalHeaderLabels(QtUtils::strVecToQStrList({ "Monat", "Bezahlt/Gesamt (€)", "Bier (0.5l)", "Bier (0.4l)", "Wasser", "Softdrinks"}));
+	tblConsumption->setHorizontalHeaderLabels(QtUtils::strVecToQStrList({ "Monat", "Bezahlt/Gesamt (" + Utils::eurSymbol() + ")", "Bier (0.5l)", "Bier (0.4l)", "Wasser", "Softdrinks"}));
 
 	QColor rowColor;
 	for (size_t row = 0; row < drEntries.size(); row++)

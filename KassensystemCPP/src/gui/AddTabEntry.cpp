@@ -56,7 +56,7 @@ AddTabEntry::AddTabEntry(const std::vector<Person>& personVec, QWidget* parent)
 	spinboxCustom->setMaximum(999.99);
 	spinboxCustom->setDecimals(2);
 	spinboxCustom->setSingleStep(0.5);
-	spinboxCustom->setSuffix(QStringLiteral(" €"));
+	spinboxCustom->setSuffix(QStringLiteral(" ") + QtUtils::eurSymbol());
 	spinboxCustom->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
 
 	lCost = new QLabel(QtUtils::toCurrencyFormat(entryCost), parent);
@@ -64,7 +64,7 @@ AddTabEntry::AddTabEntry(const std::vector<Person>& personVec, QWidget* parent)
 	lCost->setMinimumWidth(70);
 
 	btnRemove = new QPushButton(QStringLiteral("−"), parent);
-	btnRemove->setToolTip(tr("Eintrag entfernen"));
+	btnRemove->setToolTip(QStringLiteral("Eintrag entfernen"));
 	btnRemove->setFixedWidth(36);
 
 	connect(btnRemove, &QPushButton::clicked, this, [this]() { emit remove(this); });

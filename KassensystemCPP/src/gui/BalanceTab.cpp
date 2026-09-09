@@ -23,8 +23,8 @@ BalanceTab::BalanceTab(const LowerButtonBundle& lowerButtons, BalanceService& ba
 void BalanceTab::initialize()
 {
 	// buttons
-	auto* btnAddEarning		= new QPushButton(tr("+ Einnahme"), this);
-	auto* btnAddSpending	= new QPushButton(tr("+ Ausgabe"), this);
+	auto* btnAddEarning		= new QPushButton(QStringLiteral("+ Einnahme"), this);
+	auto* btnAddSpending	= new QPushButton(QStringLiteral("+ Ausgabe"), this);
 
 	// tables
 	tblEarnings		= new QTableWidget(this);
@@ -66,14 +66,14 @@ void BalanceTab::initialize()
 	configureAmount(lSpendings);
 
 	// earnings
-	auto* earningsBox = new QGroupBox(tr("Einnahmen"), this);
+	auto* earningsBox = new QGroupBox(QStringLiteral("Einnahmen"), this);
 	auto* earningsLayout = new QVBoxLayout(earningsBox);
 	earningsLayout->setContentsMargins(12, 16, 12, 12);
 	earningsLayout->setSpacing(10);
 
 	auto* earningsFooterLayout = new QHBoxLayout();
 	earningsFooterLayout->setContentsMargins(0, 0, 0, 0);
-	earningsFooterLayout->addWidget(new QLabel(tr("Gesamt:"), earningsBox));
+	earningsFooterLayout->addWidget(new QLabel(QStringLiteral("Gesamt:"), earningsBox));
 	earningsFooterLayout->addWidget(lEarnings);
 	earningsFooterLayout->addStretch();
 	earningsFooterLayout->addWidget(btnAddEarning);
@@ -82,14 +82,14 @@ void BalanceTab::initialize()
 	earningsLayout->addLayout(earningsFooterLayout);
 
 	// spendings
-	auto* spendingsBox = new QGroupBox(tr("Ausgaben"), this);
+	auto* spendingsBox = new QGroupBox(QStringLiteral("Ausgaben"), this);
 	auto* spendingsLayout = new QVBoxLayout(spendingsBox);
 	spendingsLayout->setContentsMargins(12, 16, 12, 12);
 	spendingsLayout->setSpacing(10);
 
 	auto* spendingsFooterLayout = new QHBoxLayout();
 	spendingsFooterLayout->setContentsMargins(0, 0, 0, 0);
-	spendingsFooterLayout->addWidget(new QLabel(tr("Gesamt:"), spendingsBox));
+	spendingsFooterLayout->addWidget(new QLabel(QStringLiteral("Gesamt:"), spendingsBox));
 	spendingsFooterLayout->addWidget(lSpendings);
 	spendingsFooterLayout->addStretch();
 	spendingsFooterLayout->addWidget(btnAddSpending);
@@ -104,19 +104,19 @@ void BalanceTab::initialize()
 	beforeLayout->setContentsMargins(12, 16, 12, 12);
 	beforeLayout->setHorizontalSpacing(16);
 	beforeLayout->setVerticalSpacing(7);
-	beforeLayout->addRow(tr("Bestand:"), lSavingsBefore);
-	beforeLayout->addRow(tr("Bar:"), lCashBefore);
-	beforeLayout->addRow(tr("davon Fremdanteil:"), lForeignBefore);
+	beforeLayout->addRow(QStringLiteral("Bestand:"), lSavingsBefore);
+	beforeLayout->addRow(QStringLiteral("Bar:"), lCashBefore);
+	beforeLayout->addRow(QStringLiteral("davon Fremdanteil:"), lForeignBefore);
 
 	// difference
-	auto* differenceBox = new QGroupBox(tr("Differenz"), this);
+	auto* differenceBox = new QGroupBox(QStringLiteral("Differenz"), this);
 
 	auto* differenceLayout = new QFormLayout(differenceBox);
 	differenceLayout->setContentsMargins(12, 16, 12, 12);
 	differenceLayout->setHorizontalSpacing(16);
 	differenceLayout->setVerticalSpacing(7);
-	differenceLayout->addRow(tr("Bestand:"), lSavingsDifference);
-	differenceLayout->addRow(tr("Bar:"), lCashDifference);
+	differenceLayout->addRow(QStringLiteral("Bestand:"), lSavingsDifference);
+	differenceLayout->addRow(QStringLiteral("Bar:"), lCashDifference);
 
 	// after
 	auto* btnSettleForeign = new QPushButton("Refresh");
@@ -128,15 +128,15 @@ void BalanceTab::initialize()
 	afterLayout->setContentsMargins(12, 16, 12, 12);
 	afterLayout->setHorizontalSpacing(16);
 	afterLayout->setVerticalSpacing(7);
-	afterLayout->addRow(tr("Bestand:"), lSavingsAfter);
-	afterLayout->addRow(tr("Bar:"), lCashAfter);
+	afterLayout->addRow(QStringLiteral("Bestand:"), lSavingsAfter);
+	afterLayout->addRow(QStringLiteral("Bar:"), lCashAfter);
 	
 	auto* foreignAfterLayout = new QHBoxLayout();
 	foreignAfterLayout->setContentsMargins(0, 0, 0, 0);
 	foreignAfterLayout->setSpacing(8);
 	foreignAfterLayout->addWidget(lForeignAfter);
 	foreignAfterLayout->addWidget(btnSettleForeign);
-	afterLayout->addRow(tr("davon Fremdanteil:"), foreignAfterLayout);
+	afterLayout->addRow(QStringLiteral("davon Fremdanteil:"), foreignAfterLayout);
 
 	// main layout
 	auto* tableLayout = new QHBoxLayout();
@@ -164,19 +164,35 @@ void BalanceTab::initialize()
 	connect(btnAddSpending, &QPushButton::clicked, this, [=]() {BalanceTab::addEntry(BtnIndex::AddSpending); });
 	connect(btnSettleForeign, &QPushButton::clicked, this, [=]() 
 		{
-			bool ok{};
-			double settledAmount{};
+			const double minValue = 0.0;
+			const double maxValue = balanceService.getReport().stateAfter.foreignCash;
+			const double initValue = maxValue;
+			const int decimals = 2;
 
-			double initValue = 0.0;
-			double minValue = 0.0;
-			double maxValue = std::ceil(balanceService.getReport().stateAfter.foreignCash);
-			int decimals = 2;
-			settledAmount = QInputDialog::getDouble(this, tr("Beglichenen Betrag eingeben"),
-				tr("Betrag (€):"), initValue, minValue, maxValue, decimals, &ok);
-			if (!ok || settledAmount == 0)
+			QInputDialog dialog(this);
+			dialog.setWindowTitle(QStringLiteral("Fremdanteil begleichen"));
+			dialog.setLabelText(QString::fromStdString("Betrag (" + Utils::eurSymbol() + "):"));
+
+			dialog.setDoubleRange(minValue, maxValue);
+			dialog.setDoubleDecimals(decimals);
+			dialog.setDoubleValue(initValue);
+
+			QSize size = dialog.sizeHint();
+			size.setWidth(qMax(size.width(), 200));
+			dialog.resize(size);
+
+			if (dialog.exec() != QDialog::Accepted)
+				return;
+
+			const double settledAmount = dialog.doubleValue();
+
+			if (settledAmount == 0)
 				return;
 			
-			balanceService.settleForeignShare(settledAmount); 
+			AddSettlementException exc = balanceService.addSettlement(
+				request::Settlement{
+					.amount = settledAmount
+				}); 
 
 			refresh();
 		});
@@ -203,7 +219,7 @@ void BalanceTab::addEntry(BtnIndex mode)
 	else { return; } // cancel pressed
 
 	balanceService.addEntry(
-		BalanceRequest{
+		request::Balance{
 			.type = mode==BtnIndex::AddEarning ? BalanceType::Earning : BalanceType::Spending,
 			.description = inputs.description,
 			.amount = inputs.amount,
@@ -246,7 +262,7 @@ void BalanceTab::refreshTables(registerFinancials::Report) const
 
 		table->setRowCount(rowCount);
 		table->setColumnCount(colCount);
-		table->setHorizontalHeaderLabels(QtUtils::strVecToQStrList({ "Beschreibung", "Betrag (€)", "Datum" }));
+		table->setHorizontalHeaderLabels(QtUtils::strVecToQStrList({ "Beschreibung", "Betrag (" + Utils::eurSymbol() + ")", "Datum"}));
 
 		for (size_t row = 0; row < bEntries.size(); row++)
 		{
@@ -285,7 +301,7 @@ void BalanceTab::refreshLables(registerFinancials::Report report) const
 	afterBox->setTitle(formatHeader(report.stateAfter.date));
 	lSavingsAfter->setText(QtUtils::toCurrencyFormat(report.stateAfter.savings));
 	lCashAfter->setText(QtUtils::toCurrencyFormat(report.stateAfter.cash));
-	lForeignAfter->setText(QtUtils::toCurrencyFormat(report.stateAfter.foreignCash));
+	lForeignAfter->setText(QtUtils::toCurrencyFormat(report.stateAfter.foreignCash, 3));
 }
 
 void BalanceTab::apply()
@@ -301,5 +317,5 @@ void BalanceTab::save()
 
 QString BalanceTab::formatHeader(const QDate& date) const
 {
-	return tr("Stand %1").arg(date.toString(QStringLiteral("dd.MM.yyyy")));
+	return QStringLiteral("Stand %1").arg(date.toString(QStringLiteral("dd.MM.yyyy")));
 }

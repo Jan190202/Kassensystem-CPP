@@ -9,28 +9,20 @@ DebtRepoInMem::DebtRepoInMem(PaymentRepository* paymentRepo, SettlementRepositor
 int64_t DebtRepoInMem::addEntry(entry::Debt entry)
 {
 	std::vector<int64_t> usedIDs(entries.size());
-	for (size_t i = 0; i < entries.size(); i++)
+	for (size_t i{}; i < entries.size(); i++)
 		usedIDs.at(i) = entries.at(i).debtEntryID;
 	entry.debtEntryID = idgen::getID(usedIDs);
 	
 	entries.push_back(entry);
 
-	qInfo() << "entry::Debt added! Entries: ";
-	for (auto& entry : entries)
-	{
-		qInfo()
-			<< " amount:" << entry.amount
-			<< " date:" << entry.date
-			<< " debtID:" << entry.debtEntryID
-			<< " personID:" << entry.personID;
-	}
+	qInfo() << entry;
 
 	return entry.debtEntryID;
 }
 
 double DebtRepoInMem::getTotal(int64_t personID) const
 {
-	double amount = 0;
+	double amount{};
 
 	for (auto& entry : entries)
 	{
@@ -45,7 +37,7 @@ double DebtRepoInMem::getTotal(int64_t personID) const
 
 double DebtRepoInMem::getTotal(FinancialShare share) const
 {
-	double amount = 0;
+	double amount{};
 
 	double currentShare = 1;
 	for (auto& entry : entries)
@@ -71,15 +63,23 @@ double DebtRepoInMem::getTotal(FinancialShare share) const
 
 double DebtRepoInMem::getDue(int64_t personID) const
 {
-	double due{ 0 };
-	for (auto& entry : getPaymentOutstandingEntries(personID, FilterType::OmitFullyPaid))
+	double due{};
+	for (const auto& entry : getPaymentOutstandingEntries(personID, FilterType::OmitFullyPaid))
 		due+=entry.remaining;
 	return due;
 }
 
-double DebtRepoInMem::getSettled(int64_t personID) const
+double DebtRepoInMem::getDue() const
 {
-	double settled{ 0 };
+	double due{};
+	for (const auto& entry : getSettlementOutstandingEntries(FilterType::OmitFullyPaid))
+		due += entry.remaining;
+	return due;
+}
+
+double DebtRepoInMem::getPaid(int64_t personID) const
+{
+	double settled{};
 	for (auto& entry : getPaymentOutstandingEntries(personID, FilterType::IncludeFullyPaid))
 		settled += entry.amount - entry.remaining;
 	return settled;

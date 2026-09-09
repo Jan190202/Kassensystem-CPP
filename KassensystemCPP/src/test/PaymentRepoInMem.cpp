@@ -12,16 +12,7 @@ int64_t PaymentRepoInMem::addPaymentEntry(entry::Payment entry)
 
 	paymentEntries.emplace_back(entry);
 
-	qInfo() << "entry::Payment added! Entries: ";
-	for (auto& entry : paymentEntries)
-	{
-		qInfo()
-			<< " amount:" << entry.amount
-			<< " date:" << entry.date
-			<< " overpaymentType:" << static_cast<int>(entry.overpaymentType)
-			<< " paymentID:" << entry.paymentEntryID
-			<< " personID:" << entry.personID;
-	}
+	qInfo() << entry;
 
 	return entry.paymentEntryID;
 }
@@ -34,15 +25,8 @@ int64_t PaymentRepoInMem::addAllocationEntry(entry::PaymentAllocation entry)
 	entry.paymentAllocationEntryID = idgen::getID(usedIDs);
 	paymentAllocationEntries.emplace_back(entry);
 
-	qInfo() << "entry::PaymentAllocation added! Entries: ";
-	for (auto& entry : paymentAllocationEntries)
-	{
-		qInfo()
-			<< " amount:" << entry.amount
-			<< " debtEntryID:" << entry.debtEntryID
-			<< " paymentAllocationID:" << entry.paymentAllocationEntryID
-			<< " paymentEntryID:" << entry.paymentEntryID;
-	}
+	qInfo() << entry;
+
 	return entry.paymentAllocationEntryID;
 }
 

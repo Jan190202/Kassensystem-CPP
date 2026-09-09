@@ -2,6 +2,7 @@
 #include "BaseTab.h"
 #include "GuiTypes.h"
 #include "domain/services/BalanceService.h"
+#include "common/Utils.h"
 
 #include <QDate> 
 

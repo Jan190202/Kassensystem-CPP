@@ -14,7 +14,7 @@
 
 CashRegisterSystemUI::CashRegisterSystemUI(const ServiceBundle& services, QWidget* parent) : QMainWindow(parent)
 {
-	setWindowTitle(tr("Kassensystem"));
+	setWindowTitle(QStringLiteral("Kassensystem"));
 	resize(1000, 600);
 	initUi(services);
 }
@@ -43,9 +43,9 @@ void CashRegisterSystemUI::initUi(const ServiceBundle& services)
 
 	tabs = { new PayTab(lowerButtons, services.paymentService, services.personRepo), new AddTab(lowerButtons, services.consumptionService, services.personRepo), new BalanceTab(lowerButtons, services.balanceService, services.personRepo) };
 
-	tabSelector->addTab(tabs.at(static_cast<int>(TabIndex::Pay)), tr("Schulden begleichen"));
-	tabSelector->addTab(tabs.at(static_cast<int>(TabIndex::Add)), tr("Einträge hinzufügen"));
-	tabSelector->addTab(tabs.at(static_cast<int>(TabIndex::Balance)), tr("Abteilungsbilanz bearbeiten"));
+	tabSelector->addTab(tabs.at(static_cast<int>(TabIndex::Pay)), QStringLiteral("Schulden begleichen"));
+	tabSelector->addTab(tabs.at(static_cast<int>(TabIndex::Add)), QStringLiteral("Einträge hinzufügen"));
+	tabSelector->addTab(tabs.at(static_cast<int>(TabIndex::Balance)), QStringLiteral("Abteilungsbilanz bearbeiten"));
 	
 	TabIndex initialTab = TabIndex::Pay; // initialize first tab
 	changeTab(initialTab);

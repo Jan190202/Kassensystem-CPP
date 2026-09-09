@@ -14,18 +14,7 @@ int64_t ConsumptionRepoInMem::addEntry(entry::Consumption entry)
 
 	entries.push_back(entry);
 
-	qInfo() << "entry::Consumption added! Entries: ";
-	for (auto& entry : entries)
-	{
-		qInfo()
-			<< " consumptionEntryID:" << entry.consumptionEntryID
-			<< " debtEntryID:" << entry.debtEntryID
-			<< " nBeer04:" << entry.nBeer04
-			<< " nBeer05:" << entry.nBeer05
-			<< " nSoftdrinks:" << entry.nSoftdrinks
-			<< " nWater:" << entry.nWater
-			<< " otherExpense:" << entry.otherExpense;
-	}
+	qInfo() << entry;
 
 	return entry.consumptionEntryID;
 }

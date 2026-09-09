@@ -3,6 +3,7 @@
 #include "domain/services/PaymentService.h"
 #include "domain/model/Requests.h"
 #include "GuiTypes.h"
+#include "common/Utils.h"
 
 class QComboBox;
 class QLabel;

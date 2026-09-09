@@ -29,7 +29,7 @@ void AddTab::initialize()
 	monthSelection->setCalendarPopup(false);
 	monthSelection->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
 
-	btnAddEntry = new QPushButton(tr("+ Eintrag hinzufügen"), this);
+	btnAddEntry = new QPushButton(QStringLiteral("+ Eintrag hinzufügen"), this);
 	btnAddEntry->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
 
 	entriesGrid = new QGridLayout();
@@ -38,13 +38,13 @@ void AddTab::initialize()
 	entriesGrid->setVerticalSpacing(10);
 
 	const QStringList headers = {
-		tr("Name"),
-		tr("Bier 0,5 l"),
-		tr("Bier 0,4 l"),
-		tr("Softdrinks"),
-		tr("Wasser"),
-		tr("Sonstiges"),
-		tr("Kosten"),
+		QStringLiteral("Name"),
+		QStringLiteral("Bier 0,5 l"),
+		QStringLiteral("Bier 0,4 l"),
+		QStringLiteral("Softdrinks"),
+		QStringLiteral("Wasser"),
+		QStringLiteral("Sonstiges"),
+		QStringLiteral("Kosten"),
 		QString()
 	};
 
@@ -84,7 +84,7 @@ void AddTab::initialize()
 	auto* monthLayout = new QHBoxLayout();
 	monthLayout->setContentsMargins(0, 0, 0, 0);
 	monthLayout->setSpacing(10);
-	monthLayout->addWidget(new QLabel(tr("Abrechnungsmonat"), this));
+	monthLayout->addWidget(new QLabel(QStringLiteral("Abrechnungsmonat"), this));
 	monthLayout->addWidget(monthSelection, 1);
 
 	addTabMainLayout = new QVBoxLayout(this);
@@ -130,7 +130,7 @@ void AddTab::addEntry()
 		this, &AddTab::removeEntry);
 	connect(newEntry, &AddTabEntry::calcEntryCost, this, [this](ConsumptionInputs& inputs, double& entryCost)
 		{
-			ConsumptionRequest request{
+			request::Consumption request{
 				.nBeer05 = inputs.nBeer05,
 				.nBeer04 = inputs.nBeer04,
 				.nSoftdrinks = inputs.nSoftdrinks,
@@ -179,7 +179,7 @@ void AddTab::apply()
 		int setDays = setDate.day();
 		QDate dateAtMonthEnd = setDate.addDays(nDays - setDays);
 
-		ConsumptionRequest request{
+		request::Consumption request{
 			.personInput = inputs.personInput,
 			.date = dateAtMonthEnd,
 			.nBeer05 = inputs.nBeer05,

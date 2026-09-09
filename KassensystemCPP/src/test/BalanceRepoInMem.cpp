@@ -12,19 +12,8 @@ int64_t BalanceRepoInMem::addEntry(entry::Balance entry)
 	
 	entries.push_back(entry);
 
-	qInfo() << "entry::Balance added! Entries: ";
-	for (auto& entry : entries)
-	{
-		qInfo()
-			<< " amount:" << entry.amount
-			<< " balanceEntryID:" << entry.balanceEntryID
-			<< " type:" << static_cast<int>(entry.type)
-			<< " comment:" << entry.comment
-			<< " dateBooked:" << entry.dateBooked
-			<< " dateAdded:" << entry.dateAdded
-			<< " description:" << entry.description
-			<< " personID:" << entry.personID;
-	}
+	qInfo() << entry;
+
 	return entry.balanceEntryID;
 }
 

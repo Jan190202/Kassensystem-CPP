@@ -26,10 +26,10 @@ BalanceTabDialog::BalanceTabDialog(BtnIndex mode, std::vector<Person> personVec,
 	switch (mode)
 	{
 	case BtnIndex::AddEarning:
-		setWindowTitle(tr("Einnahme hinzufügen"));
+		setWindowTitle(QStringLiteral("Einnahme hinzufügen"));
 		break;
 	case BtnIndex::AddSpending:
-		setWindowTitle(tr("Ausgabe hinzufügen"));
+		setWindowTitle(QStringLiteral("Ausgabe hinzufügen"));
 		break;
 	}
 
@@ -37,12 +37,12 @@ BalanceTabDialog::BalanceTabDialog(BtnIndex mode, std::vector<Person> personVec,
 	boldFont.setBold(true);
 
 	edtDescription = new QLineEdit();
-	edtDescription->setPlaceholderText(tr("z. B. Spende, Geschenk, ..."));
+	edtDescription->setPlaceholderText(QStringLiteral("z. B. Spende, Geschenk, ..."));
 
 	edtCost = new QDoubleSpinBox();
 	edtCost->setRange(0.0, 1'000'000.0);
 	edtCost->setDecimals(2);
-	edtCost->setSuffix(QStringLiteral(" €"));
+	edtCost->setSuffix(QStringLiteral(" ") + QtUtils::eurSymbol());
 	edtCost->setSingleStep(1.0);
 	edtCost->setAlignment(Qt::AlignLeft | Qt::AlignVCenter);
 
@@ -51,16 +51,16 @@ BalanceTabDialog::BalanceTabDialog(BtnIndex mode, std::vector<Person> personVec,
 	edtDate->setCalendarPopup(true);
 
 	edtComment = new QPlainTextEdit();
-	edtComment->setPlaceholderText(tr("optional"));
+	edtComment->setPlaceholderText(QStringLiteral("optional"));
 	edtComment->setFixedHeight(70);
 
-	auto* lblDescription = new QLabel(tr("Bezeichnung:"));
+	auto* lblDescription = new QLabel(QStringLiteral("Bezeichnung:"));
 	lblDescription->setFont(boldFont);
-	auto* lblCost = new QLabel(tr("Betrag:"));
+	auto* lblCost = new QLabel(QStringLiteral("Betrag:"));
 	lblCost->setFont(boldFont);
-	auto* lblDate = new QLabel(tr("Datum:"));
+	auto* lblDate = new QLabel(QStringLiteral("Datum:"));
 	lblDate->setFont(boldFont);
-	auto* lblComment = new QLabel(tr("Kommentar:"));
+	auto* lblComment = new QLabel(QStringLiteral("Kommentar:"));
 	lblComment->setFont(boldFont);
 
 	auto* form = new QFormLayout;
@@ -76,7 +76,7 @@ BalanceTabDialog::BalanceTabDialog(BtnIndex mode, std::vector<Person> personVec,
 	form->addRow(lblComment, edtComment);
 
 
-	edtIsCovered = new QCheckBox(tr("Von Mitglied getragen:"));
+	edtIsCovered = new QCheckBox(QStringLiteral("Von Mitglied getragen:"));
 	edtIsCovered->setChecked(false);
 
 	edtCoveringPerson = new QComboBox();
@@ -93,7 +93,7 @@ BalanceTabDialog::BalanceTabDialog(BtnIndex mode, std::vector<Person> personVec,
 	statusLayout->addWidget(edtCoveringPerson);
 	statusLayout->addStretch();
 
-	auto* sectionLabel = new QLabel(tr("Zahlungsstatus - wird als Guthaben gutgeschrieben"));
+	auto* sectionLabel = new QLabel(QStringLiteral("Zahlungsstatus - wird als Guthaben gutgeschrieben"));
 	sectionLabel->setFont(boldFont);
 
 	auto* topSeparator = new QFrame;
@@ -104,8 +104,8 @@ BalanceTabDialog::BalanceTabDialog(BtnIndex mode, std::vector<Person> personVec,
 	bottomSeparator->setFrameShape(QFrame::HLine);
 	bottomSeparator->setFrameShadow(QFrame::Sunken);
 
-	auto* btnOK = new QPushButton(tr("OK"));
-	auto* btnCancel = new QPushButton(tr("Cancel"));
+	auto* btnOK = new QPushButton(QStringLiteral("OK"));
+	auto* btnCancel = new QPushButton(QStringLiteral("Cancel"));
 	btnOK->setDefault(true);
 	btnOK->setMinimumWidth(90);
 	btnCancel->setMinimumWidth(90);

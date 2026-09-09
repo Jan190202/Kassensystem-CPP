@@ -5,7 +5,7 @@
 PaymentService::PaymentService(PaymentRepository* paymentRepo, CreditRepository* creditRepo, DebtRepository* debtRepo, ConsumptionRepository* consumptionRepo, BalanceRepository* balanceRepo, PersonRepository* personRepo)
 	: paymentRepo(paymentRepo), creditRepo(creditRepo), debtRepo(debtRepo), consumptionRepo(consumptionRepo), balanceRepo(balanceRepo), personRepo(personRepo) {}
 
-void PaymentService::addPayment(const PaymentRequest& request)
+void PaymentService::addPayment(const request::Payment& request)
 {
 	if (request.amount < 1e-9) return;
 
@@ -18,7 +18,7 @@ void PaymentService::addPayment(const PaymentRequest& request)
 	};
 
 	int64_t paymentEntryID = paymentRepo->addPaymentEntry(entry);
-	double overpaymentAmount = addPaymentAllocation(paymentEntryID, entry.personID, entry.amount, entry.date);
+	double overpaymentAmount = addPaymentAllocation(paymentEntryID, entry.personID, entry.amount);
 
 	if (overpaymentAmount > 1e-9)
 	{
@@ -34,7 +34,7 @@ void PaymentService::addPayment(const PaymentRequest& request)
 	}
 }
 
-double PaymentService::addPaymentAllocation(int64_t paymentEntryID, int64_t personID, double amount, QDate date)
+double PaymentService::addPaymentAllocation(int64_t paymentEntryID, int64_t personID, double amount)
 {
 	std::vector<entry::Outstanding> remainingDebtEntries = debtRepo->getPaymentOutstandingEntries(personID, FilterType::OmitFullyPaid);
 	
@@ -101,7 +101,7 @@ int64_t PaymentService::addTip(int64_t personID, double amount, QDate date)
 // TBD: get rid of passthrough functions
 double PaymentService::getSettledAmount(int64_t personID) const
 {
-	return debtRepo->getSettled(personID);
+	return debtRepo->getPaid(personID);
 }
 
 double PaymentService::getTotalAmount(int64_t personID) const
