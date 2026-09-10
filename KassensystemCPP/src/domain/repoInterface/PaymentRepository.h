@@ -14,4 +14,5 @@ public:
 	virtual int64_t addAllocationEntry(entry::PaymentAllocation) = 0;
 
 	virtual std::vector<entry::PaymentAllocation> getAllocEntries(int64_t debtEntryID) const = 0;
+	virtual double getPaidAllocTotal() const = 0;
 };

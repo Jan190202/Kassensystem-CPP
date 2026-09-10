@@ -2,8 +2,8 @@
 
 #include <optional>
 
-BalanceService::BalanceService(BalanceRepository* balanceRepo, CreditRepository* creditRepo, DebtRepository* debtRepo, PersonRepository* personRepo, SettlementRepository* settlementRepo, const registerFinancials::State& stateBefore)
-	: balanceRepo(balanceRepo), creditRepo(creditRepo), debtRepo(debtRepo), personRepo(personRepo), settlementRepo(settlementRepo), stateBefore(stateBefore) {}
+BalanceService::BalanceService(BalanceRepository* balanceRepo, CreditRepository* creditRepo, DebtRepository* debtRepo, PersonRepository* personRepo, SettlementRepository* settlementRepo, PaymentRepository* paymentRepo, const registerFinancials::State& stateBefore)
+	: balanceRepo(balanceRepo), creditRepo(creditRepo), debtRepo(debtRepo), personRepo(personRepo), settlementRepo(settlementRepo), paymentRepo(paymentRepo), stateBefore(stateBefore) {}
 
 int64_t BalanceService::addEntry(const request::Balance& request)
 {
@@ -76,21 +76,37 @@ std::vector<entry::Balance> BalanceService::getEntries(BalanceType type) const
 
 registerFinancials::Report BalanceService::getReport() const
 {
-	// calculations
-	double totalEarnings{};
-	auto entries = getEntries(BalanceType::EarningAndSupplement);
-	for (const auto& entry : entries) totalEarnings += entry.amount;
-		
-	double totalSpendings{};
-	entries = getEntries(BalanceType::Spending);
-	for (const auto& entry : entries) totalSpendings += entry.amount;
+	
+	// savingsDiff = (departmentEarnings - departmentSpendings) + virtual own consumption share
+	double departmentEarnings{}; // includes tips from overpayment
+	double departmentSpendings{};
+	double consumptionOwnShare{};
+	
+	for (const auto& entry : getEntries(BalanceType::Earning)) departmentEarnings += entry.amount;
+	for (const auto& entry : getEntries(BalanceType::Spending)) departmentSpendings += entry.amount;
+	consumptionOwnShare = debtRepo->getTotal(FinancialShare::Own);
 
-	double savingsDiff = totalEarnings - totalSpendings;
-	double totalDebt = debtRepo->getTotal(FinancialShare::All);
-	double totalCredit = creditRepo->getTotal();
-	double cashDiff = savingsDiff - totalDebt + totalCredit; // TBD: settlements also decrease cash
+
+	double savingsDiff = departmentEarnings - departmentSpendings + consumptionOwnShare;
+
+
+	// cashDiff = (departmentEarnings - departmentSpendings) + (paidDebt (which is totalShare) - settledValue (which is foreignShare)) + accumulatedCredit
+	double paidDebt{};
+	double settledValue{};
+	double accumulatedCredit{};
+
+	paidDebt = paymentRepo->getPaidAllocTotal();
+	settledValue = settlementRepo->getTotal();
+	accumulatedCredit = creditRepo->getTotal();
+
+
+	double cashDiff = departmentEarnings - departmentSpendings + paidDebt - settledValue + accumulatedCredit;
 
 	double currentForeignCash = debtRepo->getDue();
+
+
+
+
 
 	// struct construction
 	registerFinancials::State stateAfter{
@@ -106,8 +122,8 @@ registerFinancials::Report BalanceService::getReport() const
 		.stateAfter = stateAfter,
 		.savingsDiff = savingsDiff,
 		.cashDiff = cashDiff,
-		.totalEarnings = totalEarnings,
-		.totalSpendings = totalSpendings
+		.totalEarnings = departmentEarnings + consumptionOwnShare,
+		.totalSpendings = departmentSpendings
 	};
 
 	return report;

@@ -5,6 +5,7 @@
 #include "domain/repointerface/DebtRepository.h"
 #include "domain/repointerface/PersonRepository.h"
 #include "domain/repointerface/SettlementRepository.h"
+#include "domain/repointerface/PaymentRepository.h"
 #include "domain/model/Entities.h"
 #include "domain/model/Requests.h"
 
@@ -20,7 +21,7 @@ enum class AddSettlementException
 class BalanceService
 {
 public:
-	BalanceService(BalanceRepository* balanceRepo, CreditRepository* creditRepo, DebtRepository* debtRepo, PersonRepository* personRepo, SettlementRepository* settlementRepo, const registerFinancials::State& stateBefore);
+	BalanceService(BalanceRepository* balanceRepo, CreditRepository* creditRepo, DebtRepository* debtRepo, PersonRepository* personRepo, SettlementRepository* settlementRepo, PaymentRepository* paymentRepo, const registerFinancials::State& stateBefore);
 
 	int64_t addEntry(const request::Balance&);
 	std::vector<entry::Balance> getEntries(BalanceType) const;
@@ -37,5 +38,6 @@ private:
 	DebtRepository* debtRepo;
 	PersonRepository* personRepo;
 	SettlementRepository* settlementRepo;
+	PaymentRepository* paymentRepo;
 	const registerFinancials::State& stateBefore;
 };

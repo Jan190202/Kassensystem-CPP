@@ -219,7 +219,7 @@ void PayTab::refresh()
 	std::vector<Person> personVec = personRepo->getAll();
 	QList<QString> nameList = QtUtils::personVecToQStrList(personVec, &Person::getFullSpecifier);
 	
-	std::optional<int> indexForOldID;
+	std::optional<size_t> indexForOldID;
 	for (size_t i = 0; i < personVec.size(); i++)
 	{
 		int64_t itemID = personVec.at(i).getID();

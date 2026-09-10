@@ -42,3 +42,13 @@ std::vector<entry::PaymentAllocation> PaymentRepoInMem::getAllocEntries(int64_t 
 
 	return filteredEntries;
 }
+
+double PaymentRepoInMem::getPaidAllocTotal() const
+{
+	double paidTotal{};
+
+	for (const auto& entry : paymentAllocationEntries)
+		paidTotal += entry.amount;
+
+	return paidTotal;
+}

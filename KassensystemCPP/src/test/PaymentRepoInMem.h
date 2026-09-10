@@ -15,6 +15,7 @@ public:
 	//virtual double getPaidAmount(int64_t personID) const override;
 
 	virtual std::vector<entry::PaymentAllocation> getAllocEntries(int64_t debtEntryID) const override;
+	virtual double getPaidAllocTotal() const override;
 
 private:
 	std::vector<entry::Payment> paymentEntries = {};

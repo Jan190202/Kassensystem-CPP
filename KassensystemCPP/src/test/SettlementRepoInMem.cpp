@@ -41,3 +41,13 @@ std::vector<entry::SettlementAllocation> SettlementRepoInMem::getAllocEntries(in
 
 	return filteredEntries;
 }
+
+double SettlementRepoInMem::getTotal() const
+{
+	double total{};
+
+	for (const auto& entry : settlementEntries)
+		total += entry.amount;
+
+	return total;
+}

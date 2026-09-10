@@ -46,7 +46,7 @@ int main(int argc, char* argv[])
 
 
 	ConsumptionService		coSer(coRep, deRep, peRep, priceList);
-	BalanceService			baSer(baRep, crRep, deRep, peRep, seRep, financialStateBefore);
+	BalanceService			baSer(baRep, crRep, deRep, peRep, seRep, paRep, financialStateBefore);
 	PaymentService			paSer(paRep, crRep, deRep, coRep, baRep, peRep);
 
 	// domain testing
