@@ -88,7 +88,7 @@ registerFinancials::Report BalanceService::getReport() const
 	double savingsDiff = totalEarnings - totalSpendings;
 	double totalDebt = debtRepo->getTotal(FinancialShare::All);
 	double totalCredit = creditRepo->getTotal();
-	double cashDiff = savingsDiff - totalDebt + totalCredit;
+	double cashDiff = savingsDiff - totalDebt + totalCredit; // TBD: settlements also decrease cash
 
 	double currentForeignCash = debtRepo->getDue();
 
