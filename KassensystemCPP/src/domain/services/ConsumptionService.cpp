@@ -1,11 +1,10 @@
 #include "ConsumptionService.h"
-#include "domain/model/PriceList.h"
 
 #include <QDebug>
 #include <regex>
 
-ConsumptionService::ConsumptionService(ConsumptionRepository* consumptionRepo, DebtRepository* debtRepo, PersonRepository* personRepo)
-	: consumptionRepo(consumptionRepo), debtRepo(debtRepo), personRepo(personRepo) {}
+ConsumptionService::ConsumptionService(ConsumptionRepository* consumptionRepo, DebtRepository* debtRepo, PersonRepository* personRepo, const PriceList& priceList)
+	: consumptionRepo(consumptionRepo), debtRepo(debtRepo), personRepo(personRepo), priceList(priceList) {}
 
 void ConsumptionService::addConsumption(const request::Consumption& request)
 {
@@ -62,15 +61,11 @@ std::vector<entry::Consumption> ConsumptionService::getEntries(int personID) con
 
 double ConsumptionService::calculateDebt(const request::Consumption& request) const
 {
-	using namespace priceList;
-	
-	Entries entries = read();
-	
 	return
-		entries.beer04			* request.nBeer04 +
-		entries.beer05			* request.nBeer05 +
-		entries.water			* request.nWater +
-		entries.softdrink		* request.nSoftdrinks +
+		priceList.beer04			* request.nBeer04 +
+		priceList.beer05			* request.nBeer05 +
+		priceList.water				* request.nWater +
+		priceList.softdrink			* request.nSoftdrinks +
 		request.otherExpense;
 }
 

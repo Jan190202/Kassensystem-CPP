@@ -20,7 +20,7 @@ enum class AddSettlementException
 class BalanceService
 {
 public:
-	BalanceService(BalanceRepository* balanceRepo, CreditRepository* creditRepo, DebtRepository* debtRepo, PersonRepository* personRepo, SettlementRepository* settlementRepo);
+	BalanceService(BalanceRepository* balanceRepo, CreditRepository* creditRepo, DebtRepository* debtRepo, PersonRepository* personRepo, SettlementRepository* settlementRepo, const registerFinancials::State& stateBefore);
 
 	int64_t addEntry(const request::Balance&);
 	std::vector<entry::Balance> getEntries(BalanceType) const;
@@ -37,4 +37,5 @@ private:
 	DebtRepository* debtRepo;
 	PersonRepository* personRepo;
 	SettlementRepository* settlementRepo;
+	const registerFinancials::State& stateBefore;
 };

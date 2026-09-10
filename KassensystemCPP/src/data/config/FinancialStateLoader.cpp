@@ -1,5 +1,5 @@
-#include "FinancialStateBefore.h"
-#include "qtutils/ReadJson.h"
+#include "FinancialStateLoader.h"
+#include "JsonReader.h"
 
 #include <expected>
 #include <string>
@@ -11,25 +11,25 @@
 #include <QJsonArray>
 #include <QDebug>
 
-namespace financialStateBefore
+namespace financialStateLoader
 {
 	registerFinancials::State read()
 	{
 		std::string fileName = "FinancialsBefore.json";
 
 		registerFinancials::State state{};
-		const auto result = readJson::getQJsonObj(fileName);
+		const auto result = jsonReader::getQJsonObj(fileName);
 		
 		if (!result.has_value())
 			switch (result.error())
 			{
-			case readJson::Exception::MissingJsonObject:
+			case jsonReader::Exception::MissingJsonObject:
 				qDebug() << fileName << ": " << "No JSON object found";
 				break;
-			case readJson::Exception::OpeningFileFailed:
+			case jsonReader::Exception::OpeningFileFailed:
 				qDebug() << fileName << ": " << "Failed opening file";
 				break;
-			case readJson::Exception::ParsingJsonFailed:
+			case jsonReader::Exception::ParsingJsonFailed:
 				qDebug() << fileName << ": " << "Failed parsing JSON document";
 				break;
 

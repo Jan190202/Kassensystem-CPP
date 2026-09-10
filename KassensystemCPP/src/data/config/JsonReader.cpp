@@ -1,4 +1,4 @@
-#include "ReadJson.h"
+#include "JsonReader.h"
 
 #include <QCoreApplication>
 #include <QFile>
@@ -6,7 +6,7 @@
 #include <QJsonObject>
 #include <string>
 
-namespace readJson
+namespace jsonReader
 {
 	std::expected<QJsonObject,Exception> getQJsonObj(std::string fileNameStr, std::string relPath)
 	{

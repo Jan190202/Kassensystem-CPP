@@ -18,6 +18,9 @@
 #include "test/PaymentRepoInMem.h"
 #include "test/PersonRepoInMem.h"
 
+#include "data/config/PriceListLoader.h"
+#include "data/config/FinancialStateLoader.h"
+
 #include <string>
 #include <QDebug>
 #include <iostream>
@@ -28,7 +31,9 @@ int main(int argc, char* argv[])
 	QApplication app(argc, argv);
 
 
-
+	// load read-only
+	const PriceList priceList = priceListLoader::read();
+	const registerFinancials::State financialStateBefore = financialStateLoader::read();
 
 
 	BalanceRepository* baRep		= new BalanceRepoInMem();
@@ -40,8 +45,8 @@ int main(int argc, char* argv[])
 	DebtRepository* deRep			= new DebtRepoInMem(paRep, seRep);
 
 
-	ConsumptionService		coSer(coRep, deRep, peRep);
-	BalanceService			baSer(baRep, crRep, deRep, peRep, seRep);
+	ConsumptionService		coSer(coRep, deRep, peRep, priceList);
+	BalanceService			baSer(baRep, crRep, deRep, peRep, seRep, financialStateBefore);
 	PaymentService			paSer(paRep, crRep, deRep, coRep, baRep, peRep);
 
 	// domain testing

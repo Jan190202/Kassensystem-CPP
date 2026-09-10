@@ -296,6 +296,31 @@ namespace registerFinancials
 	};
 }
 
+struct PriceList
+{
+	double beer04 = 2.5;
+	double beer05 = 3;
+	double water = 2.5;
+	double softdrink = 3;
+
+	friend std::ostream& operator<<(std::ostream& out, const PriceList& entry)
+	{
+		out << "beer05: " << entry.beer05 << ", "
+			<< "beer05: " << entry.beer04 << ", "
+			<< "softdrink: " << entry.softdrink << ", "
+			<< "water: " << entry.water;
+		return out;
+	}
+
+	friend QDebug operator<<(QDebug out, const PriceList& entry)
+	{
+		std::ostringstream oss;
+		oss << entry;
+		out.nospace() << QString::fromStdString(oss.str());
+		return out;
+	}
+};
+
 class Person
 {
 public:

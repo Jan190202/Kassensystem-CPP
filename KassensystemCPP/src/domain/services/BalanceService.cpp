@@ -1,10 +1,9 @@
 #include "BalanceService.h"
-#include "domain/model/FinancialStateBefore.h"
 
 #include <optional>
 
-BalanceService::BalanceService(BalanceRepository* balanceRepo, CreditRepository* creditRepo, DebtRepository* debtRepo, PersonRepository* personRepo, SettlementRepository* settlementRepo) 
-	: balanceRepo(balanceRepo), creditRepo(creditRepo), debtRepo(debtRepo), personRepo(personRepo), settlementRepo(settlementRepo) {}
+BalanceService::BalanceService(BalanceRepository* balanceRepo, CreditRepository* creditRepo, DebtRepository* debtRepo, PersonRepository* personRepo, SettlementRepository* settlementRepo, const registerFinancials::State& stateBefore)
+	: balanceRepo(balanceRepo), creditRepo(creditRepo), debtRepo(debtRepo), personRepo(personRepo), settlementRepo(settlementRepo), stateBefore(stateBefore) {}
 
 int64_t BalanceService::addEntry(const request::Balance& request)
 {
@@ -94,8 +93,6 @@ registerFinancials::Report BalanceService::getReport() const
 	double currentForeignCash = debtRepo->getDue();
 
 	// struct construction
-	registerFinancials::State stateBefore = financialStateBefore::read();
-
 	registerFinancials::State stateAfter{
 	.date = QDate::currentDate(),
 	.cash = stateBefore.cash + cashDiff,

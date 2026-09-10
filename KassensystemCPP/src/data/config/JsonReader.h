@@ -4,7 +4,7 @@ class QJsonObject;
 #include <string>
 #include <expected>
 
-namespace readJson
+namespace jsonReader
 {
 	enum class Exception
 	{
