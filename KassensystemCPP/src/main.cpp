@@ -21,6 +21,9 @@
 #include "data/config/PriceListLoader.h"
 #include "data/config/FinancialStateLoader.h"
 
+#include "app/RepositoryBundle.h"
+#include "app/ServiceBundle.h"
+
 #include <string>
 #include <QDebug>
 #include <iostream>
@@ -28,26 +31,27 @@
 
 int main(int argc, char* argv[])
 {
+	// initialize QApp
 	QApplication app(argc, argv);
 
-
-	// load read-only
+	// load read-only data
 	const PriceList priceList = priceListLoader::read();
 	const registerFinancials::State financialStateBefore = financialStateLoader::read();
 
-
-	BalanceRepository* baRep		= new BalanceRepoInMem();
-	ConsumptionRepository* coRep	= new ConsumptionRepoInMem();
-	CreditRepository* crRep			= new CreditRepoInMem();
-	PaymentRepository* paRep		= new PaymentRepoInMem();
+	// initialize repositories and services
 	PersonRepository* peRep			= new PersonRepoInMem();
+	ConsumptionRepository* coRep	= new ConsumptionRepoInMem();
+	PaymentRepository* paRep		= new PaymentRepoInMem();
+	CreditRepository* crRep			= new CreditRepoInMem();
+	BalanceRepository* baRep		= new BalanceRepoInMem();
 	SettlementRepository* seRep		= new SettlementRepoInMem();
 	DebtRepository* deRep			= new DebtRepoInMem(paRep, seRep);
+	RepositoryBundle repoBundle{ .personRepo = peRep, .consumptionRepo = coRep, .debtRepo = deRep, .paymentRepo = paRep, .creditRepo = crRep, .balanceRepo = baRep, .settlementRepo = seRep };
 
-
-	ConsumptionService		coSer(coRep, deRep, peRep, priceList);
-	BalanceService			baSer(baRep, crRep, deRep, peRep, seRep, paRep, financialStateBefore);
-	PaymentService			paSer(paRep, crRep, deRep, coRep, baRep, peRep);
+	ConsumptionService		coSer(repoBundle, priceList);
+	BalanceService			baSer(repoBundle, financialStateBefore);
+	PaymentService			paSer(repoBundle);
+	ServiceBundle serviceBundle{ .consumptionService = coSer, .paymentService = paSer, .balanceService = baSer };
 
 	// domain testing
 	int64_t p1ID = peRep->addEntry("Tim", "Ebert").getID();
@@ -82,11 +86,8 @@ int main(int argc, char* argv[])
 	coSer.addConsumption(cReq5);
 
 
-
-
-
-	auto services = ServiceBundle{ .paymentService = paSer, .consumptionService = coSer, .balanceService = baSer, .personRepo = peRep };
-	CashRegisterSystemUI sysUI(services);
+	// start UI
+	CashRegisterSystemUI sysUI(serviceBundle, repoBundle);
 	sysUI.show();
 
 	return app.exec();

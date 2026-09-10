@@ -12,14 +12,14 @@
 
 #include <QDebug>
 
-CashRegisterSystemUI::CashRegisterSystemUI(const ServiceBundle& services, QWidget* parent) : QMainWindow(parent)
+CashRegisterSystemUI::CashRegisterSystemUI(const ServiceBundle& serviceBundle, const RepositoryBundle& repoBundle, QWidget* parent) : QMainWindow(parent)
 {
 	setWindowTitle(QStringLiteral("Kassensystem"));
 	resize(1000, 600);
-	initUi(services);
+	initUi(serviceBundle, repoBundle);
 }
 
-void CashRegisterSystemUI::initUi(const ServiceBundle& services)
+void CashRegisterSystemUI::initUi(const ServiceBundle& serviceBundle, const RepositoryBundle& repoBundle)
 {
 	//main widget for all contents
 	QWidget*		central		= new QWidget(this);
@@ -41,7 +41,10 @@ void CashRegisterSystemUI::initUi(const ServiceBundle& services)
 	QTabWidget* tabSelector = new QTabWidget(central);
 	rootLayout->insertWidget(0, tabSelector);
 
-	tabs = { new PayTab(lowerButtons, services.paymentService, services.personRepo), new AddTab(lowerButtons, services.consumptionService, services.personRepo), new BalanceTab(lowerButtons, services.balanceService, services.personRepo) };
+	tabs = { 
+		new PayTab(lowerButtons, serviceBundle.paymentService, repoBundle.personRepo), 
+		new AddTab(lowerButtons, serviceBundle.consumptionService, repoBundle.personRepo), 
+		new BalanceTab(lowerButtons, serviceBundle.balanceService, repoBundle.personRepo) };
 
 	tabSelector->addTab(tabs.at(static_cast<int>(TabIndex::Pay)), QStringLiteral("Schulden begleichen"));
 	tabSelector->addTab(tabs.at(static_cast<int>(TabIndex::Add)), QStringLiteral("Einträge hinzufügen"));

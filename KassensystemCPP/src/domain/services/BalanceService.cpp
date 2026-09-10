@@ -2,8 +2,8 @@
 
 #include <optional>
 
-BalanceService::BalanceService(BalanceRepository* balanceRepo, CreditRepository* creditRepo, DebtRepository* debtRepo, PersonRepository* personRepo, SettlementRepository* settlementRepo, PaymentRepository* paymentRepo, const registerFinancials::State& stateBefore)
-	: balanceRepo(balanceRepo), creditRepo(creditRepo), debtRepo(debtRepo), personRepo(personRepo), settlementRepo(settlementRepo), paymentRepo(paymentRepo), stateBefore(stateBefore) {}
+BalanceService::BalanceService(const RepositoryBundle& repoBundle, const registerFinancials::State& stateBefore)
+	: balanceRepo(repoBundle.balanceRepo), creditRepo(repoBundle.creditRepo), debtRepo(repoBundle.debtRepo), personRepo(repoBundle.personRepo), settlementRepo(repoBundle.settlementRepo), paymentRepo(repoBundle.paymentRepo), stateBefore(stateBefore) {}
 
 int64_t BalanceService::addEntry(const request::Balance& request)
 {

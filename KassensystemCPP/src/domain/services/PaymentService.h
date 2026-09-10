@@ -1,11 +1,6 @@
 #pragma once
 
-#include "domain/repointerface/PaymentRepository.h"
-#include "domain/repointerface/CreditRepository.h"
-#include "domain/repointerface/DebtRepository.h"
-#include "domain/repointerface/ConsumptionRepository.h"
-#include "domain/repointerface/BalanceRepository.h"
-#include "domain/repointerface/PersonRepository.h"
+#include "app/RepositoryBundle.h"
 #include "domain/model/DomainTypes.h"
 #include "domain/model/Entities.h"
 #include "domain/model/Requests.h"
@@ -13,7 +8,7 @@
 class PaymentService
 {
 public:
-	PaymentService(PaymentRepository*, CreditRepository*, DebtRepository*, ConsumptionRepository*, BalanceRepository*, PersonRepository*);
+	PaymentService(const RepositoryBundle& repoBundle);
 	
 	void addPayment(const request::Payment& request);
 	void resetCredit(int64_t personID);

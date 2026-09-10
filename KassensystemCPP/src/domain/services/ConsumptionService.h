@@ -2,9 +2,7 @@
 
 #include "domain/model/Entities.h"
 #include "domain/model/Requests.h"
-#include "domain/repointerface/ConsumptionRepository.h"
-#include "domain/repointerface/DebtRepository.h"
-#include "domain/repointerface/PersonRepository.h"
+#include "app/RepositoryBundle.h"
 #include <vector>
 #include <expected>
 #include <variant>
@@ -42,7 +40,7 @@ struct PersonStringSpecifiers
 class ConsumptionService
 {
 public:
-	ConsumptionService(ConsumptionRepository* consumptionRepo, DebtRepository* debtRepo, PersonRepository* personRepo, const PriceList& priceList);
+	ConsumptionService(const RepositoryBundle& repoBundle, const PriceList& priceList);
 
 	std::expected<void,validityError::Code> isRequestValid(const request::Consumption& request) const;
 	void addConsumption(const request::Consumption& request);

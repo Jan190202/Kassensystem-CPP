@@ -1,6 +1,7 @@
 #pragma once
 
 #include "GuiTypes.h"
+#include "domain/model/Entities.h"
 
 #include <QDialog>
 #include <string>

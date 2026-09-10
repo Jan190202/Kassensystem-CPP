@@ -2,8 +2,8 @@
 
 #include <expected>
 
-PaymentService::PaymentService(PaymentRepository* paymentRepo, CreditRepository* creditRepo, DebtRepository* debtRepo, ConsumptionRepository* consumptionRepo, BalanceRepository* balanceRepo, PersonRepository* personRepo)
-	: paymentRepo(paymentRepo), creditRepo(creditRepo), debtRepo(debtRepo), consumptionRepo(consumptionRepo), balanceRepo(balanceRepo), personRepo(personRepo) {}
+PaymentService::PaymentService(const RepositoryBundle& repoBundle)
+	: paymentRepo(repoBundle.paymentRepo), creditRepo(repoBundle.creditRepo), debtRepo(repoBundle.debtRepo), consumptionRepo(repoBundle.consumptionRepo), balanceRepo(repoBundle.balanceRepo), personRepo(repoBundle.personRepo) {}
 
 void PaymentService::addPayment(const request::Payment& request)
 {

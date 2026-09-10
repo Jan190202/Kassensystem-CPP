@@ -3,8 +3,8 @@
 #include <QDebug>
 #include <regex>
 
-ConsumptionService::ConsumptionService(ConsumptionRepository* consumptionRepo, DebtRepository* debtRepo, PersonRepository* personRepo, const PriceList& priceList)
-	: consumptionRepo(consumptionRepo), debtRepo(debtRepo), personRepo(personRepo), priceList(priceList) {}
+ConsumptionService::ConsumptionService(const RepositoryBundle& repoBundle, const PriceList& priceList)
+	: consumptionRepo(repoBundle.consumptionRepo), debtRepo(repoBundle.debtRepo), personRepo(repoBundle.personRepo), priceList(priceList) {}
 
 void ConsumptionService::addConsumption(const request::Consumption& request)
 {
