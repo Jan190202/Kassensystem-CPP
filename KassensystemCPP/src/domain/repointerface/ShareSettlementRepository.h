@@ -12,5 +12,5 @@ public:
 	virtual int64_t addShareSettlementAllocationEntry(entry::ShareSettlementAllocation) = 0; // add settlement allocation entry, return associated ID
 
 	virtual std::vector<entry::ShareSettlementAllocation> getDebtEntrysShareSettlementAllocationEntries(int64_t debtEntryID) const = 0; // foreign share settlement allocation entries associated with debt entry
-	virtual double getTotalShareSettlements() const = 0;
+	virtual double getTotalAllocatedShareSettlements() const = 0; // summed settlement amounts of every settlement allocation in the database
 };
