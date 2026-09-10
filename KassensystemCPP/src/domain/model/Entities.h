@@ -268,6 +268,24 @@ namespace registerFinancials
 	{
 		QDate date;
 		double cash, savings, ownCash, foreignCash;
+
+		friend std::ostream& operator<<(std::ostream& out, const State& state)
+		{
+			out << "date: " << state.date.toString().toStdString() << ", "
+				<< "savings: " << state.savings << ", "
+				<< "cash: " << state.cash << ", "
+				<< "foreignCash: " << state.foreignCash << ", "
+				<< "ownCash: " << state.ownCash;
+			return out;
+		}
+
+		friend QDebug operator<<(QDebug out, const State& state)
+		{
+			std::ostringstream oss;
+			oss << state;
+			out << QString::fromStdString(oss.str());
+			return out;
+		}
 	};
 
 	struct Report

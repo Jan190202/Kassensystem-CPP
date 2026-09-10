@@ -1,4 +1,4 @@
-#include "PriceList.h"
+#include "FinancialStateBefore.h"
 #include "qtutils/ReadJson.h"
 
 #include <expected>
@@ -11,16 +11,15 @@
 #include <QJsonArray>
 #include <QDebug>
 
-
-namespace priceList
+namespace financialStateBefore
 {
-	Entries read()
+	registerFinancials::State read()
 	{
-		std::string fileName = "PriceList.json";
+		std::string fileName = "FinancialsBefore.json";
 
-		Entries entries;
+		registerFinancials::State state{};
 		const auto result = readJson::getQJsonObj(fileName);
-
+		
 		if (!result.has_value())
 			switch (result.error())
 			{
@@ -34,19 +33,20 @@ namespace priceList
 				qDebug() << fileName << ": " << "Failed parsing JSON document";
 				break;
 
-				qDebug() << "Returning default object";
-				return entries;
+			qDebug() << "Returning default object";
+			return state;
 			}
-
+			
 		QJsonObject jsonObj = result.value();
 
-		entries.beer05 = jsonObj["Bier_0.5l"].toDouble();
-		entries.beer04 = jsonObj["Bier_0.4l"].toDouble();
-		entries.softdrink = jsonObj["Softdrink"].toDouble();
-		entries.water = jsonObj["Wasser"].toDouble();
-
-		qDebug() << entries;
-
-		return entries;
+		state.date			= QDate::fromString(jsonObj["date"].toString(), "dd.MM.yyyy");
+		state.savings		= jsonObj["savings"].toDouble();
+		state.cash			= jsonObj["cash"].toDouble();
+		state.foreignCash	= jsonObj["foreignCash"].toDouble();
+		state.ownCash = state.cash - state.foreignCash;
+		
+		qDebug() << state;
+		
+		return state;
 	}
 }
