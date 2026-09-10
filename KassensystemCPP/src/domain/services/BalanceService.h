@@ -1,10 +1,10 @@
 #pragma once
 
-#include "domain/repoInterface/BalanceRepository.h"
-#include "domain/repoInterface/CreditRepository.h"
-#include "domain/repoInterface/DebtRepository.h"
-#include "domain/repoInterface/PersonRepository.h"
-#include "domain/repoInterface/SettlementRepository.h"
+#include "domain/repointerface/BalanceRepository.h"
+#include "domain/repointerface/CreditRepository.h"
+#include "domain/repointerface/DebtRepository.h"
+#include "domain/repointerface/PersonRepository.h"
+#include "domain/repointerface/SettlementRepository.h"
 #include "domain/model/Entities.h"
 #include "domain/model/Requests.h"
 

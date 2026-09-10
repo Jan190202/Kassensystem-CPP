@@ -2,9 +2,9 @@
 
 #include "domain/model/Entities.h"
 #include "domain/model/Requests.h"
-#include "domain/repoInterface/ConsumptionRepository.h"
-#include "domain/repoInterface/DebtRepository.h"
-#include "domain/repoInterface/PersonRepository.h"
+#include "domain/repointerface/ConsumptionRepository.h"
+#include "domain/repointerface/DebtRepository.h"
+#include "domain/repointerface/PersonRepository.h"
 #include <vector>
 #include <expected>
 #include <variant>
