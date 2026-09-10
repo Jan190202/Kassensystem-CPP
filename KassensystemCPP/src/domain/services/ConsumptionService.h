@@ -1,5 +1,4 @@
 #pragma once
-
 #include "domain/model/Entities.h"
 #include "domain/model/Requests.h"
 #include "app/RepositoryBundle.h"
@@ -41,13 +40,13 @@ class ConsumptionService
 {
 public:
 	ConsumptionService(const RepositoryBundle& repoBundle, const PriceList& priceList);
+	void addConsumption(const request::Consumption& request);
 
 	std::expected<void,validityError::Code> isRequestValid(const request::Consumption& request) const;
-	void addConsumption(const request::Consumption& request);
-	double calculateDebt(const request::Consumption&) const;
+	double calculateDebt(const request::Consumption& request) const;
 	std::vector<entry::Consumption> getEntries(int personID) const;
-private:
 
+private:
 	std::expected< PersonStringSpecifiers, validityError::Name > isValidNameFormat(const std::string& nameRequest) const;
 
 	ConsumptionRepository* consumptionRepo;
@@ -55,9 +54,3 @@ private:
 	PersonRepository* personRepo;
 	const PriceList& priceList;
 };
-
-
-
-
-
-

@@ -1,5 +1,4 @@
 #include "ConsumptionService.h"
-
 #include <QDebug>
 #include <regex>
 

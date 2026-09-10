@@ -1,5 +1,4 @@
 #include "PaymentService.h"
-
 #include <expected>
 
 PaymentService::PaymentService(const RepositoryBundle& repoBundle)
@@ -119,12 +118,12 @@ double PaymentService::getDueAmount(int64_t personID) const
 	return debtRepo->getDue(personID);
 }
 
-std::vector<entry::Consumption> PaymentService::getConsumptionEntries(int64_t personID)
+std::vector<entry::Consumption> PaymentService::getConsumptionEntries(int64_t personID) const
 {
 	return consumptionRepo->getEntries(personID);
 }
 
-std::vector<entry::Outstanding> PaymentService::getPaymentOutstandingEntries(int64_t personID, FilterType filter)
+std::vector<entry::Outstanding> PaymentService::getPaymentOutstandingEntries(int64_t personID, FilterType filter) const
 {
 	return debtRepo->getPaymentOutstandingEntries(personID, filter);
 }

@@ -1,18 +1,16 @@
 #pragma once
-
+#include "domain/model/Entities.h"
 #include <string>
 #include <expected>
 #include <vector>
-#include "domain/model/Entities.h"
 
 class PersonRepository
 {
 public:
 	PersonRepository() = default;
 	virtual ~PersonRepository() = default;
+	virtual int64_t addPersonEntry(Person entry) = 0; // add person entrs, return associated ID
 
-	virtual std::expected<Person,std::string> findEntry(int64_t personID) = 0;
-	virtual Person addEntry(const std::string& firstName, const std::string& lastName, const std::string& nickName = "", const std::string& info = "") = 0;
-
-	virtual std::vector<Person> getAll() const = 0;
+	virtual std::expected<Person,std::string> findPersonEntry(int64_t personID) const = 0; // find person entry by ID
+	virtual std::vector<Person> getAllPersonEntries() const = 0; // all person entries in database
 };

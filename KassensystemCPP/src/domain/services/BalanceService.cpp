@@ -1,5 +1,4 @@
 #include "BalanceService.h"
-
 #include <optional>
 
 BalanceService::BalanceService(const RepositoryBundle& repoBundle, const registerFinancials::State& stateBefore)

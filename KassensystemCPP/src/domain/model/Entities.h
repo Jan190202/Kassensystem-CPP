@@ -211,22 +211,22 @@ namespace entry
 		}
 	};
 
-	struct Settlement
+	struct ShareSettlement
 	{
-		int64_t settlementID;
+		int64_t shareSettlementID;
 		QDate date;
 		double amount;
 
-		friend std::ostream& operator<<(std::ostream& out, const Settlement& entry)
+		friend std::ostream& operator<<(std::ostream& out, const ShareSettlement& entry)
 		{
-			out << "settlementID: " << entry.settlementID << ", "
+			out << "settlementID: " << entry.shareSettlementID << ", "
 				<< "date: " << entry.date.toString(Qt::ISODate).toStdString() << ", "
 				<< "amount: " << entry.amount;
 
 			return out;
 		}
 
-		friend QDebug operator<<(QDebug debug, const Settlement& entry)
+		friend QDebug operator<<(QDebug debug, const ShareSettlement& entry)
 		{
 			std::ostringstream oss;
 			oss << entry;
@@ -235,24 +235,24 @@ namespace entry
 		}
 	};
 
-	struct SettlementAllocation
+	struct ShareSettlementAllocation
 	{
-		int64_t settlementAllocationID;
+		int64_t shareSettlementAllocationID;
 		int64_t debtEntryID;
-		int64_t settlementID;
+		int64_t shareSettlementID;
 		double amount;
 
-		friend std::ostream& operator<<(std::ostream& out, const SettlementAllocation& entry)
+		friend std::ostream& operator<<(std::ostream& out, const ShareSettlementAllocation& entry)
 		{
-			out << "settlementAllocationID: " << entry.settlementAllocationID << ", "
+			out << "settlementAllocationID: " << entry.shareSettlementAllocationID << ", "
 				<< "debtEntryID: " << entry.debtEntryID << ", "
-				<< "settlementID: " << entry.settlementID << ", "
+				<< "settlementID: " << entry.shareSettlementID << ", "
 				<< "amount: " << entry.amount;
 
 			return out;
 		}
 
-		friend QDebug operator<<(QDebug debug, const SettlementAllocation& entry)
+		friend QDebug operator<<(QDebug debug, const ShareSettlementAllocation& entry)
 		{
 			std::ostringstream oss;
 			oss << entry;

@@ -1,5 +1,4 @@
 #pragma once
-
 #include "domain/model/Entities.h"
 #include "domain/model/DomainTypes.h"
 #include <vector>
@@ -11,8 +10,8 @@ class BalanceRepository
 public:
 	BalanceRepository() = default;
 	virtual ~BalanceRepository() = default;
+	virtual int64_t addBalanceEntry(entry::Balance) = 0; // add balance entry to database, return associated ID
 
-	virtual int64_t addEntry(entry::Balance) = 0;
-	virtual std::expected<std::reference_wrapper<const entry::Balance>, GetEntryException> getEntry(std::string description) const = 0;
-	virtual std::vector<entry::Balance> getEntries(BalanceType) const = 0;
+	virtual std::expected<std::reference_wrapper<const entry::Balance>, GetEntryException> getBalanceEntry(const std::string& description) const = 0; // return balance entry associated with description
+	virtual std::vector<entry::Balance> getBalanceEntries(BalanceType type) const = 0; // return all balance entries of passed type
 };

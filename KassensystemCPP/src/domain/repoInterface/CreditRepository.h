@@ -1,16 +1,15 @@
 #pragma once
-
-#include <QDate>
 #include "domain/model/Entities.h"
+#include <QDate>
 
 class CreditRepository
 {
 public:
 	CreditRepository() = default;
 	virtual ~CreditRepository() = default;
+	virtual int64_t addCreditEntry(entry::Credit entry) = 0; // add credit entry to database, return associated ID
+	virtual void resetPersonsCredit(int64_t personID) = 0; // delete all credit entries associated with person, TBD: replace calls with addEntres and negative credit
 
-	virtual int64_t addEntry(entry::Credit) = 0;
-	virtual double getCredit(int64_t personID) const = 0;
-	virtual double getTotal() const = 0;
-	virtual void resetCredit(int64_t personID) = 0;
+	virtual double getPersonsCredit(int64_t personID) const = 0;
+	virtual double getTotalDepositedCredit() const = 0;
 };
