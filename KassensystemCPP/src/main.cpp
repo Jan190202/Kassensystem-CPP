@@ -95,19 +95,13 @@ int main(int argc, char* argv[])
 }
 
 /*
-* TBD:
-* - repo interactions in balanceTab always restricted to date >= dateBefore (from FinancialStateBefore)
-* - repo controller: apply (temporary save), save (full save and sync)
-* - database backups must be implemented
-*/
-
-/*
 * Ideas:
-* - apply (save) button only active when changes were made
-* - new button: sync -> save saves to local copy of database, sync pushes it to remote
-* - add little calculator in balanceTab for cash counting
+* - class PendingChangeLog with entries PendingChanges for change tracking before saving/syncing
+*	- new button: sync -> save saves to local copy of database, sync pushes it to remote
+*	- apply (save) button only active when changes were made
+*	- "changes" window to show applied changes for inspection before saving
+* - add basic calculator in balanceTab for cash counting
 * - add buttons in PayTab: "Redeem All Credits", "Export Debts (CSV/CopyToClipboard/URL)"
 * - add info-icons in BalanceTab (clickable/tooltip) -> get details on report calculation
 * - add new tab for manual database changes (dropDown for which repository + QTableView)
-* - "changes" window to show applied changes for inspection before saving
 */ 
