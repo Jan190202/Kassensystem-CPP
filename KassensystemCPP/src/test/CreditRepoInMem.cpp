@@ -41,12 +41,3 @@ double CreditRepoInMem::getTotalDepositedCredit() const
 
 	return credit;
 }
-
-void CreditRepoInMem::resetPersonsCredit(int64_t personID)
-{
-	// usage: std::erase_if(container, predicate) where predicate can be a lambda taking an entry and returns true/false (remove/keep)
-	std::erase_if(entries, [=](const auto& entry)
-		{
-			return entry.personID == personID;
-		});
-}

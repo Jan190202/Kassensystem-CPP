@@ -253,17 +253,25 @@ void PayTab::save()
 void PayTab::redeemCredit()
 {
 	int64_t personID = nameSelect->currentData().toLongLong();
-	
-	creditRepo->resetPersonsCredit(personID);
 
-	request::Payment request{
+	double redemptionAmount = std::min(credit, due);
+
+	creditRepo->addCreditEntry(
+		entry::Credit{
+			.creditEntryID = 0,
+			.personID = personID,
+			.date = QDate::currentDate(),
+			.amount = -redemptionAmount,
+			.description = "Einlösung von bestehendem Guthaben"
+		});
+
+	paymentService.addPayment(
+		request::Payment{
 		.personID = personID,
 		.date = QDate::currentDate(),
-		.amount = credit,
+		.amount = redemptionAmount,
 		.overpaymentType = OverpaymentDisposition::Credit
-	};
-
-	paymentService.addPayment(request);
+		});
 
 	refresh();
 }
