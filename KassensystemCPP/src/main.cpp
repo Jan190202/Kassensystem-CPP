@@ -98,6 +98,7 @@ int main(int argc, char* argv[])
 * TBD:
 * - repo interactions (getter, calculation, ...) always restricted to date >= dateBefore (from FinancialStateBefore)
 * - repo controller: apply (temporary save), save (full save and sync)
+* - database backups must be implemented
 */
 
 /*
@@ -108,4 +109,5 @@ int main(int argc, char* argv[])
 * - add buttons in PayTab: "Redeem All Credits", "Export Debts (CSV/CopyToClipboard/URL)"
 * - add info-icons in BalanceTab (clickable/tooltip) -> get details on report calculation
 * - add new tab for manual database changes (dropDown for which repository + QTableView)
+* - "changes" window to show applied changes for inspection before saving
 */ 
