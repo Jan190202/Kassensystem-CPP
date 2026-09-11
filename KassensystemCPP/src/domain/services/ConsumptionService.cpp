@@ -60,11 +60,6 @@ void ConsumptionService::addConsumption(const request::Consumption& request)
 	int64_t cEntryID = consumptionRepo->addConsumptionEntry(cEntry);
 }
 
-std::vector<entry::Consumption> ConsumptionService::getEntries(int personID) const
-{
-	return consumptionRepo->getConsumptionEntries(personID);
-}
-
 double ConsumptionService::calculateDebt(const request::Consumption& request) const
 {
 	return

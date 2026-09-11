@@ -4,7 +4,7 @@
 BalanceService::BalanceService(const RepositoryBundle& repoBundle, const registerFinancials::State& stateBefore)
 	: balanceRepo(repoBundle.balanceRepo), creditRepo(repoBundle.creditRepo), debtRepo(repoBundle.debtRepo), personRepo(repoBundle.personRepo), shareSettlementRepo(repoBundle.shareSettlementRepo), paymentRepo(repoBundle.paymentRepo), stateBefore(stateBefore) {}
 
-int64_t BalanceService::addEntry(const request::Balance& request)
+int64_t BalanceService::addBalanceItem(const request::Balance& request)
 {
 	int64_t personID{};
 	if (request.coveringPersonID.has_value())
@@ -35,8 +35,10 @@ int64_t BalanceService::addEntry(const request::Balance& request)
 	return balanceRepo->addBalanceEntry(entry);
 }
 
-int64_t BalanceService::addCredit(int64_t personID, double amount, QDate date, const std::string& description)
+int64_t BalanceService::addCredit(int64_t personID, double amount, const QDate& date, const std::string& description)
 {
+	// potential validity check here
+	
 	return creditRepo->addCreditEntry(
 		entry::Credit{ 
 			.creditEntryID = 0, 
@@ -47,7 +49,7 @@ int64_t BalanceService::addCredit(int64_t personID, double amount, QDate date, c
 		});
 }
 
-std::vector<entry::Balance> BalanceService::getEntries(BalanceType type) const
+std::vector<entry::Balance> BalanceService::getBalanceEntries(BalanceType type) const
 {
 	auto entries = balanceRepo->getBalanceEntries(type);
 
@@ -81,10 +83,9 @@ registerFinancials::Report BalanceService::getReport() const
 	double departmentSpendings{};
 	double consumptionOwnShare{};
 	
-	for (const auto& entry : getEntries(BalanceType::Earning)) departmentEarnings += entry.amount;
-	for (const auto& entry : getEntries(BalanceType::Spending)) departmentSpendings += entry.amount;
+	for (const auto& entry : getBalanceEntries(BalanceType::Earning)) departmentEarnings += entry.amount;
+	for (const auto& entry : getBalanceEntries(BalanceType::Spending)) departmentSpendings += entry.amount;
 	consumptionOwnShare = debtRepo->getTotalShare(FinancialShare::Own);
-
 
 	double savingsDiff = departmentEarnings - departmentSpendings + consumptionOwnShare;
 
@@ -98,8 +99,8 @@ registerFinancials::Report BalanceService::getReport() const
 	settledValue = shareSettlementRepo->getTotalAllocatedShareSettlements();
 	depositedCredit = creditRepo->getTotalDepositedCredit();
 
-
 	double cashDiff = departmentEarnings - departmentSpendings + paidDebt - settledValue + depositedCredit;
+
 
 	double currentForeignCash = debtRepo->getForeignDue();
 

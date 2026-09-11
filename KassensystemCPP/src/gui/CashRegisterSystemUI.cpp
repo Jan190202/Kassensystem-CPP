@@ -40,7 +40,7 @@ void CashRegisterSystemUI::initUi(const ServiceBundle& serviceBundle, const Repo
 	rootLayout->insertWidget(0, tabSelector);
 
 	tabs = { 
-		new PayTab(lowerButtons, serviceBundle.paymentService, repoBundle.personRepo), 
+		new PayTab(lowerButtons, serviceBundle.paymentService, repoBundle.personRepo, repoBundle.consumptionRepo, repoBundle.debtRepo, repoBundle.creditRepo), 
 		new AddTab(lowerButtons, serviceBundle.consumptionService, repoBundle.personRepo), 
 		new BalanceTab(lowerButtons, serviceBundle.balanceService, repoBundle.personRepo) };
 

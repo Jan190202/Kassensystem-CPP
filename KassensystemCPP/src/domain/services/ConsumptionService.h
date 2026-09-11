@@ -44,7 +44,6 @@ public:
 
 	std::expected<void,validityError::Code> isRequestValid(const request::Consumption& request) const;
 	double calculateDebt(const request::Consumption& request) const;
-	std::vector<entry::Consumption> getEntries(int personID) const;
 
 private:
 	std::expected< PersonStringSpecifiers, validityError::Name > isValidNameFormat(const std::string& nameRequest) const;

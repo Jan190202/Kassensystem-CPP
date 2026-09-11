@@ -185,7 +185,7 @@ void BalanceTab::addEntry(BtnIndex mode)
 	}
 	else { return; } // cancel pressed
 
-	balanceService.addEntry(
+	balanceService.addBalanceItem(
 		request::Balance{
 			.type = mode==BtnIndex::AddEarning ? BalanceType::Earning : BalanceType::Spending,
 			.description = inputs.description,
@@ -223,7 +223,7 @@ void BalanceTab::refreshTables() const
 		BalanceType type = allocVec.at(i).second;
 
 		table->clearContents();
-		std::vector<entry::Balance> bEntries = balanceService.getEntries(type);
+		std::vector<entry::Balance> bEntries = balanceService.getBalanceEntries(type);
 		int rowCount = bEntries.size();
 		int colCount = 3; // description, amount, dateBooked
 

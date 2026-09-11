@@ -16,8 +16,8 @@
 #include <QVBoxLayout>
 #include <QColor>
 
-PayTab::PayTab(const LowerButtonBundle& lowerButtons, PaymentService& paymentService, PersonRepository* personRepo, QWidget* parent) 
-	: lowerButtons(lowerButtons), paymentService(paymentService), personRepo(personRepo), BaseTab(parent) {}
+PayTab::PayTab(const LowerButtonBundle& lowerButtons, PaymentService& paymentService, PersonRepository* personRepo, ConsumptionRepository* consumptionRepo, DebtRepository* debtRepo, CreditRepository* creditRepo, QWidget* parent) 
+	: lowerButtons(lowerButtons), paymentService(paymentService), personRepo(personRepo), consumptionRepo(consumptionRepo), debtRepo(debtRepo), creditRepo(creditRepo), BaseTab(parent) {}
 
 void PayTab::initialize()
 {
@@ -183,10 +183,10 @@ void PayTab::nameChanged()
 {
 	int64_t personID = nameSelect->currentData().toLongLong();
 
-	total = paymentService.getTotalAmount(personID);
-	settled = paymentService.getSettledAmount(personID);
-	due = paymentService.getDueAmount(personID);
-	credit = paymentService.getCreditAmount(personID);
+	total = debtRepo->getPersonsTotal(personID);
+	settled = debtRepo->getPersonsPaid(personID);
+	due = debtRepo->getPersonsDue(personID);
+	credit = creditRepo->getPersonsCredit(personID);
 
 	// refresh table
 	refreshTable(personID);
@@ -254,7 +254,7 @@ void PayTab::redeemCredit()
 {
 	int64_t personID = nameSelect->currentData().toLongLong();
 	
-	paymentService.resetCredit(personID);
+	creditRepo->resetPersonsCredit(personID);
 
 	request::Payment request{
 		.personID = personID,
@@ -272,8 +272,8 @@ void PayTab::refreshTable(int64_t personID)
 {
 	tblConsumption->clearContents();
 	
-	std::vector<entry::Consumption> cEntries = paymentService.getConsumptionEntries(personID);
-	std::vector<entry::Outstanding> drEntries = paymentService.getPaymentOutstandingEntries(personID, FilterType::IncludeFullyPaid);
+	std::vector<entry::Consumption> cEntries = consumptionRepo->getConsumptionEntries(personID);
+	std::vector<entry::Outstanding> drEntries = debtRepo->getPersonsOutstandingEntries(personID, FilterType::IncludeFullyPaid);
 
 	// create items and add them to table
 	int rowCount = drEntries.size();

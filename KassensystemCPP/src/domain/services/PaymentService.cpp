@@ -60,29 +60,22 @@ double PaymentService::addPaymentAllocation(int64_t paymentEntryID, int64_t pers
 
 int64_t PaymentService::addCredit(int64_t personID, double amount, const QDate& date, const std::string& description)
 {
+	// potential validity check here
+	
 	return creditRepo->addCreditEntry(
 		entry::Credit{ 
 			.creditEntryID = 0, 
 			.personID = personID, 
 			.date = date, 
 			.amount = amount, 
-			.description = description}
-			);
+			.description = description
+		});
 }
 
 int64_t PaymentService::addTip(int64_t personID, double amount, const QDate& date)
 {
-	//std::string tipDescription = "Trinkgeld bei Schuldenbegleichung";
-	//double existingTips{};
-
-	//auto tipEntry = balanceRepo->getEntry(tipDescription);
-	//
-	//if (tipEntry.has_value())
-	//{
-	//	existingTips += tipEntry.value().amount;
-	//	balanceRepo->removeEntry(tipEntry.value().balanceEntryID);
-	//}
-
+	// potential validity check here
+	
 	return balanceRepo->addBalanceEntry(
 		entry::Balance{ 
 		.balanceEntryID = 0, 
@@ -92,43 +85,6 @@ int64_t PaymentService::addTip(int64_t personID, double amount, const QDate& dat
 		.dateBooked = date, 
 		.dateAdded = QDate::currentDate(),
 		.comment = "", 
-		.personID = personID }
-		);
-}
-
-
-// TBD: get rid of passthrough functions
-double PaymentService::getSettledAmount(int64_t personID) const
-{
-	return debtRepo->getPersonsPaid(personID);
-}
-
-double PaymentService::getTotalAmount(int64_t personID) const
-{
-	return debtRepo->getPersonsTotal(personID);
-}
-
-double PaymentService::getCreditAmount(int64_t personID) const
-{
-	return creditRepo->getPersonsCredit(personID);
-}
-
-double PaymentService::getDueAmount(int64_t personID) const
-{
-	return debtRepo->getPersonsDue(personID);
-}
-
-std::vector<entry::Consumption> PaymentService::getConsumptionEntries(int64_t personID) const
-{
-	return consumptionRepo->getConsumptionEntries(personID);
-}
-
-std::vector<entry::Outstanding> PaymentService::getPaymentOutstandingEntries(int64_t personID, FilterType filter) const
-{
-	return debtRepo->getPersonsOutstandingEntries(personID, filter);
-}
-
-void PaymentService::resetCredit(int64_t personID)
-{
-	creditRepo->resetPersonsCredit(personID);
+		.personID = personID 
+		});
 }

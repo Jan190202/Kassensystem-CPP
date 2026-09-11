@@ -77,9 +77,9 @@ int main(int argc, char* argv[])
 	//coSer.addConsumption(cReq3);
 	coSer.addConsumption(cReq4);
 
-	baSer.addEntry(bReq1);
-	baSer.addEntry(bReq2);
-	baSer.addEntry(bReq3);
+	baSer.addBalanceItem(bReq1);
+	baSer.addBalanceItem(bReq2);
+	baSer.addBalanceItem(bReq3);
 
 	paSer.addPayment(pEntry1);
 	//paSer.addPayment(pEntry2);
@@ -93,6 +93,12 @@ int main(int argc, char* argv[])
 
 	return app.exec();
 }
+
+/*
+* TBD:
+* - repo interactions (getter, calculation, ...) always restricted to date >= dateBefore (from FinancialStateBefore)
+* - repo controller: apply (temporary save), save (full save and sync)
+*/
 
 /*
 * Ideas:
