@@ -2,7 +2,7 @@
 #include <optional>
 
 BalanceService::BalanceService(const RepositoryBundle& repoBundle, const registerFinancials::State& stateBefore)
-	: balanceRepo(repoBundle.balanceRepo), creditRepo(repoBundle.creditRepo), debtRepo(repoBundle.debtRepo), personRepo(repoBundle.personRepo), settlementRepo(repoBundle.settlementRepo), paymentRepo(repoBundle.paymentRepo), stateBefore(stateBefore) {}
+	: balanceRepo(repoBundle.balanceRepo), creditRepo(repoBundle.creditRepo), debtRepo(repoBundle.debtRepo), personRepo(repoBundle.personRepo), shareSettlementRepo(repoBundle.shareSettlementRepo), paymentRepo(repoBundle.paymentRepo), stateBefore(stateBefore) {}
 
 int64_t BalanceService::addEntry(const request::Balance& request)
 {
@@ -32,24 +32,24 @@ int64_t BalanceService::addEntry(const request::Balance& request)
 		addCredit(entry.personID, entry.amount, entry.dateBooked, "Abteilungsausgabe übernommen");
 	}
 	
-	return balanceRepo->addEntry(entry);
+	return balanceRepo->addBalanceEntry(entry);
 }
 
-int64_t BalanceService::addCredit(int64_t personID, double amount, QDate date, std::string description)
+int64_t BalanceService::addCredit(int64_t personID, double amount, QDate date, const std::string& description)
 {
-	return creditRepo->addEntry(
+	return creditRepo->addCreditEntry(
 		entry::Credit{ 
 			.creditEntryID = 0, 
 			.personID = personID, 
 			.date = date, 
 			.amount = amount, 
-			.description = description }
-			);
+			.description = description 
+		});
 }
 
 std::vector<entry::Balance> BalanceService::getEntries(BalanceType type) const
 {
-	auto entries = balanceRepo->getEntries(type);
+	auto entries = balanceRepo->getBalanceEntries(type);
 
 	if (type == BalanceType::EarningAndSupplement)
 	{
@@ -57,7 +57,7 @@ std::vector<entry::Balance> BalanceService::getEntries(BalanceType type) const
 			entry::Balance{
 				.type = BalanceType::Earning,
 				.description = "Einnahmen durch Getränkeverkäufe",
-				.amount = debtRepo->getTotal(FinancialShare::Own),
+				.amount = debtRepo->getTotalShare(FinancialShare::Own),
 				.dateBooked = QDate::currentDate()
 			});
 
@@ -83,28 +83,25 @@ registerFinancials::Report BalanceService::getReport() const
 	
 	for (const auto& entry : getEntries(BalanceType::Earning)) departmentEarnings += entry.amount;
 	for (const auto& entry : getEntries(BalanceType::Spending)) departmentSpendings += entry.amount;
-	consumptionOwnShare = debtRepo->getTotal(FinancialShare::Own);
+	consumptionOwnShare = debtRepo->getTotalShare(FinancialShare::Own);
 
 
 	double savingsDiff = departmentEarnings - departmentSpendings + consumptionOwnShare;
 
 
-	// cashDiff = (departmentEarnings - departmentSpendings) + (paidDebt (which is totalShare) - settledValue (which is foreignShare)) + accumulatedCredit
+	// cashDiff = (departmentEarnings - departmentSpendings) + (paidDebt (which is totalShare) - settledValue (which is foreignShare)) + depositedCredit
 	double paidDebt{};
 	double settledValue{};
-	double accumulatedCredit{};
+	double depositedCredit{};
 
-	paidDebt = paymentRepo->getPaidAllocTotal();
-	settledValue = settlementRepo->getTotal();
-	accumulatedCredit = creditRepo->getTotal();
-
-
-	double cashDiff = departmentEarnings - departmentSpendings + paidDebt - settledValue + accumulatedCredit;
-
-	double currentForeignCash = debtRepo->getDue();
+	paidDebt = paymentRepo->getTotalAllocatedPayments();
+	settledValue = shareSettlementRepo->getTotalAllocatedShareSettlements();
+	depositedCredit = creditRepo->getTotalDepositedCredit();
 
 
+	double cashDiff = departmentEarnings - departmentSpendings + paidDebt - settledValue + depositedCredit;
 
+	double currentForeignCash = debtRepo->getForeignDue();
 
 
 	// struct construction
@@ -128,24 +125,24 @@ registerFinancials::Report BalanceService::getReport() const
 	return report;
 }
 
-AddSettlementException BalanceService::addSettlement(request::Settlement request)
+AddSettlementException BalanceService::addShareSettlement(request::ShareSettlement request)
 {
 	if (request.amount < 0) 
 		return AddSettlementException::AmountNegative;
 	if (request.amount < 1e-9) 
 		return AddSettlementException::AmountZero;
-	if (request.amount - debtRepo->getDue() > 1e-9)
+	if (request.amount - debtRepo->getForeignDue() > 1e-9)
 		return AddSettlementException::AmountGreaterThanTotalForeignShare;
 
-	entry::Settlement entry{
-		.settlementID = 0,
+	entry::ShareSettlement entry{
+		.shareSettlementID = 0,
 		.date = QDate::currentDate(),
 		.amount = request.amount,
 	};
 
-	int64_t settlementEntryID = settlementRepo->addSettlementEntry(entry);
+	int64_t settlementEntryID = shareSettlementRepo->addShareSettlementEntry(entry);
 
-	double overpaymentAmount = addSettlementAllocation(settlementEntryID, entry.amount);
+	double overpaymentAmount = addShareSettlementAllocation(settlementEntryID, entry.amount);
 
 	if (overpaymentAmount > 1e-9)
 	{
@@ -153,14 +150,14 @@ AddSettlementException BalanceService::addSettlement(request::Settlement request
 		// if settlement in advance (or up-rounding) intended later, implement here
 	}
 
-	debtRepo->getSettlementOutstandingEntries(FilterType::OmitFullyPaid);
+	debtRepo->getForeignShareOutstandingEntries(FilterType::OmitFullyPaid);
 
 	return AddSettlementException::None;
 }
 
-double BalanceService::addSettlementAllocation(int64_t settlementEntryID, double amount)
+double BalanceService::addShareSettlementAllocation(int64_t settlementEntryID, double amount)
 {
-	std::vector<entry::Outstanding> remainingDebtEntries = debtRepo->getSettlementOutstandingEntries(FilterType::OmitFullyPaid);
+	std::vector<entry::Outstanding> remainingDebtEntries = debtRepo->getForeignShareOutstandingEntries(FilterType::OmitFullyPaid);
 
 	double amountLeft = amount;
 	for (const auto& entryRem : remainingDebtEntries)
@@ -171,14 +168,14 @@ double BalanceService::addSettlementAllocation(int64_t settlementEntryID, double
 
 		amountLeft -= appliedToCurrentEntry;
 
-		entry::SettlementAllocation aEntry{
-			.settlementAllocationID = 0,
+		entry::ShareSettlementAllocation aEntry{
+			.shareSettlementAllocationID = 0,
 			.debtEntryID = entryRem.debtEntryID,
-			.settlementID = settlementEntryID,
+			.shareSettlementID = settlementEntryID,
 			.amount = appliedToCurrentEntry 
 		};
 
-		settlementRepo->addSettlementAllocationEntry(aEntry);
+		shareSettlementRepo->addShareSettlementAllocationEntry(aEntry);
 	}
 
 	return amountLeft;

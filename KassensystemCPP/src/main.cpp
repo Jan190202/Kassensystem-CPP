@@ -1,6 +1,5 @@
 #include "gui/CashRegisterSystemUI.h"
 #include "gui/GuiTypes.h"
-#include <QApplication>
 
 #include "domain/model/Entities.h"
 #include "domain/model/Requests.h"
@@ -14,7 +13,7 @@
 #include "test/ConsumptionRepoInMem.h"
 #include "test/CreditRepoInMem.h"
 #include "test/DebtRepoInMem.h"
-#include "test/SettlementRepoInMem.h"
+#include "test/ShareSettlementRepoInMem.h"
 #include "test/PaymentRepoInMem.h"
 #include "test/PersonRepoInMem.h"
 
@@ -25,9 +24,11 @@
 #include "app/ServiceBundle.h"
 
 #include <string>
-#include <QDebug>
 #include <iostream>
 #include <optional>
+
+#include <QApplication>
+#include <QDebug>
 
 int main(int argc, char* argv[])
 {
@@ -39,14 +40,14 @@ int main(int argc, char* argv[])
 	const registerFinancials::State financialStateBefore = financialStateLoader::read();
 
 	// initialize repositories and services
-	PersonRepository* peRep			= new PersonRepoInMem();
-	ConsumptionRepository* coRep	= new ConsumptionRepoInMem();
-	PaymentRepository* paRep		= new PaymentRepoInMem();
-	CreditRepository* crRep			= new CreditRepoInMem();
-	BalanceRepository* baRep		= new BalanceRepoInMem();
-	SettlementRepository* seRep		= new SettlementRepoInMem();
-	DebtRepository* deRep			= new DebtRepoInMem(paRep, seRep);
-	RepositoryBundle repoBundle{ .personRepo = peRep, .consumptionRepo = coRep, .debtRepo = deRep, .paymentRepo = paRep, .creditRepo = crRep, .balanceRepo = baRep, .settlementRepo = seRep };
+	PersonRepository* peRep				= new PersonRepoInMem();
+	ConsumptionRepository* coRep		= new ConsumptionRepoInMem();
+	PaymentRepository* paRep			= new PaymentRepoInMem();
+	CreditRepository* crRep				= new CreditRepoInMem();
+	BalanceRepository* baRep			= new BalanceRepoInMem();
+	ShareSettlementRepository* seRep	= new ShareSettlementRepoInMem();
+	DebtRepository* deRep				= new DebtRepoInMem(paRep, seRep);
+	RepositoryBundle repoBundle{ .personRepo = peRep, .consumptionRepo = coRep, .debtRepo = deRep, .paymentRepo = paRep, .creditRepo = crRep, .balanceRepo = baRep, .shareSettlementRepo = seRep };
 
 	ConsumptionService		coSer(repoBundle, priceList);
 	BalanceService			baSer(repoBundle, financialStateBefore);
@@ -54,8 +55,8 @@ int main(int argc, char* argv[])
 	ServiceBundle serviceBundle{ .consumptionService = coSer, .paymentService = paSer, .balanceService = baSer };
 
 	// domain testing
-	int64_t p1ID = peRep->addEntry("Tim", "Ebert").getID();
-	int64_t p2ID = peRep->addEntry("Alfons", "Strauss").getID();
+	int64_t p1ID = peRep->addPersonEntry(entry::Person{ .firstName = "Tim", .lastName = "Ebert" });
+	int64_t p2ID = peRep->addPersonEntry(entry::Person{ .firstName = "Alfons", .lastName = "Strauss" });
 
 	request::Consumption cReq4{ .personInput = p1ID, .date = QDate::currentDate(), .nBeer05 = 6, .nBeer04 = 9, .nSoftdrinks = 3, .nWater = 1, .otherExpense = 1.4 };
 	request::Consumption cReq5{ .personInput = p1ID, .date = QDate::currentDate(), .nBeer05 = 60, .nBeer04 = 9, .nSoftdrinks = 3, .nWater = 1, .otherExpense = 1.4 };

@@ -20,8 +20,8 @@ public:
 
 private:
 	double addPaymentAllocation(int64_t paymentEntryID, int64_t personID, double amount);
-	int64_t addTip(int64_t personID, double amount, QDate date);
-	int64_t addCredit(int64_t personID, double amount, QDate date, std::string description);
+	int64_t addTip(int64_t personID, double amount, const QDate& date);
+	int64_t addCredit(int64_t personID, double amount, const QDate& date, const std::string& description);
 
 	PaymentRepository* paymentRepo;
 	CreditRepository* creditRepo;

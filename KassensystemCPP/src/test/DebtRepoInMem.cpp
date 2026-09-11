@@ -1,12 +1,11 @@
 #include "DebtRepoInMem.h"
 #include "IDGenerator.h"
-
 #include <QDebug>
 
-DebtRepoInMem::DebtRepoInMem(PaymentRepository* paymentRepo, SettlementRepository* settlementRepo) 
-	: paymentRepo(paymentRepo), settlementRepo(settlementRepo) {}
+DebtRepoInMem::DebtRepoInMem(PaymentRepository* paymentRepo, ShareSettlementRepository* shareSettlementRepo) 
+	: paymentRepo(paymentRepo), shareSettlementRepo(shareSettlementRepo) {}
 
-int64_t DebtRepoInMem::addEntry(entry::Debt entry)
+int64_t DebtRepoInMem::addDebtEntry(entry::Debt entry)
 {
 	std::vector<int64_t> usedIDs(entries.size());
 	for (size_t i{}; i < entries.size(); i++)
@@ -20,7 +19,7 @@ int64_t DebtRepoInMem::addEntry(entry::Debt entry)
 	return entry.debtEntryID;
 }
 
-double DebtRepoInMem::getTotal(int64_t personID) const
+double DebtRepoInMem::getPersonsTotal(int64_t personID) const
 {
 	double amount{};
 
@@ -35,7 +34,7 @@ double DebtRepoInMem::getTotal(int64_t personID) const
 	return amount;
 }
 
-double DebtRepoInMem::getTotal(FinancialShare share) const
+double DebtRepoInMem::getTotalShare(FinancialShare share) const
 {
 	double amount{};
 
@@ -61,31 +60,31 @@ double DebtRepoInMem::getTotal(FinancialShare share) const
 	return amount;
 }
 
-double DebtRepoInMem::getDue(int64_t personID) const
+double DebtRepoInMem::getPersonsDue(int64_t personID) const
 {
 	double due{};
-	for (const auto& entry : getPaymentOutstandingEntries(personID, FilterType::OmitFullyPaid))
+	for (const auto& entry : getPersonsOutstandingEntries(personID, FilterType::OmitFullyPaid))
 		due+=entry.remaining;
 	return due;
 }
 
-double DebtRepoInMem::getDue() const
+double DebtRepoInMem::getForeignDue() const
 {
 	double due{};
-	for (const auto& entry : getSettlementOutstandingEntries(FilterType::OmitFullyPaid))
+	for (const auto& entry : getForeignShareOutstandingEntries(FilterType::OmitFullyPaid))
 		due += entry.remaining;
 	return due;
 }
 
-double DebtRepoInMem::getPaid(int64_t personID) const
+double DebtRepoInMem::getPersonsPaid(int64_t personID) const
 {
 	double settled{};
-	for (auto& entry : getPaymentOutstandingEntries(personID, FilterType::IncludeFullyPaid))
+	for (auto& entry : getPersonsOutstandingEntries(personID, FilterType::IncludeFullyPaid))
 		settled += entry.amount - entry.remaining;
 	return settled;
 }
 
-std::vector<entry::Outstanding> DebtRepoInMem::getPaymentOutstandingEntries(int64_t personID, FilterType filter) const
+std::vector<entry::Outstanding> DebtRepoInMem::getPersonsOutstandingEntries(int64_t personID, FilterType filter) const
 {
 	std::vector<entry::Outstanding> filteredEntries = {};
 
@@ -110,13 +109,13 @@ std::vector<entry::Outstanding> DebtRepoInMem::getPaymentOutstandingEntries(int6
 	return filteredEntries;
 }
 
-std::vector<entry::Outstanding> DebtRepoInMem::getSettlementOutstandingEntries(FilterType filter) const
+std::vector<entry::Outstanding> DebtRepoInMem::getForeignShareOutstandingEntries(FilterType filter) const
 {
 	std::vector<entry::Outstanding> filteredEntries = {};
 
 	for (const auto& entry : entries)
 	{
-		double remaining = entry.foreignShare * entry.amount -  getAllocatedSettlements(entry.debtEntryID);
+		double remaining = entry.foreignShare * entry.amount -  getAllocatedShareSettlements(entry.debtEntryID);
 
 		if (filter == FilterType::OmitFullyPaid && remaining < 1e-9) continue;
 
@@ -134,7 +133,7 @@ std::vector<entry::Outstanding> DebtRepoInMem::getSettlementOutstandingEntries(F
 
 double DebtRepoInMem::getAllocatedPayments(int64_t debtEntryID) const
 {
-	std::vector<entry::PaymentAllocation> allocEntries = paymentRepo->getAllocEntries(debtEntryID);
+	std::vector<entry::PaymentAllocation> allocEntries = paymentRepo->getDebtsEntrysPaymentAllocationEntries(debtEntryID);
 
 	double allocatedPayments{};
 	for (auto& entry : allocEntries)
@@ -143,9 +142,9 @@ double DebtRepoInMem::getAllocatedPayments(int64_t debtEntryID) const
 	return allocatedPayments;
 }
 
-double DebtRepoInMem::getAllocatedSettlements(int64_t debtEntryID) const
+double DebtRepoInMem::getAllocatedShareSettlements(int64_t debtEntryID) const
 {
-	std::vector<entry::SettlementAllocation> allocEntries = settlementRepo->getAllocEntries(debtEntryID);
+	std::vector<entry::ShareSettlementAllocation> allocEntries = shareSettlementRepo->getDebtEntrysShareSettlementAllocationEntries(debtEntryID);
 
 	double allocatedSettlements{};
 	for (auto& entry : allocEntries)

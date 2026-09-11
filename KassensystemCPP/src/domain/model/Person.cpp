@@ -1,7 +1,6 @@
 #include "Entities.h"
 
-Person::Person(const std::string& firstName, const std::string& lastName, int64_t id, const std::string& nickName, const std::string& info)
-	: firstName(firstName), lastName(lastName), id(id), nickName(nickName), info(info) {}
+using namespace entry;
 
 std::string Person::getFirstName() const
 {
@@ -40,24 +39,4 @@ std::string Person::getFullSpecifier() const
 	else if (isInfo) additionalString = "(" + info + ")";
 
 	return getFullName() + " " + additionalString;
-}
-
-int64_t Person::getID() const
-{
-	return id;
-}
-
-std::ostream& operator<<(std::ostream& out, const Person& person)
-{
-	out << "FullSpecifier: " << person.getFullSpecifier() << ", "
-		<< "ID: " << person.getID();
-	return out;
-}
-
-QDebug operator<<(QDebug out, const Person& person)
-{
-	std::ostringstream ss;
-	ss << person;
-	out.nospace() << QString::fromStdString(ss.str());
-	return out;
 }

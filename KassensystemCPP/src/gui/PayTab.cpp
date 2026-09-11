@@ -1,6 +1,5 @@
 #include "PayTab.h"
 #include "qtutils/QtConversions.h"
-
 #include <QButtonGroup>
 #include <QCheckBox>
 #include <QComboBox>
@@ -16,7 +15,6 @@
 #include <QTableWidget>
 #include <QVBoxLayout>
 #include <QColor>
-
 
 PayTab::PayTab(const LowerButtonBundle& lowerButtons, PaymentService& paymentService, PersonRepository* personRepo, QWidget* parent) 
 	: lowerButtons(lowerButtons), paymentService(paymentService), personRepo(personRepo), BaseTab(parent) {}
@@ -216,13 +214,13 @@ void PayTab::refresh()
 
 	nameSelect->clear();
 	
-	std::vector<Person> personVec = personRepo->getAll();
-	QList<QString> nameList = QtUtils::personVecToQStrList(personVec, &Person::getFullSpecifier);
+	std::vector<entry::Person> personVec = personRepo->getAllPersonEntries();
+	QList<QString> nameList = QtUtils::personVecToQStrList(personVec, &entry::Person::getFullSpecifier);
 	
 	std::optional<size_t> indexForOldID;
 	for (size_t i = 0; i < personVec.size(); i++)
 	{
-		int64_t itemID = personVec.at(i).getID();
+		int64_t itemID = personVec.at(i).id;
 		nameSelect->addItem(nameList.at(i), itemID);
 		if (itemID == oldID) indexForOldID = i;
 	}

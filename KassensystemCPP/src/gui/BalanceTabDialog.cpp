@@ -1,6 +1,5 @@
 #include "BalanceTabDialog.h"
 #include "qtutils/QtConversions.h"
-
 #include <QDialog>
 #include <QWidget>
 #include <QPushButton>
@@ -18,10 +17,9 @@
 #include <QComboBox>
 #include <QFont>
 #include <QPlainTextEdit>
-
 #include <string>
 
-BalanceTabDialog::BalanceTabDialog(BtnIndex mode, std::vector<Person> personVec, QWidget* parent) : QDialog(parent)
+BalanceTabDialog::BalanceTabDialog(BtnIndex mode, const std::vector<entry::Person>& personVec, QWidget* parent) : QDialog(parent)
 {
 	switch (mode)
 	{
@@ -81,11 +79,11 @@ BalanceTabDialog::BalanceTabDialog(BtnIndex mode, std::vector<Person> personVec,
 
 	edtCoveringPerson = new QComboBox();
 	edtCoveringPerson->setEnabled(false);
-	QList<QString> nameList = QtUtils::personVecToQStrList(personVec, &Person::getFullName);
+	QList<QString> nameList = QtUtils::personVecToQStrList(personVec, &entry::Person::getFullName);
 	for (size_t i = 0; i < personVec.size(); i++)
 		edtCoveringPerson->addItem(
 			nameList.at(i),
-			personVec.at(i).getID()
+			personVec.at(i).id
 		);
 
 	auto* statusLayout = new QHBoxLayout;
@@ -140,18 +138,16 @@ BalanceTabDialog::BalanceTabDialog(BtnIndex mode, std::vector<Person> personVec,
 	adjustSize();
 }
 
-dlgInputs& BalanceTabDialog::getInputs() const
+dlgInputs BalanceTabDialog::getInputs() const
 {
-	static dlgInputs inputs;
-	inputs.description = edtDescription->text().toStdString();
-	inputs.amount = edtCost->value();
-	inputs.date = edtDate->date();
-	inputs.comment = edtComment->toPlainText().toStdString();
-
-	if (edtIsCovered->isChecked())
-	{
-		inputs.coveringPersonID = edtCoveringPerson->currentData().toLongLong();
-	}
-
-	return inputs;
+	return dlgInputs{
+		.description = edtDescription->text().toStdString(),
+		.amount = edtCost->value(),
+		.date = edtDate->date(),
+		.comment = edtComment->toPlainText().toStdString(),
+		.coveringPersonID = edtIsCovered->isChecked() ? 
+			std::optional<int64_t>(edtCoveringPerson->currentData().toLongLong()) : 
+			std::optional<int64_t>(std::nullopt) 
+			// std::optional-casting needed as ternary operator expects same datatypes in both branches
+	};
 }

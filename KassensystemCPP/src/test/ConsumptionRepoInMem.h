@@ -1,6 +1,5 @@
 #pragma once
-
-#include "domain/repoInterface/ConsumptionRepository.h"
+#include "domain/repointerface/ConsumptionRepository.h"
 #include "domain/model/Entities.h"
 #include <vector>
 
@@ -10,8 +9,8 @@ public:
 	ConsumptionRepoInMem() = default;
 	virtual ~ConsumptionRepoInMem() = default;
 
-	virtual int64_t addEntry(entry::Consumption) override;
-	virtual std::vector<entry::Consumption> getEntries(int64_t personID) const override;
+	virtual int64_t addConsumptionEntry(entry::Consumption) override;
+	virtual std::vector<entry::Consumption> getConsumptionEntries(int64_t personID) const override;
 private:
-	std::vector<entry::Consumption> entries;
+	std::vector<entry::Consumption> entries{};
 };

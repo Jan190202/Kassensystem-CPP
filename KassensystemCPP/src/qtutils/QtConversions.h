@@ -1,19 +1,18 @@
 #pragma once
-
+#include <domain/model/Entities.h>
 #include <string>
 #include <vector>
 #include <QList>
 #include <QString>
 #include <QObject>
 #include <QDate>
-#include <domain/model/Entities.h>
 
 namespace QtUtils
 {
 	QList<QString> strVecToQStrList(const std::vector<std::string>& vec);
 
 	// template for generating a QList<QString> for any getter of person; templates need to be defined in header in c++
-	QList<QString> personVecToQStrList(const std::vector<Person>& personVec, auto projection) // auto projection carries pointer to member function in Person, like &Person::getFullName
+	QList<QString> personVecToQStrList(const std::vector<entry::Person>& personVec, auto projection) // auto projection carries pointer to member function in Person, like &Person::getFullName
 	{
 		QList<QString> listQ;
 		listQ.reserve(personVec.size()); // x.reserve(int) instead of QList<> x(int) as expensive string constructor would be called for every index, else

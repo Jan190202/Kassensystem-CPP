@@ -1,9 +1,7 @@
 #include "AddTab.h"
-
 #include "AddTabEntry.h"
-#include "qtutils/QtConversions.h"
 #include "GuiTypes.h"
-
+#include "qtutils/QtConversions.h"
 #include <QDate>
 #include <QDateEdit>
 #include <QGridLayout>
@@ -15,11 +13,9 @@
 #include <QVBoxLayout>
 #include <QSpacerItem>
 #include <QMessageBox>
-
+#include <QDebug>
 #include <algorithm>
 #include <string>
-
-#include <QDebug>
 
 AddTab::AddTab(const LowerButtonBundle& lowerButtons, ConsumptionService& consumptionService, PersonRepository* personRepo, QWidget* parent) : lowerButtons(lowerButtons), consumptionService(consumptionService), personRepo(personRepo), BaseTab(parent) {}
 
@@ -119,7 +115,7 @@ void AddTab::clearEntries()
 
 void AddTab::addEntry()
 {
-	std::vector<Person> personVec = personRepo->getAll();
+	std::vector<entry::Person> personVec = personRepo->getAllPersonEntries();
 
 	auto* newEntry = new AddTabEntry(personVec, this);
 

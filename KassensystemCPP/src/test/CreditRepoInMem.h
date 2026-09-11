@@ -1,6 +1,5 @@
 #pragma once
-
-#include "domain/repoInterface/CreditRepository.h"
+#include "domain/repointerface/CreditRepository.h"
 #include <QDate>
 #include <vector>
 
@@ -10,10 +9,10 @@ public:
 	CreditRepoInMem() = default;
 	virtual ~CreditRepoInMem() = default;
 
-	virtual int64_t addEntry(entry::Credit) override;
-	virtual void resetCredit(int64_t personID) override;
-	virtual double getCredit(int64_t personID) const override;
-	virtual double getTotal() const override;
+	virtual int64_t addCreditEntry(entry::Credit) override;
+	virtual void resetPersonsCredit(int64_t personID) override;
+	virtual double getPersonsCredit(int64_t personID) const override;
+	virtual double getTotalDepositedCredit() const override;
 private:
 	std::vector<entry::Credit> entries{};
 };

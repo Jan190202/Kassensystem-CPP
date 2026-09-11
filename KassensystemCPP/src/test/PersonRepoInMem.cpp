@@ -1,17 +1,14 @@
 #include "PersonRepoInMem.h"
 #include "IDGenerator.h"
-
 #include <string>
 #include <vector>
-
 #include <QDebug>
 
-
-std::expected<Person,std::string> PersonRepoInMem::findEntry(int64_t personID)
+std::expected<entry::Person,std::string> PersonRepoInMem::findPersonEntry(int64_t personID) const
 {
 	for (auto& entry : entries)
 	{
-		if (entry.getID() == personID)
+		if (entry.id == personID)
 		{
 			return entry;
 		}
@@ -20,22 +17,21 @@ std::expected<Person,std::string> PersonRepoInMem::findEntry(int64_t personID)
 	return std::unexpected("Entry not found!");
 }
 
-Person PersonRepoInMem::addEntry(const std::string& firstName, const std::string& lastName, const std::string& nickName, const std::string& info)
+int64_t PersonRepoInMem::addPersonEntry(entry::Person entry)
 {
 	std::vector<int64_t> usedIDs(entries.size());
 	for (size_t i = 0; i < entries.size(); i++)
-		usedIDs.at(i) = entries.at(i).getID();
+		usedIDs.at(i) = entries.at(i).id;
 	int64_t id = idgen::getID(usedIDs);
+	entry.id = id;
+	entries.push_back(entry);
 
-	Person person{ firstName, lastName, id, nickName, info };
-	entries.push_back(person);
+	qInfo() << entry;
 
-	qInfo() << person;
-
-	return person;
+	return id;
 }
 
-std::vector<Person> PersonRepoInMem::getAll() const
+std::vector<entry::Person> PersonRepoInMem::getAllPersonEntries() const
 {
 	return entries;
 }

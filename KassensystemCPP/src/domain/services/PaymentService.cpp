@@ -35,7 +35,7 @@ void PaymentService::addPayment(const request::Payment& request)
 
 double PaymentService::addPaymentAllocation(int64_t paymentEntryID, int64_t personID, double amount)
 {
-	std::vector<entry::Outstanding> remainingDebtEntries = debtRepo->getPaymentOutstandingEntries(personID, FilterType::OmitFullyPaid);
+	std::vector<entry::Outstanding> remainingDebtEntries = debtRepo->getPersonsOutstandingEntries(personID, FilterType::OmitFullyPaid);
 	
 	double amountLeft = amount;
 	for (auto& entryRem : remainingDebtEntries)
@@ -52,15 +52,15 @@ double PaymentService::addPaymentAllocation(int64_t paymentEntryID, int64_t pers
 			.paymentEntryID = paymentEntryID, 
 			.amount = appliedToCurrentEntry };
 
-		paymentRepo->addAllocationEntry(aEntry);
+		paymentRepo->addPaymentAllocationEntry(aEntry);
 	}
 
 	return amountLeft;
 }
 
-int64_t PaymentService::addCredit(int64_t personID, double amount, QDate date, std::string description)
+int64_t PaymentService::addCredit(int64_t personID, double amount, const QDate& date, const std::string& description)
 {
-	return creditRepo->addEntry(
+	return creditRepo->addCreditEntry(
 		entry::Credit{ 
 			.creditEntryID = 0, 
 			.personID = personID, 
@@ -70,7 +70,7 @@ int64_t PaymentService::addCredit(int64_t personID, double amount, QDate date, s
 			);
 }
 
-int64_t PaymentService::addTip(int64_t personID, double amount, QDate date)
+int64_t PaymentService::addTip(int64_t personID, double amount, const QDate& date)
 {
 	//std::string tipDescription = "Trinkgeld bei Schuldenbegleichung";
 	//double existingTips{};
@@ -83,7 +83,7 @@ int64_t PaymentService::addTip(int64_t personID, double amount, QDate date)
 	//	balanceRepo->removeEntry(tipEntry.value().balanceEntryID);
 	//}
 
-	return balanceRepo->addEntry(
+	return balanceRepo->addBalanceEntry(
 		entry::Balance{ 
 		.balanceEntryID = 0, 
 		.type = BalanceType::Earning, 
@@ -100,35 +100,35 @@ int64_t PaymentService::addTip(int64_t personID, double amount, QDate date)
 // TBD: get rid of passthrough functions
 double PaymentService::getSettledAmount(int64_t personID) const
 {
-	return debtRepo->getPaid(personID);
+	return debtRepo->getPersonsPaid(personID);
 }
 
 double PaymentService::getTotalAmount(int64_t personID) const
 {
-	return debtRepo->getTotal(personID);
+	return debtRepo->getPersonsTotal(personID);
 }
 
 double PaymentService::getCreditAmount(int64_t personID) const
 {
-	return creditRepo->getCredit(personID);
+	return creditRepo->getPersonsCredit(personID);
 }
 
 double PaymentService::getDueAmount(int64_t personID) const
 {
-	return debtRepo->getDue(personID);
+	return debtRepo->getPersonsDue(personID);
 }
 
 std::vector<entry::Consumption> PaymentService::getConsumptionEntries(int64_t personID) const
 {
-	return consumptionRepo->getEntries(personID);
+	return consumptionRepo->getConsumptionEntries(personID);
 }
 
 std::vector<entry::Outstanding> PaymentService::getPaymentOutstandingEntries(int64_t personID, FilterType filter) const
 {
-	return debtRepo->getPaymentOutstandingEntries(personID, filter);
+	return debtRepo->getPersonsOutstandingEntries(personID, filter);
 }
 
 void PaymentService::resetCredit(int64_t personID)
 {
-	creditRepo->resetCredit(personID);
+	creditRepo->resetPersonsCredit(personID);
 }

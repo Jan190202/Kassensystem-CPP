@@ -1,8 +1,5 @@
 #include "AddTabEntry.h"
 #include "qtutils/QtConversions.h"
-
-#include <variant>
-
 #include <QComboBox>
 #include <QDoubleSpinBox>
 #include <QGridLayout>
@@ -13,17 +10,17 @@
 #include <QWidget>
 #include <QCompleter>
 #include <QLineEdit>
-
 #include <QDebug>
+#include <variant>
 
-AddTabEntry::AddTabEntry(const std::vector<Person>& personVec, QWidget* parent)
+AddTabEntry::AddTabEntry(const std::vector<entry::Person>& personVec, QWidget* parent)
 {
 	nameSelect = new QComboBox(parent);
-	QList<QString> nameList = QtUtils::personVecToQStrList(personVec, &Person::getFullSpecifier);
+	QList<QString> nameList = QtUtils::personVecToQStrList(personVec, &entry::Person::getFullSpecifier);
 	for (size_t i = 0; i < personVec.size(); i++) 
 		nameSelect->addItem(
 			nameList.at(i), 
-			QVariant::fromValue(personVec.at(i).getID())
+			QVariant::fromValue(personVec.at(i).id)
 		);
 	nameSelect->setEditable(true);
 	nameSelect->setDuplicatesEnabled(false);
@@ -162,12 +159,7 @@ ConsumptionInputs AddTabEntry::getEntryInputs() const
 		.otherExpense = spinboxCustom->value() };
 }
 
-//QWidget* AddTabEntry::getFirstWidget()
-//{
-//	return nameSelect;
-//}
-
-QWidget* AddTabEntry::getLastWidget()
+QWidget* AddTabEntry::getLastWidget() const
 {
 	return btnRemove;
 }

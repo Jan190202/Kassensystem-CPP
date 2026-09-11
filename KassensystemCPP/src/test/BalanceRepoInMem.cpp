@@ -1,9 +1,8 @@
 #include "BalanceRepoInMem.h"
 #include "IDGenerator.h"
-
 #include <QDebug>
 
-int64_t BalanceRepoInMem::addEntry(entry::Balance entry)
+int64_t BalanceRepoInMem::addBalanceEntry(entry::Balance entry)
 {
 	std::vector<int64_t> usedIDs(entries.size());
 	for (size_t i = 0; i < entries.size(); i++)
@@ -17,37 +16,7 @@ int64_t BalanceRepoInMem::addEntry(entry::Balance entry)
 	return entry.balanceEntryID;
 }
 
-//double BalanceRepoInMem::getTotalEarnings() const
-//{
-//	double totalEarnings = 0;
-//
-//	for (auto& entry : entries)
-//	{
-//		if (entry.type == BalanceType::Earning)
-//		{
-//			totalEarnings += entry.amount;
-//		}
-//	}
-//
-//	return totalEarnings;
-//}
-//
-//double BalanceRepoInMem::getTotalSpendings() const
-//{
-//	double totalSpendings = 0;
-//
-//	for (auto& entry : entries)
-//	{
-//		if (entry.type == BalanceType::Spending)
-//		{
-//			totalSpendings += entry.amount;
-//		}
-//	}
-//
-//	return totalSpendings;
-//}
-
-std::vector<entry::Balance> BalanceRepoInMem::getEntries(BalanceType type) const
+std::vector<entry::Balance> BalanceRepoInMem::getBalanceEntries(BalanceType type) const
 {
 	if (type == BalanceType::EarningAndSpending) return entries;
 
@@ -63,7 +32,7 @@ std::vector<entry::Balance> BalanceRepoInMem::getEntries(BalanceType type) const
 	return filteredEntries;
 }
 
-std::expected<std::reference_wrapper<const entry::Balance>, GetEntryException> BalanceRepoInMem::getEntry(std::string description) const
+std::expected<std::reference_wrapper<const entry::Balance>, GetEntryException> BalanceRepoInMem::getBalanceEntry(const std::string& description) const
 {
 	const entry::Balance* foundEntry = nullptr;
 

@@ -1,9 +1,8 @@
 #include "CreditRepoInMem.h"
 #include "IDGenerator.h"
-
 #include <QDebug>
 
-int64_t CreditRepoInMem::addEntry(entry::Credit entry)
+int64_t CreditRepoInMem::addCreditEntry(entry::Credit entry)
 {
 	std::vector<int64_t> usedIDs(entries.size());
 	for (size_t i = 0; i < entries.size(); i++)
@@ -17,7 +16,7 @@ int64_t CreditRepoInMem::addEntry(entry::Credit entry)
 	return entry.creditEntryID;
 }
 
-double CreditRepoInMem::getCredit(int64_t personID) const
+double CreditRepoInMem::getPersonsCredit(int64_t personID) const
 {
 	double credit{};
 	
@@ -31,7 +30,7 @@ double CreditRepoInMem::getCredit(int64_t personID) const
 	return credit;
 }
 
-double CreditRepoInMem::getTotal() const
+double CreditRepoInMem::getTotalDepositedCredit() const
 {
 	double credit{};
 
@@ -43,7 +42,7 @@ double CreditRepoInMem::getTotal() const
 	return credit;
 }
 
-void CreditRepoInMem::resetCredit(int64_t personID)
+void CreditRepoInMem::resetPersonsCredit(int64_t personID)
 {
 	// usage: std::erase_if(container, predicate) where predicate can be a lambda taking an entry and returns true/false (remove/keep)
 	std::erase_if(entries, [=](const auto& entry)

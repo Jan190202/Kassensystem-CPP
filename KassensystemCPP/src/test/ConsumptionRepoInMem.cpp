@@ -1,11 +1,9 @@
 #include "ConsumptionRepoInMem.h"
 #include "IDGenerator.h"
-
 #include <vector>
-
 #include <QDebug>
 
-int64_t ConsumptionRepoInMem::addEntry(entry::Consumption entry)
+int64_t ConsumptionRepoInMem::addConsumptionEntry(entry::Consumption entry)
 {
 	std::vector<int64_t> usedIDs(entries.size());
 	for (size_t i = 0; i < entries.size(); i++)
@@ -19,7 +17,7 @@ int64_t ConsumptionRepoInMem::addEntry(entry::Consumption entry)
 	return entry.consumptionEntryID;
 }
 
-std::vector<entry::Consumption> ConsumptionRepoInMem::getEntries(int64_t personID) const
+std::vector<entry::Consumption> ConsumptionRepoInMem::getConsumptionEntries(int64_t personID) const
 {
 	std::vector<entry::Consumption> filteredData = {};
 

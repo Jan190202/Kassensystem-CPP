@@ -22,7 +22,14 @@ void ConsumptionService::addConsumption(const request::Consumption& request)
 		if (result.has_value())
 		{
 			PersonStringSpecifiers spec = result.value();
-			personID = personRepo->addEntry(spec.firstName, spec.lastName, spec.nickName, spec.info).getID();
+			personID = personRepo->addPersonEntry(
+				entry::Person{
+					.firstName = spec.firstName,
+					.lastName = spec.lastName,
+					.nickName = spec.nickName,
+					.info = spec.info,
+					.id = 0
+				});
 		}
 		else
 		{
@@ -47,15 +54,15 @@ void ConsumptionService::addConsumption(const request::Consumption& request)
 
 	// add debt and consumption entry
 	entry::Debt dEntry{ .debtEntryID = 0, .personID = personID, .date = request.date, .amount = amount};
-	int64_t dEntryID = debtRepo->addEntry(dEntry);
+	int64_t dEntryID = debtRepo->addDebtEntry(dEntry);
 
 	entry::Consumption cEntry{ .consumptionEntryID = 0, .debtEntryID = dEntryID, .nBeer05 = request.nBeer05 , .nBeer04 = request.nBeer04, .nSoftdrinks = request.nSoftdrinks, .nWater = request.nWater };
-	int64_t cEntryID = consumptionRepo->addEntry(cEntry);
+	int64_t cEntryID = consumptionRepo->addConsumptionEntry(cEntry);
 }
 
 std::vector<entry::Consumption> ConsumptionService::getEntries(int personID) const
 {
-	return consumptionRepo->getEntries(personID);
+	return consumptionRepo->getConsumptionEntries(personID);
 }
 
 double ConsumptionService::calculateDebt(const request::Consumption& request) const

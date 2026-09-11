@@ -1,19 +1,18 @@
 #pragma once
+#include "domain/repointerface/ShareSettlementRepository.h"
 
-#include "domain/repoInterface/SettlementRepository.h"
-
-class SettlementRepoInMem : public SettlementRepository
+class ShareSettlementRepoInMem : public ShareSettlementRepository
 {
 public:
-	SettlementRepoInMem() = default;
-	virtual ~SettlementRepoInMem() = default;
+	ShareSettlementRepoInMem() = default;
+	virtual ~ShareSettlementRepoInMem() = default;
+	virtual int64_t addShareSettlementEntry(entry::ShareSettlement entry) override;
+	virtual int64_t addShareSettlementAllocationEntry(entry::ShareSettlementAllocation entry) override;
 
-	virtual int64_t addSettlementEntry(entry::Settlement) override;
-	virtual int64_t addSettlementAllocationEntry(entry::SettlementAllocation) override;
+	virtual std::vector<entry::ShareSettlementAllocation> getDebtEntrysShareSettlementAllocationEntries(int64_t debtEntryID) const override;
+	virtual double getTotalAllocatedShareSettlements() const override;
 
-	virtual std::vector<entry::SettlementAllocation> getAllocEntries(int64_t debtEntryID) const override;
-	virtual double getTotal() const override;
 private:
-	std::vector<entry::Settlement> settlementEntries;
-	std::vector<entry::SettlementAllocation> settlementAllocationEntries;
+	std::vector<entry::ShareSettlement> shareSettlementEntries{};
+	std::vector<entry::ShareSettlementAllocation> shareSettlementAllocationEntries{};
 };

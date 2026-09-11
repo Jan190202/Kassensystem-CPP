@@ -1,10 +1,8 @@
 ﻿#pragma once
-
 #include "BaseTab.h"
 #include "GuiTypes.h"
 #include "app/ServiceBundle.h"
 #include "app/RepositoryBundle.h"
-
 #include <QMainWindow>
 #include <array>
 

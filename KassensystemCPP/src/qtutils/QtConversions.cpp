@@ -1,6 +1,5 @@
 #include "QtConversions.h"
 #include <algorithm>
-
 #include <QDebug>
 
 namespace QtUtils

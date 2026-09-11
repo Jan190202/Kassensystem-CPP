@@ -12,6 +12,33 @@
 
 namespace entry
 {
+	struct Person
+	{
+		std::string firstName, lastName, nickName, info;
+		int64_t id;
+
+		std::string getFirstName() const;
+		std::string getLastName() const;
+		std::string getFullName() const;
+		std::string getNickName() const;
+		std::string getInfo() const;
+		std::string getFullSpecifier() const;
+
+		friend std::ostream& operator<<(std::ostream& out, const Person& person)
+		{
+			out << "FullSpecifier: " << person.getFullSpecifier() << ", "
+				<< "ID: " << person.id;
+			return out;
+		}
+		friend QDebug operator<<(QDebug out, const Person& person)
+		{
+			std::ostringstream ss;
+			ss << person;
+			out.nospace() << QString::fromStdString(ss.str());
+			return out;
+		}
+	};
+
 	struct Balance
 	{
 		int64_t balanceEntryID;
@@ -319,23 +346,4 @@ struct PriceList
 		out.nospace() << QString::fromStdString(oss.str());
 		return out;
 	}
-};
-
-class Person
-{
-public:
-	Person(const std::string& firstName, const std::string& lastName, int64_t id, const std::string& nickName = "", const std::string& info = "");
-	std::string getFirstName() const;
-	std::string getLastName() const;
-	std::string getFullName() const;
-	std::string getNickName() const;
-	std::string getInfo() const;
-	std::string getFullSpecifier() const;
-	int64_t getID() const;
-
-	friend std::ostream& operator<<(std::ostream& out, const Person& person);
-	friend QDebug operator<<(QDebug out, const Person& person);
-private:
-	std::string firstName, lastName, nickName, info;
-	int64_t id;
 };

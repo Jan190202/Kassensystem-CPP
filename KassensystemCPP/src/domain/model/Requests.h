@@ -33,7 +33,7 @@ namespace request
 		OverpaymentDisposition overpaymentType;
 	};
 
-	struct Settlement
+	struct ShareSettlement
 	{
 		double amount;
 	};

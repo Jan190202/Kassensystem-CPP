@@ -1,13 +1,11 @@
 #pragma once
-
 #include "GuiTypes.h"
 #include "domain/model/Entities.h"
-
 #include <QDialog>
-#include <string>
 #include <QDate>
 #include <vector>
 #include <optional>
+#include <string>
 
 class QDateEdit;
 class QLineEdit;
@@ -29,8 +27,10 @@ class BalanceTabDialog : public QDialog
 {
 	Q_OBJECT
 public:
-	BalanceTabDialog(BtnIndex mode, std::vector<Person> personVec, QWidget* parent);
-	dlgInputs& getInputs() const;
+	BalanceTabDialog(BtnIndex mode, const std::vector<entry::Person>& personVec, QWidget* parent);
+
+	dlgInputs getInputs() const;
+
 private:
 	QLineEdit*		edtDescription;
 	QDoubleSpinBox*	edtCost;

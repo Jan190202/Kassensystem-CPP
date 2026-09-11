@@ -1,10 +1,9 @@
 #pragma once
-
+#include "GuiTypes.h"
+#include "qtutils/QtConversions.h"
 #include <QObject>
 #include <QList>
 #include <QString>
-#include "GuiTypes.h"
-#include "qtutils/QtConversions.h"
 
 class QComboBox;
 class QDoubleSpinBox;
@@ -14,26 +13,23 @@ class QPushButton;
 class QSpinBox;
 class QWidget;
 
-
-
 class AddTabEntry : public QObject
 {
 	Q_OBJECT
 
 signals:
 	void remove(AddTabEntry* removedEntry);
-	void calcEntryCost(ConsumptionInputs&, double&);
+	void calcEntryCost(ConsumptionInputs& inputs, double& cost);
 
 public:
-	AddTabEntry(const std::vector<Person>& personVec = {},
-		QWidget* parent = nullptr);
+	AddTabEntry(const std::vector<entry::Person>& personVec = {}, QWidget* parent = nullptr);
 	~AddTabEntry() override;
-
 	void addToGrid(QGridLayout* grid, int row);
 	void removeFromGrid(QGridLayout* grid);
+
+	QWidget* getLastWidget() const;
 	ConsumptionInputs getEntryInputs() const;
-	//QWidget* getFirstWidget();
-	QWidget* getLastWidget();
+
 private:
 	QComboBox* nameSelect = nullptr;
 	QSpinBox* spinboxBeer05 = nullptr;

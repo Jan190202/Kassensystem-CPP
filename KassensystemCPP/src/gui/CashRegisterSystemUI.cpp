@@ -2,14 +2,12 @@
 #include "AddTab.h"
 #include "PayTab.h"
 #include "BalanceTab.h"
-
 #include <QCoreApplication>
 #include <QHBoxLayout>
 #include <QVBoxLayout>
 #include <QTabWidget>
 #include <QPushButton>
 #include <QMainWindow>
-
 #include <QDebug>
 
 CashRegisterSystemUI::CashRegisterSystemUI(const ServiceBundle& serviceBundle, const RepositoryBundle& repoBundle, QWidget* parent) : QMainWindow(parent)

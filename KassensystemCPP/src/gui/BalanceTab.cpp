@@ -169,7 +169,7 @@ void BalanceTab::addEntry(BtnIndex mode)
 {
 	dlgInputs inputs;
 
-	std::vector<Person> personVec = personRepo->getAll();
+	std::vector<entry::Person> personVec = personRepo->getAllPersonEntries();
 	auto* inputDialog = new BalanceTabDialog(mode, personVec, this);
 	if (inputDialog->exec() == QDialog::Accepted)
 	{
@@ -202,11 +202,11 @@ void BalanceTab::refresh()
 {
 	const registerFinancials::Report report = balanceService.getReport();
 	
-	refreshTables(report);
+	refreshTables();
 	refreshLables(report);
 }
 
-void BalanceTab::refreshTables(registerFinancials::Report) const
+void BalanceTab::refreshTables() const
 {
 	using TableAllocation = std::pair<QTableWidget*, BalanceType>;
 	std::vector<TableAllocation> allocVec;
@@ -252,7 +252,7 @@ void BalanceTab::refreshTables(registerFinancials::Report) const
 	}
 }
 
-void BalanceTab::refreshLables(registerFinancials::Report report) const
+void BalanceTab::refreshLables(const registerFinancials::Report& report) const
 {
 	lEarnings->setText(QtUtils::toCurrencyFormat(report.totalEarnings));
 	lSpendings->setText(QtUtils::toCurrencyFormat(report.totalSpendings));
@@ -314,8 +314,8 @@ void BalanceTab::addSettlement()
 	if (settledAmount == 0)
 		return;
 
-	auto returnMsg = balanceService.addSettlement(
-		request::Settlement{
+	auto returnMsg = balanceService.addShareSettlement(
+		request::ShareSettlement{
 			.amount = settledAmount
 		});
 

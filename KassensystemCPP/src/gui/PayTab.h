@@ -23,7 +23,12 @@ public:
 	virtual void refresh() override;
 	virtual void apply() override;
 	virtual void save() override;
+
 private:
+	void nameChanged();
+	void redeemCredit();
+	void refreshTable(int64_t personID);
+
 	QComboBox*		nameSelect			= nullptr;
 	QLabel*			totalNumLabel		= nullptr;
 	QLabel*			settledNumLabel		= nullptr;
@@ -39,9 +44,7 @@ private:
 	PaymentService& paymentService;
 	PersonRepository* personRepo;
 	const LowerButtonBundle& lowerButtons;
-private: // temp values
+
 	double total{}, settled{}, due{}, credit{};
-	void nameChanged();
-	void redeemCredit();
-	void refreshTable(int64_t personID);
+
 };
