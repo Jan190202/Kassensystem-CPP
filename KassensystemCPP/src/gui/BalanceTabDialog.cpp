@@ -83,7 +83,7 @@ BalanceTabDialog::BalanceTabDialog(BtnIndex mode, const std::vector<entry::Perso
 	for (size_t i = 0; i < personVec.size(); i++)
 		edtCoveringPerson->addItem(
 			nameList.at(i),
-			personVec.at(i).id
+			personVec.at(i).personEntryID
 		);
 
 	auto* statusLayout = new QHBoxLayout;
@@ -145,7 +145,7 @@ dlgInputs BalanceTabDialog::getInputs() const
 		.amount = edtCost->value(),
 		.date = edtDate->date(),
 		.comment = edtComment->toPlainText().toStdString(),
-		.coveringPersonID = edtIsCovered->isChecked() ? 
+		.coveringpersonEntryID = edtIsCovered->isChecked() ? 
 			std::optional<int64_t>(edtCoveringPerson->currentData().toLongLong()) : 
 			std::optional<int64_t>(std::nullopt) 
 			// std::optional-casting needed as ternary operator expects same datatypes in both branches

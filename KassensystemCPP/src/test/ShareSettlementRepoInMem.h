@@ -10,9 +10,11 @@ public:
 	virtual int64_t addShareSettlementAllocationEntry(entry::ShareSettlementAllocation entry) override;
 
 	virtual std::vector<entry::ShareSettlementAllocation> getDebtEntrysShareSettlementAllocationEntries(int64_t debtEntryID) const override;
-	virtual double getTotalAllocatedShareSettlements() const override;
+	virtual double getTotalAllocatedShareSettlements(const QDate& minDate) const override;
 
 private:
+	entry::ShareSettlement getShareSettlementEntry(int64_t shareSettlementEntryID) const;
+
 	std::vector<entry::ShareSettlement> shareSettlementEntries{};
 	std::vector<entry::ShareSettlementAllocation> shareSettlementAllocationEntries{};
 };

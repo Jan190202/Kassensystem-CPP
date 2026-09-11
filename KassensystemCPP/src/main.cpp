@@ -64,12 +64,12 @@ int main(int argc, char* argv[])
 	//request::Consumption cReq2{ .personInput = "Maja Apfel",	 .date = QDate::currentDate(), .nBeer05 = 2, .nBeer04 = 2, .nSoftdrinks = 5, .nWater = 5, .otherExpense = 3.1 };
 	//request::Consumption cReq3{ .personInput = "Max Birne",    .date = QDate::currentDate(), .nBeer05 = 0, .nBeer04 = 1, .nSoftdrinks = 0, .nWater = 0, .otherExpense = 1 };
 
-	request::Balance bReq1{ .type = BalanceType::Spending, .description = "Eintrag 1", .amount = 11, .date = QDate::currentDate(), .comment = "", .coveringPersonID = std::nullopt };
-	request::Balance bReq2{ .type = BalanceType::Earning,  .description = "Eintrag 2", .amount = 200, .date = QDate::currentDate(), .comment = "", .coveringPersonID = std::nullopt };
-	request::Balance bReq3{ .type = BalanceType::Spending, .description = "Eintrag 3", .amount = 13, .date = QDate::currentDate(), .comment = "", .coveringPersonID = p2ID };
+	request::Balance bReq1{ .type = BalanceType::Spending, .description = "Eintrag 1", .amount = 11, .date = QDate::currentDate(), .comment = "", .coveringpersonEntryID = std::nullopt };
+	request::Balance bReq2{ .type = BalanceType::Earning,  .description = "Eintrag 2", .amount = 200, .date = QDate::currentDate(), .comment = "", .coveringpersonEntryID = std::nullopt };
+	request::Balance bReq3{ .type = BalanceType::Spending, .description = "Eintrag 3", .amount = 13, .date = QDate::currentDate(), .comment = "", .coveringpersonEntryID = p2ID };
 
-	request::Payment pEntry1{ .personID = p1ID, .date = QDate::currentDate(), .amount = 20, .overpaymentType = OverpaymentDisposition::Credit };
-	request::Payment pEntry2{ .personID = p1ID, .date = QDate::currentDate(), .amount = 80, .overpaymentType = OverpaymentDisposition::Tip };
+	request::Payment pEntry1{ .personEntryID = p1ID, .date = QDate::currentDate(), .amount = 20, .overpaymentType = OverpaymentDisposition::Credit };
+	request::Payment pEntry2{ .personEntryID = p1ID, .date = QDate::currentDate(), .amount = 80, .overpaymentType = OverpaymentDisposition::Tip };
 
 
 	//coSer.addConsumption(cReq1);
@@ -96,7 +96,7 @@ int main(int argc, char* argv[])
 
 /*
 * TBD:
-* - repo interactions (getter, calculation, ...) always restricted to date >= dateBefore (from FinancialStateBefore)
+* - repo interactions in balanceTab always restricted to date >= dateBefore (from FinancialStateBefore)
 * - repo controller: apply (temporary save), save (full save and sync)
 * - database backups must be implemented
 */

@@ -10,32 +10,32 @@ void PaymentService::addPayment(const request::Payment& request)
 
 	entry::Payment entry{
 		.paymentEntryID = 0,
-		.personID = request.personID,
+		.personEntryID = request.personEntryID,
 		.date = request.date,
 		.amount = request.amount,
 		.overpaymentType = request.overpaymentType
 	};
 
 	int64_t paymentEntryID = paymentRepo->addPaymentEntry(entry);
-	double overpaymentAmount = addPaymentAllocation(paymentEntryID, entry.personID, entry.amount);
+	double overpaymentAmount = addPaymentAllocation(paymentEntryID, entry.personEntryID, entry.amount);
 
 	if (overpaymentAmount > 1e-9)
 	{
 		switch (entry.overpaymentType)
 		{
 		case OverpaymentDisposition::Credit:
-			addCredit(entry.personID, overpaymentAmount, entry.date, "Guthaben durch Einzahlung/Überbezahlung");
+			addCredit(entry.personEntryID, overpaymentAmount, entry.date, "Guthaben durch Einzahlung/Überbezahlung");
 			break;
 		case OverpaymentDisposition::Tip:
-			addTip(entry.personID, overpaymentAmount, entry.date);
+			addTip(entry.personEntryID, overpaymentAmount, entry.date);
 			break;
 		}
 	}
 }
 
-double PaymentService::addPaymentAllocation(int64_t paymentEntryID, int64_t personID, double amount)
+double PaymentService::addPaymentAllocation(int64_t paymentEntryID, int64_t personEntryID, double amount)
 {
-	std::vector<entry::Outstanding> remainingDebtEntries = debtRepo->getPersonsOutstandingEntries(personID, FilterType::OmitFullyPaid);
+	std::vector<entry::Outstanding> remainingDebtEntries = debtRepo->getPersonsOutstandingEntries(personEntryID, FilterType::OmitFullyPaid);
 	
 	double amountLeft = amount;
 	for (auto& entryRem : remainingDebtEntries)
@@ -58,21 +58,21 @@ double PaymentService::addPaymentAllocation(int64_t paymentEntryID, int64_t pers
 	return amountLeft;
 }
 
-int64_t PaymentService::addCredit(int64_t personID, double amount, const QDate& date, const std::string& description)
+int64_t PaymentService::addCredit(int64_t personEntryID, double amount, const QDate& date, const std::string& description)
 {
 	// potential validity check here
 	
 	return creditRepo->addCreditEntry(
 		entry::Credit{ 
 			.creditEntryID = 0, 
-			.personID = personID, 
+			.personEntryID = personEntryID, 
 			.date = date, 
 			.amount = amount, 
 			.description = description
 		});
 }
 
-int64_t PaymentService::addTip(int64_t personID, double amount, const QDate& date)
+int64_t PaymentService::addTip(int64_t personEntryID, double amount, const QDate& date)
 {
 	// potential validity check here
 	
@@ -85,6 +85,6 @@ int64_t PaymentService::addTip(int64_t personID, double amount, const QDate& dat
 		.dateBooked = date, 
 		.dateAdded = QDate::currentDate(),
 		.comment = "", 
-		.personID = personID 
+		.personEntryID = personEntryID 
 		});
 }

@@ -31,5 +31,5 @@ namespace QtUtils
 
 	QString eurSymbol();
 
-	QString extractMonth(QDate);
+	QString extractMonth(const QDate& date);
 }

@@ -29,7 +29,7 @@ public:
 private:
 	void nameChanged();
 	void redeemCredit();
-	void refreshTable(int64_t personID);
+	void refreshTable(int64_t personEntryID);
 
 	QComboBox*		nameSelect			= nullptr;
 	QLabel*			totalNumLabel		= nullptr;

@@ -22,12 +22,12 @@ namespace request
 		double amount;
 		QDate date;
 		std::string comment;
-		std::optional<int64_t> coveringPersonID;
+		std::optional<int64_t> coveringpersonEntryID;
 	};
 
 	struct Payment
 	{
-		int64_t personID;
+		int64_t personEntryID;
 		QDate date;
 		double amount;
 		OverpaymentDisposition overpaymentType;

@@ -24,7 +24,7 @@ private:
 	void addSettlement();
 
 	QString formatHeader(const QDate& date) const;
-	void refreshTables() const;
+	void refreshTables(const registerFinancials::Report& report) const;
 	void refreshLables(const registerFinancials::Report& report) const;
 
 	QTableWidget* tblSpendings = nullptr;
@@ -45,4 +45,5 @@ private:
 	BalanceService& balanceService;
 	PersonRepository* personRepo;
 	const LowerButtonBundle& lowerButtons;
+	registerFinancials::Report report;
 };

@@ -10,8 +10,8 @@ public:
 	virtual ~CreditRepoInMem() = default;
 	virtual int64_t addCreditEntry(entry::Credit) override;
 
-	virtual double getPersonsCredit(int64_t personID) const override;
-	virtual double getTotalDepositedCredit() const override;
+	virtual double getPersonsCredit(int64_t personEntryID) const override;
+	virtual double getTotalDepositedCredit(const QDate& minDate) const override;
 private:
 	std::vector<entry::Credit> entries{};
 };

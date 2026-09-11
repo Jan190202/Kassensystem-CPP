@@ -19,13 +19,13 @@ int64_t DebtRepoInMem::addDebtEntry(entry::Debt entry)
 	return entry.debtEntryID;
 }
 
-double DebtRepoInMem::getPersonsTotal(int64_t personID) const
+double DebtRepoInMem::getPersonsTotal(int64_t personEntryID) const
 {
 	double amount{};
 
 	for (auto& entry : entries)
 	{
-		if (entry.personID == personID)
+		if (entry.personEntryID == personEntryID)
 		{
 			amount += entry.amount;
 		}
@@ -34,13 +34,15 @@ double DebtRepoInMem::getPersonsTotal(int64_t personID) const
 	return amount;
 }
 
-double DebtRepoInMem::getTotalShare(FinancialShare share) const
+double DebtRepoInMem::getTotalShare(FinancialShare share, const QDate& minDate) const
 {
 	double amount{};
 
 	double currentShare = 1;
-	for (auto& entry : entries)
+	for (const auto& entry : entries)
 	{
+		if (entry.date < minDate) continue;
+
 		switch (share)
 		{
 		case FinancialShare::All:
@@ -60,10 +62,10 @@ double DebtRepoInMem::getTotalShare(FinancialShare share) const
 	return amount;
 }
 
-double DebtRepoInMem::getPersonsDue(int64_t personID) const
+double DebtRepoInMem::getPersonsDue(int64_t personEntryID) const
 {
 	double due{};
-	for (const auto& entry : getPersonsOutstandingEntries(personID, FilterType::OmitFullyPaid))
+	for (const auto& entry : getPersonsOutstandingEntries(personEntryID, FilterType::OmitFullyPaid))
 		due+=entry.remaining;
 	return due;
 }
@@ -76,21 +78,21 @@ double DebtRepoInMem::getForeignDue() const
 	return due;
 }
 
-double DebtRepoInMem::getPersonsPaid(int64_t personID) const
+double DebtRepoInMem::getPersonsPaid(int64_t personEntryID) const
 {
 	double settled{};
-	for (auto& entry : getPersonsOutstandingEntries(personID, FilterType::IncludeFullyPaid))
+	for (auto& entry : getPersonsOutstandingEntries(personEntryID, FilterType::IncludeFullyPaid))
 		settled += entry.amount - entry.remaining;
 	return settled;
 }
 
-std::vector<entry::Outstanding> DebtRepoInMem::getPersonsOutstandingEntries(int64_t personID, FilterType filter) const
+std::vector<entry::Outstanding> DebtRepoInMem::getPersonsOutstandingEntries(int64_t personEntryID, FilterType filter) const
 {
 	std::vector<entry::Outstanding> filteredEntries = {};
 
 	for (auto& entry : entries)
 	{
-		if (entry.personID == personID)
+		if (entry.personEntryID == personEntryID)
 		{
 			double remaining = entry.amount - getAllocatedPayments(entry.debtEntryID);
 

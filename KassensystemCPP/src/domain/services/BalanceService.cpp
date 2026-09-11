@@ -6,14 +6,14 @@ BalanceService::BalanceService(const RepositoryBundle& repoBundle, const registe
 
 int64_t BalanceService::addBalanceItem(const request::Balance& request)
 {
-	int64_t personID{};
-	if (request.coveringPersonID.has_value())
+	int64_t personEntryID{};
+	if (request.coveringpersonEntryID.has_value())
 	{
-		personID = request.coveringPersonID.value();
+		personEntryID = request.coveringpersonEntryID.value();
 	}
 	else
 	{
-		personID = -1;
+		personEntryID = -1;
 	}
 	
 	entry::Balance entry{
@@ -24,34 +24,34 @@ int64_t BalanceService::addBalanceItem(const request::Balance& request)
 		.dateBooked = request.date,
 		.dateAdded = QDate::currentDate(),
 		.comment = request.comment,
-		.personID = personID
+		.personEntryID = personEntryID
 	};
 
-	if (request.coveringPersonID.has_value() && entry.type == BalanceType::Spending)
+	if (request.coveringpersonEntryID.has_value() && entry.type == BalanceType::Spending)
 	{
-		addCredit(entry.personID, entry.amount, entry.dateBooked, "Abteilungsausgabe übernommen");
+		addCredit(entry.personEntryID, entry.amount, entry.dateBooked, "Abteilungsausgabe übernommen");
 	}
 	
 	return balanceRepo->addBalanceEntry(entry);
 }
 
-int64_t BalanceService::addCredit(int64_t personID, double amount, const QDate& date, const std::string& description)
+int64_t BalanceService::addCredit(int64_t personEntryID, double amount, const QDate& date, const std::string& description)
 {
 	// potential validity check here
 	
 	return creditRepo->addCreditEntry(
 		entry::Credit{ 
 			.creditEntryID = 0, 
-			.personID = personID, 
+			.personEntryID = personEntryID, 
 			.date = date, 
 			.amount = amount, 
 			.description = description 
 		});
 }
 
-std::vector<entry::Balance> BalanceService::getBalanceEntries(BalanceType type) const
+std::vector<entry::Balance> BalanceService::getBalanceEntries(BalanceType type, const QDate& minDate) const
 {
-	auto entries = balanceRepo->getBalanceEntries(type);
+	auto entries = balanceRepo->getBalanceEntries(type, minDate);
 
 	if (type == BalanceType::EarningAndSupplement)
 	{
@@ -59,7 +59,7 @@ std::vector<entry::Balance> BalanceService::getBalanceEntries(BalanceType type) 
 			entry::Balance{
 				.type = BalanceType::Earning,
 				.description = "Einnahmen durch Getränkeverkäufe",
-				.amount = debtRepo->getTotalShare(FinancialShare::Own),
+				.amount = debtRepo->getTotalShare(FinancialShare::Own, minDate),
 				.dateBooked = QDate::currentDate()
 			});
 
@@ -83,9 +83,9 @@ registerFinancials::Report BalanceService::getReport() const
 	double departmentSpendings{};
 	double consumptionOwnShare{};
 	
-	for (const auto& entry : getBalanceEntries(BalanceType::Earning)) departmentEarnings += entry.amount;
-	for (const auto& entry : getBalanceEntries(BalanceType::Spending)) departmentSpendings += entry.amount;
-	consumptionOwnShare = debtRepo->getTotalShare(FinancialShare::Own);
+	for (const auto& entry : getBalanceEntries(BalanceType::Earning, stateBefore.date)) departmentEarnings += entry.amount;
+	for (const auto& entry : getBalanceEntries(BalanceType::Spending, stateBefore.date)) departmentSpendings += entry.amount;
+	consumptionOwnShare = debtRepo->getTotalShare(FinancialShare::Own, stateBefore.date);
 
 	double savingsDiff = departmentEarnings - departmentSpendings + consumptionOwnShare;
 
@@ -95,9 +95,9 @@ registerFinancials::Report BalanceService::getReport() const
 	double settledValue{};
 	double depositedCredit{};
 
-	paidDebt = paymentRepo->getTotalAllocatedPayments();
-	settledValue = shareSettlementRepo->getTotalAllocatedShareSettlements();
-	depositedCredit = creditRepo->getTotalDepositedCredit();
+	paidDebt = paymentRepo->getTotalAllocatedPayments(stateBefore.date);
+	settledValue = shareSettlementRepo->getTotalAllocatedShareSettlements(stateBefore.date);
+	depositedCredit = creditRepo->getTotalDepositedCredit(stateBefore.date);
 
 	double cashDiff = departmentEarnings - departmentSpendings + paidDebt - settledValue + depositedCredit;
 
@@ -136,7 +136,7 @@ AddSettlementException BalanceService::addShareSettlement(request::ShareSettleme
 		return AddSettlementException::AmountGreaterThanTotalForeignShare;
 
 	entry::ShareSettlement entry{
-		.shareSettlementID = 0,
+		.shareSettlementEntryID = 0,
 		.date = QDate::currentDate(),
 		.amount = request.amount,
 	};
@@ -170,9 +170,9 @@ double BalanceService::addShareSettlementAllocation(int64_t settlementEntryID, d
 		amountLeft -= appliedToCurrentEntry;
 
 		entry::ShareSettlementAllocation aEntry{
-			.shareSettlementAllocationID = 0,
+			.shareSettlementAllocationEntryID = 0,
 			.debtEntryID = entryRem.debtEntryID,
-			.shareSettlementID = settlementEntryID,
+			.shareSettlementEntryID = settlementEntryID,
 			.amount = appliedToCurrentEntry 
 		};
 

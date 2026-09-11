@@ -2,7 +2,6 @@
 #include "BalanceTabDialog.h"
 #include "GuiTypes.h"
 #include "qtutils/QtConversions.h"
-
 #include <QDate>
 #include <QFormLayout>
 #include <QGroupBox>
@@ -12,10 +11,9 @@
 #include <QSizePolicy>
 #include <QTableWidget>
 #include <QVBoxLayout>
-#include <string>
 #include <QInputDialog>
-
 #include <QDebug>
+#include <string>
 
 BalanceTab::BalanceTab(const LowerButtonBundle& lowerButtons, BalanceService& balanceService, PersonRepository* personRepo, QWidget* parent) 
 	: lowerButtons(lowerButtons), balanceService(balanceService), personRepo(personRepo), BaseTab(parent) {}
@@ -176,10 +174,10 @@ void BalanceTab::addEntry(BtnIndex mode)
 		// inputs given and OK pressed
 		inputs = inputDialog->getInputs();
 		qInfo() << inputs.description;
-		qInfo() << inputs.coveringPersonID.has_value();
-		if (inputs.coveringPersonID.has_value())
+		qInfo() << inputs.coveringpersonEntryID.has_value();
+		if (inputs.coveringpersonEntryID.has_value())
 		{
-			qInfo() << inputs.coveringPersonID.value();
+			qInfo() << inputs.coveringpersonEntryID.value();
 		}
 		qInfo() << inputs.comment;
 	}
@@ -192,7 +190,7 @@ void BalanceTab::addEntry(BtnIndex mode)
 			.amount = inputs.amount,
 			.date = inputs.date,
 			.comment = inputs.comment,
-			.coveringPersonID = inputs.coveringPersonID
+			.coveringpersonEntryID = inputs.coveringpersonEntryID
 		});
 
 	refresh();
@@ -200,13 +198,13 @@ void BalanceTab::addEntry(BtnIndex mode)
 
 void BalanceTab::refresh()
 {
-	const registerFinancials::Report report = balanceService.getReport();
+	report = balanceService.getReport();
 	
-	refreshTables();
+	refreshTables(report);
 	refreshLables(report);
 }
 
-void BalanceTab::refreshTables() const
+void BalanceTab::refreshTables(const registerFinancials::Report& report) const
 {
 	using TableAllocation = std::pair<QTableWidget*, BalanceType>;
 	std::vector<TableAllocation> allocVec;
@@ -223,7 +221,7 @@ void BalanceTab::refreshTables() const
 		BalanceType type = allocVec.at(i).second;
 
 		table->clearContents();
-		std::vector<entry::Balance> bEntries = balanceService.getBalanceEntries(type);
+		std::vector<entry::Balance> bEntries = balanceService.getBalanceEntries(type, report.stateBefore.date);
 		int rowCount = bEntries.size();
 		int colCount = 3; // description, amount, dateBooked
 
@@ -290,7 +288,7 @@ QString BalanceTab::formatHeader(const QDate& date) const
 void BalanceTab::addSettlement()
 {
 	const double minValue = 0.0;
-	const double maxValue = balanceService.getReport().stateAfter.foreignCash; // TBD: get directly from repo
+	const double maxValue = report.stateAfter.foreignCash;
 	const double initValue = maxValue;
 	const int decimals = 2;
 

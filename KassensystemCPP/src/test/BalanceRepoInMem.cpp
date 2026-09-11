@@ -16,17 +16,16 @@ int64_t BalanceRepoInMem::addBalanceEntry(entry::Balance entry)
 	return entry.balanceEntryID;
 }
 
-std::vector<entry::Balance> BalanceRepoInMem::getBalanceEntries(BalanceType type) const
+std::vector<entry::Balance> BalanceRepoInMem::getBalanceEntries(BalanceType type, const QDate& minDate) const
 {
-	if (type == BalanceType::EarningAndSpending) return entries;
-
 	if (type == BalanceType::EarningAndSupplement) type = BalanceType::Earning;
-	
-	std::vector<entry::Balance> filteredEntries;
 
-	for (auto& entry : entries)
+	std::vector<entry::Balance> filteredEntries;
+	
+	for (const auto& entry : entries)
 	{
-		if (entry.type == type) filteredEntries.push_back(entry);
+		if (entry.dateBooked < minDate) continue;
+		if (type == BalanceType::EarningAndSpending || entry.type == type) filteredEntries.push_back(entry);
 	}
 
 	return filteredEntries;

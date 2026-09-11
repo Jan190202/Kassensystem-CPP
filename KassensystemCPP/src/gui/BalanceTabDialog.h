@@ -20,7 +20,7 @@ struct dlgInputs
 	double amount;
 	QDate date;
 	std::string comment;
-	std::optional<int64_t> coveringPersonID;
+	std::optional<int64_t> coveringpersonEntryID;
 };
 
 class BalanceTabDialog : public QDialog

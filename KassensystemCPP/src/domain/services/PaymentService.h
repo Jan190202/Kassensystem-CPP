@@ -11,9 +11,9 @@ public:
 	void addPayment(const request::Payment& request);
 
 private:
-	double addPaymentAllocation(int64_t paymentEntryID, int64_t personID, double amount);
-	int64_t addTip(int64_t personID, double amount, const QDate& date);
-	int64_t addCredit(int64_t personID, double amount, const QDate& date, const std::string& description);
+	double addPaymentAllocation(int64_t paymentEntryID, int64_t personEntryID, double amount);
+	int64_t addTip(int64_t personEntryID, double amount, const QDate& date);
+	int64_t addCredit(int64_t personEntryID, double amount, const QDate& date, const std::string& description);
 
 	PaymentRepository* paymentRepo;
 	CreditRepository* creditRepo;

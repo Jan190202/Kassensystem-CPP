@@ -10,7 +10,7 @@ public:
 	virtual ~ConsumptionRepoInMem() = default;
 
 	virtual int64_t addConsumptionEntry(entry::Consumption) override;
-	virtual std::vector<entry::Consumption> getConsumptionEntries(int64_t personID) const override;
+	virtual std::vector<entry::Consumption> getConsumptionEntries(int64_t personEntryID) const override;
 private:
 	std::vector<entry::Consumption> entries{};
 };

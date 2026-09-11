@@ -11,12 +11,12 @@ public:
 	virtual ~DebtRepoInMem() = default;
 	virtual int64_t addDebtEntry(entry::Debt entry) override;
 
-	virtual double getPersonsTotal(int64_t personID) const override;
-	virtual double getPersonsDue(int64_t personID) const override;
-	virtual double getPersonsPaid(int64_t personID) const override;
-	virtual double getTotalShare(FinancialShare share) const override;
+	virtual double getPersonsTotal(int64_t personEntryID) const override;
+	virtual double getPersonsDue(int64_t personEntryID) const override;
+	virtual double getPersonsPaid(int64_t personEntryID) const override;
+	virtual double getTotalShare(FinancialShare share, const QDate& minDate) const override;
 	virtual double getForeignDue() const override;
-	virtual std::vector<entry::Outstanding> getPersonsOutstandingEntries(int64_t personID, FilterType filter) const override;
+	virtual std::vector<entry::Outstanding> getPersonsOutstandingEntries(int64_t personEntryID, FilterType filter) const override;
 	virtual std::vector<entry::Outstanding> getForeignShareOutstandingEntries(FilterType filter) const override;
 private:
 	std::vector<entry::Debt> entries{};

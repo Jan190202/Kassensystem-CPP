@@ -13,7 +13,7 @@ public:
 	virtual ~PersonRepoInMem() = default;
 	virtual int64_t addPersonEntry(entry::Person entry) override;
 
-	virtual std::expected<entry::Person, std::string> findPersonEntry(int64_t personID) const override;
+	virtual std::expected<entry::Person, std::string> findPersonEntry(int64_t personEntryID) const override;
 	virtual std::vector<entry::Person> getAllPersonEntries() const override;
 
 private:

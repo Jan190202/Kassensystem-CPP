@@ -17,7 +17,7 @@ int64_t ConsumptionRepoInMem::addConsumptionEntry(entry::Consumption entry)
 	return entry.consumptionEntryID;
 }
 
-std::vector<entry::Consumption> ConsumptionRepoInMem::getConsumptionEntries(int64_t personID) const
+std::vector<entry::Consumption> ConsumptionRepoInMem::getConsumptionEntries(int64_t personEntryID) const
 {
 	std::vector<entry::Consumption> filteredData = {};
 

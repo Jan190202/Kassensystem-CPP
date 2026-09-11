@@ -20,8 +20,8 @@ namespace QtUtils
 		return QStringLiteral("%1 \u20AC").arg(QString::number(value, 'f', decimals));
 	}
 
-	QString extractMonth(QDate date)
-	{
+	QString extractMonth(const QDate& date)
+	{		
 		std::string m;
 
 		switch (date.month())

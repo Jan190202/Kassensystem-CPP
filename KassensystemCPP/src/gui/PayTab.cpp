@@ -181,15 +181,15 @@ void PayTab::initialize()
 
 void PayTab::nameChanged()
 {
-	int64_t personID = nameSelect->currentData().toLongLong();
+	int64_t personEntryID = nameSelect->currentData().toLongLong();
 
-	total = debtRepo->getPersonsTotal(personID);
-	settled = debtRepo->getPersonsPaid(personID);
-	due = debtRepo->getPersonsDue(personID);
-	credit = creditRepo->getPersonsCredit(personID);
+	total = debtRepo->getPersonsTotal(personEntryID);
+	settled = debtRepo->getPersonsPaid(personEntryID);
+	due = debtRepo->getPersonsDue(personEntryID);
+	credit = creditRepo->getPersonsCredit(personEntryID);
 
 	// refresh table
-	refreshTable(personID);
+	refreshTable(personEntryID);
 
 	// refresh labels
 	totalNumLabel->setText(QtUtils::toCurrencyFormat(total));
@@ -220,7 +220,7 @@ void PayTab::refresh()
 	std::optional<size_t> indexForOldID;
 	for (size_t i = 0; i < personVec.size(); i++)
 	{
-		int64_t itemID = personVec.at(i).id;
+		int64_t itemID = personVec.at(i).personEntryID;
 		nameSelect->addItem(nameList.at(i), itemID);
 		if (itemID == oldID) indexForOldID = i;
 	}
@@ -233,7 +233,7 @@ void PayTab::refresh()
 void PayTab::apply()
 {
 	request::Payment request{
-		.personID = nameSelect->currentData().toLongLong(),
+		.personEntryID = nameSelect->currentData().toLongLong(),
 		.date = QDate::currentDate(),
 		.amount = paymentSpinBox->value(),
 		.overpaymentType = btnSurplusToCredit->isChecked() ? OverpaymentDisposition::Credit : OverpaymentDisposition::Tip
@@ -252,14 +252,15 @@ void PayTab::save()
 
 void PayTab::redeemCredit()
 {
-	int64_t personID = nameSelect->currentData().toLongLong();
+	int64_t personEntryID = nameSelect->currentData().toLongLong();
 
 	double redemptionAmount = std::min(credit, due);
+	if (redemptionAmount == 0) return;
 
 	creditRepo->addCreditEntry(
 		entry::Credit{
 			.creditEntryID = 0,
-			.personID = personID,
+			.personEntryID = personEntryID,
 			.date = QDate::currentDate(),
 			.amount = -redemptionAmount,
 			.description = "Einlösung von bestehendem Guthaben"
@@ -267,7 +268,7 @@ void PayTab::redeemCredit()
 
 	paymentService.addPayment(
 		request::Payment{
-		.personID = personID,
+		.personEntryID = personEntryID,
 		.date = QDate::currentDate(),
 		.amount = redemptionAmount,
 		.overpaymentType = OverpaymentDisposition::Credit
@@ -276,12 +277,12 @@ void PayTab::redeemCredit()
 	refresh();
 }
 
-void PayTab::refreshTable(int64_t personID)
+void PayTab::refreshTable(int64_t personEntryID)
 {
 	tblConsumption->clearContents();
 	
-	std::vector<entry::Consumption> cEntries = consumptionRepo->getConsumptionEntries(personID);
-	std::vector<entry::Outstanding> drEntries = debtRepo->getPersonsOutstandingEntries(personID, FilterType::IncludeFullyPaid);
+	std::vector<entry::Consumption> cEntries = consumptionRepo->getConsumptionEntries(personEntryID);
+	std::vector<entry::Outstanding> drEntries = debtRepo->getPersonsOutstandingEntries(personEntryID, FilterType::IncludeFullyPaid);
 
 	// create items and add them to table
 	int rowCount = drEntries.size();

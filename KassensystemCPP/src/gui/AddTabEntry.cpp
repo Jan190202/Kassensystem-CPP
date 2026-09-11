@@ -20,7 +20,7 @@ AddTabEntry::AddTabEntry(const std::vector<entry::Person>& personVec, QWidget* p
 	for (size_t i = 0; i < personVec.size(); i++) 
 		nameSelect->addItem(
 			nameList.at(i), 
-			QVariant::fromValue(personVec.at(i).id)
+			QVariant::fromValue(personVec.at(i).personEntryID)
 		);
 	nameSelect->setEditable(true);
 	nameSelect->setDuplicatesEnabled(false);

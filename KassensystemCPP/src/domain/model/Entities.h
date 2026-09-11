@@ -15,7 +15,7 @@ namespace entry
 	struct Person
 	{
 		std::string firstName, lastName, nickName, info;
-		int64_t id;
+		int64_t personEntryID;
 
 		std::string getFirstName() const;
 		std::string getLastName() const;
@@ -26,8 +26,8 @@ namespace entry
 
 		friend std::ostream& operator<<(std::ostream& out, const Person& person)
 		{
-			out << "FullSpecifier: " << person.getFullSpecifier() << ", "
-				<< "ID: " << person.id;
+			out << "fullSpecifier: " << person.getFullSpecifier() << ", "
+				<< "personEntryID: " << person.personEntryID;
 			return out;
 		}
 		friend QDebug operator<<(QDebug out, const Person& person)
@@ -48,7 +48,7 @@ namespace entry
 		QDate dateBooked;
 		QDate dateAdded;
 		std::string comment;
-		int64_t personID;
+		int64_t personEntryID;
 
 		friend std::ostream& operator<<(std::ostream& out, const Balance& entry)
 		{
@@ -59,7 +59,7 @@ namespace entry
 				<< "dateBooked: " << entry.dateBooked.toString(Qt::ISODate).toStdString() << ", "
 				<< "dateAdded: " << entry.dateAdded.toString(Qt::ISODate).toStdString() << ", "
 				<< "comment: " << entry.comment << ", "
-				<< "personID: " << entry.personID;
+				<< "personEntryID: " << entry.personEntryID;
 
 			return out;
 		}
@@ -105,7 +105,7 @@ namespace entry
 	struct Debt
 	{
 		int64_t debtEntryID;
-		int64_t personID;
+		int64_t personEntryID;
 		QDate date;
 		double amount;
 		double foreignShare = 0.85;
@@ -113,7 +113,7 @@ namespace entry
 		friend std::ostream& operator<<(std::ostream& out, const Debt& entry)
 		{
 			out << "debtEntryID: " << entry.debtEntryID << ", "
-				<< "personID: " << entry.personID << ", "
+				<< "personEntryID: " << entry.personEntryID << ", "
 				<< "date: " << entry.date.toString(Qt::ISODate).toStdString() << ", "
 				<< "amount: " << entry.amount << ", "
 				<< "foreignShare: " << entry.foreignShare;
@@ -159,7 +159,7 @@ namespace entry
 	struct Payment
 	{
 		int64_t paymentEntryID;
-		int64_t personID;
+		int64_t personEntryID;
 		QDate date;
 		double amount;
 		OverpaymentDisposition overpaymentType;
@@ -167,7 +167,7 @@ namespace entry
 		friend std::ostream& operator<<(std::ostream& out, const Payment& entry)
 		{
 			out << "paymentEntryID: " << entry.paymentEntryID << ", "
-				<< "personID: " << entry.personID << ", "
+				<< "personEntryID: " << entry.personEntryID << ", "
 				<< "date: " << entry.date.toString(Qt::ISODate).toStdString() << ", "
 				<< "amount: " << entry.amount << ", "
 				<< "overpaymentType: " << static_cast<int>(entry.overpaymentType);
@@ -213,7 +213,7 @@ namespace entry
 	struct Credit
 	{
 		int64_t creditEntryID;
-		int64_t personID;
+		int64_t personEntryID;
 		QDate date;
 		double amount;
 		std::string description;
@@ -221,7 +221,7 @@ namespace entry
 		friend std::ostream& operator<<(std::ostream& out, const Credit& entry)
 		{
 			out << "creditEntryID: " << entry.creditEntryID << ", "
-				<< "personID: " << entry.personID << ", "
+				<< "personEntryID: " << entry.personEntryID << ", "
 				<< "date: " << entry.date.toString(Qt::ISODate).toStdString() << ", "
 				<< "amount: " << entry.amount << ", "
 				<< "description: " << entry.description;
@@ -240,13 +240,13 @@ namespace entry
 
 	struct ShareSettlement
 	{
-		int64_t shareSettlementID;
+		int64_t shareSettlementEntryID;
 		QDate date;
 		double amount;
 
 		friend std::ostream& operator<<(std::ostream& out, const ShareSettlement& entry)
 		{
-			out << "settlementID: " << entry.shareSettlementID << ", "
+			out << "settlementEntryID: " << entry.shareSettlementEntryID << ", "
 				<< "date: " << entry.date.toString(Qt::ISODate).toStdString() << ", "
 				<< "amount: " << entry.amount;
 
@@ -264,16 +264,16 @@ namespace entry
 
 	struct ShareSettlementAllocation
 	{
-		int64_t shareSettlementAllocationID;
+		int64_t shareSettlementAllocationEntryID;
 		int64_t debtEntryID;
-		int64_t shareSettlementID;
+		int64_t shareSettlementEntryID;
 		double amount;
 
 		friend std::ostream& operator<<(std::ostream& out, const ShareSettlementAllocation& entry)
 		{
-			out << "settlementAllocationID: " << entry.shareSettlementAllocationID << ", "
+			out << "settlementAllocationEntryID: " << entry.shareSettlementAllocationEntryID << ", "
 				<< "debtEntryID: " << entry.debtEntryID << ", "
-				<< "settlementID: " << entry.shareSettlementID << ", "
+				<< "settlementEntryID: " << entry.shareSettlementEntryID << ", "
 				<< "amount: " << entry.amount;
 
 			return out;

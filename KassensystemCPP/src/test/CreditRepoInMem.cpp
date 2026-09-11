@@ -16,13 +16,13 @@ int64_t CreditRepoInMem::addCreditEntry(entry::Credit entry)
 	return entry.creditEntryID;
 }
 
-double CreditRepoInMem::getPersonsCredit(int64_t personID) const
+double CreditRepoInMem::getPersonsCredit(int64_t personEntryID) const
 {
 	double credit{};
 	
 	for (auto& entry : entries)
 	{
-		if (entry.personID == personID)
+		if (entry.personEntryID == personEntryID)
 		{
 			credit += entry.amount;
 		}
@@ -30,12 +30,13 @@ double CreditRepoInMem::getPersonsCredit(int64_t personID) const
 	return credit;
 }
 
-double CreditRepoInMem::getTotalDepositedCredit() const
+double CreditRepoInMem::getTotalDepositedCredit(const QDate& minDate) const
 {
 	double credit{};
 
 	for (auto& entry : entries)
 	{
+		if (entry.date < minDate) continue;
 		credit += entry.amount;
 	}
 

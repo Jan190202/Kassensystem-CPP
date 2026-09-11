@@ -10,7 +10,7 @@ void ConsumptionService::addConsumption(const request::Consumption& request)
 	double amount = calculateDebt(request);
 	
 	// find or create Person entry
-	int64_t personID{};
+	int64_t personEntryID{};
 	if (std::holds_alternative<std::string>(request.personInput)) // new name, no avaliable ID
 	{		
 		std::string nameRequest = std::get<std::string>(request.personInput);
@@ -22,13 +22,13 @@ void ConsumptionService::addConsumption(const request::Consumption& request)
 		if (result.has_value())
 		{
 			PersonStringSpecifiers spec = result.value();
-			personID = personRepo->addPersonEntry(
+			personEntryID = personRepo->addPersonEntry(
 				entry::Person{
 					.firstName = spec.firstName,
 					.lastName = spec.lastName,
 					.nickName = spec.nickName,
 					.info = spec.info,
-					.id = 0
+					.personEntryID = 0
 				});
 		}
 		else
@@ -49,11 +49,11 @@ void ConsumptionService::addConsumption(const request::Consumption& request)
 	}
 	else
 	{
-		personID = std::get<int64_t>(request.personInput);
+		personEntryID = std::get<int64_t>(request.personInput);
 	}
 
 	// add debt and consumption entry
-	entry::Debt dEntry{ .debtEntryID = 0, .personID = personID, .date = request.date, .amount = amount};
+	entry::Debt dEntry{ .debtEntryID = 0, .personEntryID = personEntryID, .date = request.date, .amount = amount};
 	int64_t dEntryID = debtRepo->addDebtEntry(dEntry);
 
 	entry::Consumption cEntry{ .consumptionEntryID = 0, .debtEntryID = dEntryID, .nBeer05 = request.nBeer05 , .nBeer04 = request.nBeer04, .nSoftdrinks = request.nSoftdrinks, .nWater = request.nWater };

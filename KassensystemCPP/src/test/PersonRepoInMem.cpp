@@ -4,11 +4,11 @@
 #include <vector>
 #include <QDebug>
 
-std::expected<entry::Person,std::string> PersonRepoInMem::findPersonEntry(int64_t personID) const
+std::expected<entry::Person,std::string> PersonRepoInMem::findPersonEntry(int64_t personEntryID) const
 {
 	for (auto& entry : entries)
 	{
-		if (entry.id == personID)
+		if (entry.personEntryID == personEntryID)
 		{
 			return entry;
 		}
@@ -21,9 +21,9 @@ int64_t PersonRepoInMem::addPersonEntry(entry::Person entry)
 {
 	std::vector<int64_t> usedIDs(entries.size());
 	for (size_t i = 0; i < entries.size(); i++)
-		usedIDs.at(i) = entries.at(i).id;
+		usedIDs.at(i) = entries.at(i).personEntryID;
 	int64_t id = idgen::getID(usedIDs);
-	entry.id = id;
+	entry.personEntryID = id;
 	entries.push_back(entry);
 
 	qInfo() << entry;

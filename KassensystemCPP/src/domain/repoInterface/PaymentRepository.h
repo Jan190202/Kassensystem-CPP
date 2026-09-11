@@ -11,5 +11,5 @@ public:
 	virtual int64_t addPaymentAllocationEntry(entry::PaymentAllocation entry) = 0; // add payment allocation entry to database, return associated ID
 
 	virtual std::vector<entry::PaymentAllocation> getDebtsEntrysPaymentAllocationEntries(int64_t debtEntryID) const = 0; // payment allocation entries associated with debt entry
-	virtual double getTotalAllocatedPayments() const = 0; // total payments belonging to debts in database (e.g. excluding tips after overpayment)
+	virtual double getTotalAllocatedPayments(const QDate& minDate) const = 0; // total payments belonging to debts in database that came after or at minDate (e.g. excluding tips after overpayment)
 };
