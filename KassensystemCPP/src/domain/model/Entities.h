@@ -56,8 +56,8 @@ namespace entry
 				<< "type: " << static_cast<int>(entry.type) << ", "
 				<< "description: " << entry.description << ", "
 				<< "amount: " << entry.amount << ", "
-				<< "dateBooked: " << entry.dateBooked.toString(Qt::ISODate).toStdString() << ", "
-				<< "dateAdded: " << entry.dateAdded.toString(Qt::ISODate).toStdString() << ", "
+				<< "dateBooked: " << entry.dateBooked.toString("dd.MM.yyyy").toStdString() << ", "
+				<< "dateAdded: " << entry.dateAdded.toString("dd.MM.yyyy").toStdString() << ", "
 				<< "comment: " << entry.comment << ", "
 				<< "personEntryID: " << entry.personEntryID;
 
@@ -114,7 +114,7 @@ namespace entry
 		{
 			out << "debtEntryID: " << entry.debtEntryID << ", "
 				<< "personEntryID: " << entry.personEntryID << ", "
-				<< "date: " << entry.date.toString(Qt::ISODate).toStdString() << ", "
+				<< "date: " << entry.date.toString("dd.MM.yyyy").toStdString() << ", "
 				<< "amount: " << entry.amount << ", "
 				<< "foreignShare: " << entry.foreignShare;
 
@@ -140,7 +140,7 @@ namespace entry
 		friend std::ostream& operator<<(std::ostream& out, const Outstanding& entry)
 		{
 			out << "debtEntryID: " << entry.debtEntryID << ", "
-				<< "date: " << entry.date.toString(Qt::ISODate).toStdString() << ", "
+				<< "date: " << entry.date.toString("dd.MM.yyyy").toStdString() << ", "
 				<< "amount: " << entry.amount << ", "
 				<< "remaining: " << entry.remaining;
 
@@ -168,7 +168,7 @@ namespace entry
 		{
 			out << "paymentEntryID: " << entry.paymentEntryID << ", "
 				<< "personEntryID: " << entry.personEntryID << ", "
-				<< "date: " << entry.date.toString(Qt::ISODate).toStdString() << ", "
+				<< "date: " << entry.date.toString("dd.MM.yyyy").toStdString() << ", "
 				<< "amount: " << entry.amount << ", "
 				<< "overpaymentType: " << static_cast<int>(entry.overpaymentType);
 
@@ -222,7 +222,7 @@ namespace entry
 		{
 			out << "creditEntryID: " << entry.creditEntryID << ", "
 				<< "personEntryID: " << entry.personEntryID << ", "
-				<< "date: " << entry.date.toString(Qt::ISODate).toStdString() << ", "
+				<< "date: " << entry.date.toString("dd.MM.yyyy").toStdString() << ", "
 				<< "amount: " << entry.amount << ", "
 				<< "description: " << entry.description;
 
@@ -247,7 +247,7 @@ namespace entry
 		friend std::ostream& operator<<(std::ostream& out, const ShareSettlement& entry)
 		{
 			out << "settlementEntryID: " << entry.shareSettlementEntryID << ", "
-				<< "date: " << entry.date.toString(Qt::ISODate).toStdString() << ", "
+				<< "date: " << entry.date.toString("dd.MM.yyyy").toStdString() << ", "
 				<< "amount: " << entry.amount;
 
 			return out;
@@ -298,7 +298,7 @@ namespace registerFinancials
 
 		friend std::ostream& operator<<(std::ostream& out, const State& state)
 		{
-			out << "date: " << state.date.toString().toStdString() << ", "
+			out << "date: " << state.date.toString("dd.MM.yyyy").toStdString() << ", "
 				<< "savings: " << state.savings << ", "
 				<< "cash: " << state.cash << ", "
 				<< "foreignCash: " << state.foreignCash << ", "

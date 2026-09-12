@@ -4,6 +4,8 @@
 #include <vector>
 #include <QDebug>
 
+#include <iostream>
+
 std::expected<entry::Person,std::string> PersonRepoInMem::findPersonEntry(int64_t personEntryID) const
 {
 	for (auto& entry : entries)

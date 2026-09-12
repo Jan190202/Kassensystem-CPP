@@ -23,21 +23,38 @@
 #include "app/RepositoryBundle.h"
 #include "app/ServiceBundle.h"
 
+#include <Windows.h>
+#include <cstdio>
 #include <string>
 #include <iostream>
 #include <optional>
-
 #include <QApplication>
 #include <QDebug>
+#include <QtGlobal>
+
+void utf8MessageHandler(QtMsgType type, const QMessageLogContext& context, const QString& msg)
+{
+	QByteArray utf8Msg = msg.toUtf8();  // explicit UTF-8, no locale involved
+	FILE* stream = (type == QtDebugMsg || type == QtInfoMsg) ? stdout : stderr;
+	fprintf(stream, "%s\n", utf8Msg.constData());
+}
 
 int main(int argc, char* argv[])
 {
+	// force qDebug to output QStrings in UTF-8 instead of down encoding to CP-1252
+	qInstallMessageHandler(utf8MessageHandler);
+	// UTF-8 encoding for non-ascii character display in console (ß,ä,ä,ü,...)
+	SetConsoleOutputCP(CP_UTF8);
+	SetConsoleCP(CP_UTF8);
+
 	// initialize QApp
 	QApplication app(argc, argv);
 
 	// load read-only data
+	qDebug() << "Reading config:";
 	const PriceList priceList = priceListLoader::read();
 	const registerFinancials::State financialStateBefore = financialStateLoader::read();
+	qDebug() << "\n";
 
 	// initialize repositories and services
 	PersonRepository* peRep				= new PersonRepoInMem();
@@ -55,15 +72,18 @@ int main(int argc, char* argv[])
 	ServiceBundle serviceBundle{ .consumptionService = coSer, .paymentService = paSer, .balanceService = baSer };
 
 	// domain testing
+	qDebug() << "Adding person entries";
 	int64_t p1ID = peRep->addPersonEntry(entry::Person{ .firstName = "Tim", .lastName = "Ebert" });
-	int64_t p2ID = peRep->addPersonEntry(entry::Person{ .firstName = "Alfons", .lastName = "Strau�", .info = "Gast"});
-	int64_t p3ID = peRep->addPersonEntry(entry::Person{ .firstName = "Eberhadt", .lastName = "N�bel", .nickName = "Eber"});
-	
+	int64_t p2ID = peRep->addPersonEntry(entry::Person{ .firstName = "Alfons", .lastName = "Strauß", .info = "Gast"});
+	int64_t p3ID = peRep->addPersonEntry(entry::Person{ .firstName = "Eberhadt", .lastName = "Nöbel", .nickName = "Eber"});
+	int64_t p4ID = peRep->addPersonEntry(entry::Person{ .firstName = "Dieter", .lastName = "Armen"});
+	qDebug() << "\n"; 
+
 	// total,allDates: 80 (12+68), totalShare,>=2026: 40 (6+34)
-	request::Consumption cReq1{ .personInput = "Dieter Armen", .date = QDate::currentDate(), .otherExpense = 10};
-	request::Consumption cReq2{ .personInput = "Dieter Armen", .date = QDate(2025,1,1), .otherExpense = 10};
-	request::Consumption cReq3{ .personInput = "Dieter Armen", .date = QDate(2025,7,7), .otherExpense = 10};
-	request::Consumption cReq4{ .personInput = "Dieter Armen", .date = QDate(2025,12,31), .otherExpense = 10};
+	request::Consumption cReq1{ .personInput = p4ID, .date = QDate::currentDate(), .otherExpense = 10};
+	request::Consumption cReq2{ .personInput = p4ID, .date = QDate(2025,1,1), .otherExpense = 10};
+	request::Consumption cReq3{ .personInput = p4ID, .date = QDate(2025,7,7), .otherExpense = 10};
+	request::Consumption cReq4{ .personInput = p4ID, .date = QDate(2025,12,31), .otherExpense = 10};
 	request::Consumption cReq5{ .personInput = "Maja Apfel", .date = QDate(2026,1,1), .otherExpense = 10};
 	request::Consumption cReq6{ .personInput = "Max Birne", .date = QDate(2026,5,5), .otherExpense = 10};
 	request::Consumption cReq7{ .personInput = p1ID, .date = QDate::currentDate(), .otherExpense = 10};
@@ -94,6 +114,7 @@ int main(int argc, char* argv[])
 	request::ShareSettlement sEntry2{ .amount = 10 };
 	request::ShareSettlement sEntry3{ .amount = 10 };
 
+	qDebug() << "Adding consumption";
 	coSer.addConsumption(cReq1);
 	coSer.addConsumption(cReq2);
 	coSer.addConsumption(cReq3);
@@ -102,7 +123,9 @@ int main(int argc, char* argv[])
 	coSer.addConsumption(cReq6);
 	coSer.addConsumption(cReq7);
 	coSer.addConsumption(cReq8);
+	qDebug() << "\n";
 
+	qDebug() << "Adding balance items";
 	baSer.addBalanceItem(bReq1);
 	baSer.addBalanceItem(bReq2);
 	baSer.addBalanceItem(bReq3);
@@ -113,19 +136,25 @@ int main(int argc, char* argv[])
 	baSer.addBalanceItem(bReq8);
 	baSer.addBalanceItem(bReq9);
 	baSer.addBalanceItem(bReq10);
+	qDebug() << "\n";
 
+	qDebug() << "Adding payments";
 	paSer.addPayment(pEntry1);
 	paSer.addPayment(pEntry2);
 	paSer.addPayment(pEntry3);
 	paSer.addPayment(pEntry4);
 	paSer.addPayment(pEntry5);
 	paSer.addPayment(pEntry6);
+	qDebug() << "\n";
 
+	qDebug() << "Adding share settlements";
 	baSer.addShareSettlement(sEntry1);
 	baSer.addShareSettlement(sEntry2);
 	baSer.addShareSettlement(sEntry3);
+	qDebug() << "\n";
 
 	// start UI
+	qDebug() << "Starting UI";
 	CashRegisterSystemUI sysUI(serviceBundle, repoBundle);
 	sysUI.show();
 

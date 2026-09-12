@@ -235,7 +235,7 @@ void BalanceTab::refreshTables(const registerFinancials::Report& report) const
 
 			QTableWidgetItem* descriptionItem = new QTableWidgetItem(QString::fromStdString(bEntry.description));
 			QTableWidgetItem* amountItem = new QTableWidgetItem(QString::number(bEntry.amount, 'f', 2));
-			QTableWidgetItem* dateItem = new QTableWidgetItem(bEntry.dateBooked.toString(QStringLiteral("dd.MM.yyyy")));
+			QTableWidgetItem* dateItem = new QTableWidgetItem(bEntry.dateBooked.toString("dd.MM.yyyy"));
 
 			//descriptionItem->setTextAlignment(Qt::AlignHCenter | Qt::AlignVCenter);
 			//amountItem->setTextAlignment(Qt::AlignHCenter | Qt::AlignVCenter);
@@ -282,7 +282,7 @@ void BalanceTab::save()
 
 QString BalanceTab::formatHeader(const QDate& date) const
 {
-	return QStringLiteral("Stand %1").arg(date.toString(QStringLiteral("dd.MM.yyyy")));
+	return QStringLiteral("Stand %1").arg(date.toString("dd.MM.yyyy"));
 }
 
 void BalanceTab::addSettlement()
