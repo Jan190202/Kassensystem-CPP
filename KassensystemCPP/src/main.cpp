@@ -56,36 +56,74 @@ int main(int argc, char* argv[])
 
 	// domain testing
 	int64_t p1ID = peRep->addPersonEntry(entry::Person{ .firstName = "Tim", .lastName = "Ebert" });
-	int64_t p2ID = peRep->addPersonEntry(entry::Person{ .firstName = "Alfons", .lastName = "Strauss" });
+	int64_t p2ID = peRep->addPersonEntry(entry::Person{ .firstName = "Alfons", .lastName = "Strauß", .info = "Gast"});
+	int64_t p3ID = peRep->addPersonEntry(entry::Person{ .firstName = "Eberhadt", .lastName = "Nöbel", .nickName = "Eber"});
+	
+	// total,allDates: 80 (12+68), totalShare,>=2026: 40 (6+34)
+	request::Consumption cReq1{ .personInput = "Dieter Armen", .date = QDate::currentDate(), .otherExpense = 10};
+	request::Consumption cReq2{ .personInput = "Dieter Armen", .date = QDate(2025,1,1), .otherExpense = 10};
+	request::Consumption cReq3{ .personInput = "Dieter Armen", .date = QDate(2025,7,7), .otherExpense = 10};
+	request::Consumption cReq4{ .personInput = "Dieter Armen", .date = QDate(2025,12,31), .otherExpense = 10};
+	request::Consumption cReq5{ .personInput = "Maja Apfel", .date = QDate(2026,1,1), .otherExpense = 10};
+	request::Consumption cReq6{ .personInput = "Max Birne", .date = QDate(2026,5,5), .otherExpense = 10};
+	request::Consumption cReq7{ .personInput = p1ID, .date = QDate::currentDate(), .otherExpense = 10};
+	request::Consumption cReq8{ .personInput = p2ID, .date = QDate(2024,10,10), .otherExpense = 10};
 
-	request::Consumption cReq4{ .personInput = p1ID, .date = QDate::currentDate(), .nBeer05 = 6, .nBeer04 = 9, .nSoftdrinks = 3, .nWater = 1, .otherExpense = 1.4 };
-	request::Consumption cReq5{ .personInput = p1ID, .date = QDate::currentDate(), .nBeer05 = 60, .nBeer04 = 9, .nSoftdrinks = 3, .nWater = 1, .otherExpense = 1.4 };
-	//request::Consumption cReq1{ .personInput = "Dieter Armen", .date = QDate::currentDate(), .nBeer05 = 1, .nBeer04 = 2, .nSoftdrinks = 3, .nWater = 1, .otherExpense = 1.4 };
-	//request::Consumption cReq2{ .personInput = "Maja Apfel",	 .date = QDate::currentDate(), .nBeer05 = 2, .nBeer04 = 2, .nSoftdrinks = 5, .nWater = 5, .otherExpense = 3.1 };
-	//request::Consumption cReq3{ .personInput = "Max Birne",    .date = QDate::currentDate(), .nBeer05 = 0, .nBeer04 = 1, .nSoftdrinks = 0, .nWater = 0, .otherExpense = 1 };
+	// 6xEarning (>=2026 --> 1,2,9,10, total: 40), 4xSpending (>=2026 --> 3,4,5,6, total: 40), p1ID --> credit: 30
+	request::Balance bReq1{ .type = BalanceType::Earning,  .description = "Eintrag 1", .amount = 10, .date = QDate::currentDate(), .comment = "Kommentar 1", .coveringpersonEntryID = std::nullopt };
+	request::Balance bReq2{ .type = BalanceType::Earning,  .description = "Eintrag 2", .amount = 10, .date = QDate::currentDate(), .comment = "Kommentar 2", .coveringpersonEntryID = std::nullopt };
+	request::Balance bReq3{ .type = BalanceType::Spending, .description = "Eintrag 3", .amount = 10, .date = QDate::currentDate(), .comment = "Kommentar 3", .coveringpersonEntryID = p1ID };
+	request::Balance bReq4{ .type = BalanceType::Spending, .description = "Eintrag 4", .amount = 10, .date = QDate::currentDate(), .comment = "Kommentar 4", .coveringpersonEntryID = p1ID };
+	request::Balance bReq5{ .type = BalanceType::Spending, .description = "Eintrag 5", .amount = 10, .date = QDate::currentDate(), .comment = "Kommentar 5", .coveringpersonEntryID = p1ID };
+	request::Balance bReq6{ .type = BalanceType::Spending, .description = "Eintrag 6", .amount = 10, .date = QDate::currentDate(), .comment = "Kommentar 6", .coveringpersonEntryID = std::nullopt };
+	request::Balance bReq7{ .type = BalanceType::Earning, .description = "Eintrag 7", .amount = 10, .date = QDate(2025,12,31), .comment = "Kommentar 7", .coveringpersonEntryID = std::nullopt};
+	request::Balance bReq8{ .type = BalanceType::Earning, .description = "Eintrag 8", .amount = 10, .date = QDate(2025,12,31), .comment = "Kommentar 8", .coveringpersonEntryID = std::nullopt};
+	request::Balance bReq9{ .type = BalanceType::Earning, .description = "Eintrag 9", .amount = 10, .date = QDate(2026,1,1), .comment = "Kommentar 9", .coveringpersonEntryID = std::nullopt};
+	request::Balance bReq10{ .type = BalanceType::Earning, .description = "Eintrag 10", .amount = 10, .date = QDate(2026,1,2), .comment = "Kommentar 10", .coveringpersonEntryID = std::nullopt};
 
-	request::Balance bReq1{ .type = BalanceType::Spending, .description = "Eintrag 1", .amount = 11, .date = QDate::currentDate(), .comment = "", .coveringpersonEntryID = std::nullopt };
-	request::Balance bReq2{ .type = BalanceType::Earning,  .description = "Eintrag 2", .amount = 200, .date = QDate::currentDate(), .comment = "", .coveringpersonEntryID = std::nullopt };
-	request::Balance bReq3{ .type = BalanceType::Spending, .description = "Eintrag 3", .amount = 13, .date = QDate::currentDate(), .comment = "", .coveringpersonEntryID = p2ID };
+	// p1ID --> total: 15, toCredit: 5, toTip: 10, >=2026: 8
+	request::Payment pEntry1{ .personEntryID = p1ID, .date = QDate::currentDate(), .amount = 1, .overpaymentType = OverpaymentDisposition::Credit };
+	request::Payment pEntry2{ .personEntryID = p1ID, .date = QDate(2026,1,1), .amount = 1, .overpaymentType = OverpaymentDisposition::Credit};
+	request::Payment pEntry3{ .personEntryID = p1ID, .date = QDate(2026,1,2), .amount = 1, .overpaymentType = OverpaymentDisposition::Credit};
+	request::Payment pEntry4{ .personEntryID = p1ID, .date = QDate(2025,12,12), .amount = 2, .overpaymentType = OverpaymentDisposition::Credit};
+	request::Payment pEntry5{ .personEntryID = p1ID, .date = QDate(2026,2,2), .amount = 5, .overpaymentType = OverpaymentDisposition::Tip};
+	request::Payment pEntry6{ .personEntryID = p1ID, .date = QDate(2025,8,8), .amount = 5, .overpaymentType = OverpaymentDisposition::Tip};
 
-	request::Payment pEntry1{ .personEntryID = p1ID, .date = QDate::currentDate(), .amount = 20, .overpaymentType = OverpaymentDisposition::Credit };
-	request::Payment pEntry2{ .personEntryID = p1ID, .date = QDate::currentDate(), .amount = 80, .overpaymentType = OverpaymentDisposition::Tip };
+	// total: 30
+	request::ShareSettlement sEntry1{ .amount = 10 };
+	request::ShareSettlement sEntry2{ .amount = 10 };
+	request::ShareSettlement sEntry3{ .amount = 10 };
 
-
-	//coSer.addConsumption(cReq1);
-	//coSer.addConsumption(cReq2);
-	//coSer.addConsumption(cReq3);
+	coSer.addConsumption(cReq1);
+	coSer.addConsumption(cReq2);
+	coSer.addConsumption(cReq3);
 	coSer.addConsumption(cReq4);
+	coSer.addConsumption(cReq5);
+	coSer.addConsumption(cReq6);
+	coSer.addConsumption(cReq7);
+	coSer.addConsumption(cReq8);
 
 	baSer.addBalanceItem(bReq1);
 	baSer.addBalanceItem(bReq2);
 	baSer.addBalanceItem(bReq3);
+	baSer.addBalanceItem(bReq4);
+	baSer.addBalanceItem(bReq5);
+	baSer.addBalanceItem(bReq6);
+	baSer.addBalanceItem(bReq7);
+	baSer.addBalanceItem(bReq8);
+	baSer.addBalanceItem(bReq9);
+	baSer.addBalanceItem(bReq10);
 
 	paSer.addPayment(pEntry1);
-	//paSer.addPayment(pEntry2);
+	paSer.addPayment(pEntry2);
+	paSer.addPayment(pEntry3);
+	paSer.addPayment(pEntry4);
+	paSer.addPayment(pEntry5);
+	paSer.addPayment(pEntry6);
 
-	coSer.addConsumption(cReq5);
-
+	baSer.addShareSettlement(sEntry1);
+	baSer.addShareSettlement(sEntry2);
+	baSer.addShareSettlement(sEntry3);
 
 	// start UI
 	CashRegisterSystemUI sysUI(serviceBundle, repoBundle);
