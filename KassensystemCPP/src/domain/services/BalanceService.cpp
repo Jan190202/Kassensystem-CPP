@@ -101,6 +101,14 @@ registerFinancials::Report BalanceService::getReport() const
 
 	double cashDiff = departmentEarnings - departmentSpendings + paidDebt - settledValue + depositedCredit;
 
+	qDebug() << "Creating financial report";
+	qDebug() << "ConsumptionOwnShare: " << consumptionOwnShare;
+	qDebug() << "DepartmentEarnings: " << departmentEarnings;
+	qDebug() << "DepartmentSpendings: " << departmentSpendings;
+	qDebug() << "PaidDebt: " << paidDebt;
+	qDebug() << "SettledValue: " << settledValue;
+	qDebug() << "DepositedCredit: " << depositedCredit;
+	qDebug() << "";
 
 	double currentForeignCash = debtRepo->getForeignDue();
 

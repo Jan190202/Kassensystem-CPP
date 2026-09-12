@@ -42,7 +42,7 @@ int main(int argc, char* argv[])
 	qDebug() << "Reading config:";
 	const PriceList priceList = priceListLoader::read();
 	const registerFinancials::State financialStateBefore = financialStateLoader::read();
-	qDebug() << "\n";
+	qDebug() << "";
 
 	// initialize repositories and services
 	PersonRepository* peRep				= new PersonRepoInMem();
@@ -65,7 +65,7 @@ int main(int argc, char* argv[])
 	int64_t p2ID = peRep->addPersonEntry(entry::Person{ .firstName = "Alfons", .lastName = "Strauß", .info = "Gast"});
 	int64_t p3ID = peRep->addPersonEntry(entry::Person{ .firstName = "Eberhadt", .lastName = "Nöbel", .nickName = "Eber"});
 	int64_t p4ID = peRep->addPersonEntry(entry::Person{ .firstName = "Dieter", .lastName = "Armen"});
-	qDebug() << "\n"; 
+	qDebug() << ""; 
 
 	// total,allDates: 80 (12+68), totalShare,>=2026: 40 (6+34)
 	request::Consumption cReq1{ .personInput = p4ID, .date = QDate::currentDate(), .otherExpense = 10};
@@ -111,7 +111,7 @@ int main(int argc, char* argv[])
 	coSer.addConsumption(cReq6);
 	coSer.addConsumption(cReq7);
 	coSer.addConsumption(cReq8);
-	qDebug() << "\n";
+	qDebug() << "";
 
 	qDebug() << "Adding balance items";
 	baSer.addBalanceItem(bReq1);
@@ -124,7 +124,7 @@ int main(int argc, char* argv[])
 	baSer.addBalanceItem(bReq8);
 	baSer.addBalanceItem(bReq9);
 	baSer.addBalanceItem(bReq10);
-	qDebug() << "\n";
+	qDebug() << "";
 
 	qDebug() << "Adding payments";
 	paSer.addPayment(pEntry1);
@@ -133,16 +133,16 @@ int main(int argc, char* argv[])
 	paSer.addPayment(pEntry4);
 	paSer.addPayment(pEntry5);
 	paSer.addPayment(pEntry6);
-	qDebug() << "\n";
+	qDebug() << "";
 
 	qDebug() << "Adding share settlements";
 	baSer.addShareSettlement(sEntry1);
 	baSer.addShareSettlement(sEntry2);
 	baSer.addShareSettlement(sEntry3);
-	qDebug() << "\n";
+	qDebug() << "";
 
 	// start UI
-	qDebug() << "Starting UI";
+	qDebug() << "Starting UI\n";
 	CashRegisterSystemUI sysUI(serviceBundle, repoBundle);
 	sysUI.show();
 

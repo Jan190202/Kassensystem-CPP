@@ -201,8 +201,7 @@ void AddTab::apply()
 void AddTab::save()
 {
 	apply();
-	//consumptionService->save();
-	//consumptionService->sync();
+	// TBD
 }
 
 void AddTab::handleInputValidityError(const validityError::Code& errorCode) const

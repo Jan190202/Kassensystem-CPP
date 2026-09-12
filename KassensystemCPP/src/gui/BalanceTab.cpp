@@ -271,6 +271,7 @@ void BalanceTab::refreshLables(const registerFinancials::Report& report) const
 
 void BalanceTab::apply()
 {
+	// in future: buffer added entries / share settlements and only add them on apply
 	// TBD
 }
 

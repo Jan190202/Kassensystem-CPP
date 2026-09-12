@@ -42,7 +42,7 @@ std::vector<entry::PaymentAllocation> PaymentRepoInMem::getDebtsEntrysPaymentAll
 	return filteredEntries;
 }
 
-double PaymentRepoInMem::getTotalAllocatedPayments(const QDate& minDate) const // TBD: use minDate
+double PaymentRepoInMem::getTotalAllocatedPayments(const QDate& minDate) const
 {
 	double paidTotal{};
 
