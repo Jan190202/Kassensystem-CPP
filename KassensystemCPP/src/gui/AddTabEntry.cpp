@@ -12,12 +12,17 @@
 #include <QLineEdit>
 #include <QDebug>
 #include <variant>
+#include <algorithm>
 
-AddTabEntry::AddTabEntry(const std::vector<entry::Person>& personVec, QWidget* parent)
+AddTabEntry::AddTabEntry(std::vector<entry::Person>& personVec, QWidget* parent)
 {
 	nameSelect = new QComboBox(parent);
+	std::sort(personVec.begin(), personVec.end(), [](const entry::Person& a, const entry::Person& b)
+		{
+			return a.getFullSpecifier() > b.getFullSpecifier();
+		});
 	QList<QString> nameList = QtUtils::personVecToQStrList(personVec, &entry::Person::getFullSpecifier);
-	for (size_t i = 0; i < personVec.size(); i++) 
+	for (size_t i = personVec.size(); i-- > 0; ) // loop backward to insert in inverse-alphabetical order
 		nameSelect->addItem(
 			nameList.at(i), 
 			QVariant::fromValue(personVec.at(i).personEntryID)

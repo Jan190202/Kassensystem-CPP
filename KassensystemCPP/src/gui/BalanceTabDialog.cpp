@@ -18,8 +18,9 @@
 #include <QFont>
 #include <QPlainTextEdit>
 #include <string>
+#include <algorithm>
 
-BalanceTabDialog::BalanceTabDialog(BtnIndex mode, const std::vector<entry::Person>& personVec, QWidget* parent) : QDialog(parent)
+BalanceTabDialog::BalanceTabDialog(BtnIndex mode, std::vector<entry::Person>& personVec, QWidget* parent) : QDialog(parent)
 {
 	switch (mode)
 	{
@@ -79,8 +80,12 @@ BalanceTabDialog::BalanceTabDialog(BtnIndex mode, const std::vector<entry::Perso
 
 	edtCoveringPerson = new QComboBox();
 	edtCoveringPerson->setEnabled(false);
+	std::sort(personVec.begin(), personVec.end(), [](const entry::Person& a, const entry::Person& b)
+		{
+			return a.getFullSpecifier() > b.getFullSpecifier();
+		});
 	QList<QString> nameList = QtUtils::personVecToQStrList(personVec, &entry::Person::getFullName);
-	for (size_t i = 0; i < personVec.size(); i++)
+	for (size_t i = personVec.size(); i-- > 0; )
 		edtCoveringPerson->addItem(
 			nameList.at(i),
 			personVec.at(i).personEntryID

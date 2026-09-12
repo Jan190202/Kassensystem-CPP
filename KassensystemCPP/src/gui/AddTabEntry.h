@@ -22,7 +22,7 @@ signals:
 	void calcEntryCost(ConsumptionInputs& inputs, double& cost);
 
 public:
-	AddTabEntry(const std::vector<entry::Person>& personVec = {}, QWidget* parent = nullptr);
+	AddTabEntry(std::vector<entry::Person>& personVec, QWidget* parent = nullptr);
 	~AddTabEntry() override;
 	void addToGrid(QGridLayout* grid, int row);
 	void removeFromGrid(QGridLayout* grid);

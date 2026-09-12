@@ -15,6 +15,7 @@
 #include <QTableWidget>
 #include <QVBoxLayout>
 #include <QColor>
+#include <algorithm>
 
 PayTab::PayTab(const LowerButtonBundle& lowerButtons, PaymentService& paymentService, PersonRepository* personRepo, ConsumptionRepository* consumptionRepo, DebtRepository* debtRepo, CreditRepository* creditRepo, QWidget* parent) 
 	: lowerButtons(lowerButtons), paymentService(paymentService), personRepo(personRepo), consumptionRepo(consumptionRepo), debtRepo(debtRepo), creditRepo(creditRepo), BaseTab(parent) {}
@@ -207,7 +208,7 @@ void PayTab::nameChanged()
 void PayTab::refresh()
 {
 	// refresh name list (clear and rebuild from database), in case it was altered
-	// try to keed name loaded before
+	// try to keep name loaded before
 	// refresh tab for current name
 
 	int64_t oldID = nameSelect->currentData().toLongLong();
@@ -215,14 +216,18 @@ void PayTab::refresh()
 	nameSelect->clear();
 	
 	std::vector<entry::Person> personVec = personRepo->getAllPersonEntries();
+	std::sort(personVec.begin(), personVec.end(), [](const entry::Person& a, const entry::Person& b) 
+		{
+			return a.getFullSpecifier() > b.getFullSpecifier(); 
+		});
 	QList<QString> nameList = QtUtils::personVecToQStrList(personVec, &entry::Person::getFullSpecifier);
 	
 	std::optional<size_t> indexForOldID;
-	for (size_t i = 0; i < personVec.size(); i++)
+	for (size_t i = personVec.size(); i-- > 0; ) // loop backward to insert in inverse-alphabetical order (i = size()-1 ... 0)
 	{
 		int64_t itemID = personVec.at(i).personEntryID;
 		nameSelect->addItem(nameList.at(i), itemID);
-		if (itemID == oldID) indexForOldID = i;
+		if (itemID == oldID) indexForOldID = personVec.size()-i-1; // == 0 ... size()-1
 	}
 
 	if (indexForOldID.has_value()) nameSelect->setCurrentIndex(indexForOldID.value());
@@ -284,13 +289,19 @@ void PayTab::refreshTable(int64_t personEntryID)
 	std::vector<entry::Consumption> cEntries = consumptionRepo->getConsumptionEntries(personEntryID);
 	std::vector<entry::Outstanding> drEntries = debtRepo->getPersonsOutstandingEntries(personEntryID, FilterType::IncludeFullyPaid);
 
+	// sort by date
+	std::sort(drEntries.begin(), drEntries.end(), [](const entry::Outstanding& a, const entry::Outstanding& b)
+		{
+			return a.date > b.date;
+		});
+
 	// create items and add them to table
 	int rowCount = drEntries.size();
 	int columnCount = 6;
 
 	tblConsumption->setRowCount(rowCount);
 	tblConsumption->setColumnCount(columnCount);
-	tblConsumption->setHorizontalHeaderLabels(QtUtils::strVecToQStrList({ "Monat", "Bezahlt/Gesamt (" + Utils::eurSymbol() + ")", "Bier (0.5l)", "Bier (0.4l)", "Wasser", "Softdrinks"}));
+	tblConsumption->setHorizontalHeaderLabels(QtUtils::strVecToQStrList({ "Zeitraum", "Bezahlt / Gesamt (" + Utils::eurSymbol() + ")", "Bier (0.5l)", "Bier (0.4l)", "Wasser", "Softdrinks"}));
 
 	QColor rowColor;
 	for (size_t row = 0; row < drEntries.size(); row++)
@@ -315,7 +326,7 @@ void PayTab::refreshTable(int64_t personEntryID)
 			}
 		}
 
-		QTableWidgetItem* dateItem = new QTableWidgetItem(QtUtils::extractMonth(drEntry.date));
+		QTableWidgetItem* dateItem = new QTableWidgetItem(QtUtils::extractMonth(drEntry.date) + " " + drEntry.date.toString("yy"));
 		QTableWidgetItem* infoItem = new QTableWidgetItem(QString::number(drEntry.amount-drEntry.remaining, 'f', 2) + QString::fromStdString(" / ") + QString::number(drEntry.amount, 'f', 2));
 
 		QTableWidgetItem* beer05Item;

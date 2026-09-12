@@ -14,6 +14,7 @@
 #include <QInputDialog>
 #include <QDebug>
 #include <string>
+#include <algorithm>
 
 BalanceTab::BalanceTab(const LowerButtonBundle& lowerButtons, BalanceService& balanceService, PersonRepository* personRepo, QWidget* parent) 
 	: lowerButtons(lowerButtons), balanceService(balanceService), personRepo(personRepo), BaseTab(parent) {}
@@ -222,6 +223,12 @@ void BalanceTab::refreshTables(const registerFinancials::Report& report) const
 
 		table->clearContents();
 		std::vector<entry::Balance> bEntries = balanceService.getBalanceEntries(type, report.stateBefore.date);
+
+		std::sort(bEntries.begin(), bEntries.end(), [](const entry::Balance& a, const entry::Balance& b) 
+			{
+				return a.dateBooked > b.dateBooked;
+			});
+
 		int rowCount = bEntries.size();
 		int colCount = 3; // description, amount, dateBooked
 

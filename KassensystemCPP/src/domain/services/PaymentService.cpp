@@ -1,5 +1,6 @@
 #include "PaymentService.h"
 #include <expected>
+#include <algorithm>
 
 PaymentService::PaymentService(const RepositoryBundle& repoBundle)
 	: paymentRepo(repoBundle.paymentRepo), creditRepo(repoBundle.creditRepo), debtRepo(repoBundle.debtRepo), consumptionRepo(repoBundle.consumptionRepo), balanceRepo(repoBundle.balanceRepo), personRepo(repoBundle.personRepo) {}
@@ -37,8 +38,14 @@ double PaymentService::addPaymentAllocation(int64_t paymentEntryID, int64_t pers
 {
 	std::vector<entry::Outstanding> remainingDebtEntries = debtRepo->getPersonsOutstandingEntries(personEntryID, FilterType::OmitFullyPaid);
 	
+	// sort be reverse date so older outstanding debts are paid first
+	std::sort(remainingDebtEntries.begin(), remainingDebtEntries.end(), [](const entry::Outstanding& a, const entry::Outstanding& b)
+		{
+			return a.date < b.date;
+		});
+
 	double amountLeft = amount;
-	for (auto& entryRem : remainingDebtEntries)
+	for (const auto& entryRem : remainingDebtEntries)
 	{
 		if (amountLeft < 1e-9) break;
 

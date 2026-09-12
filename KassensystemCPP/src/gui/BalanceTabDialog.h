@@ -27,7 +27,7 @@ class BalanceTabDialog : public QDialog
 {
 	Q_OBJECT
 public:
-	BalanceTabDialog(BtnIndex mode, const std::vector<entry::Person>& personVec, QWidget* parent);
+	BalanceTabDialog(BtnIndex mode, std::vector<entry::Person>& personVec, QWidget* parent);
 
 	dlgInputs getInputs() const;
 
