@@ -23,29 +23,17 @@
 #include "app/RepositoryBundle.h"
 #include "app/ServiceBundle.h"
 
-#include <Windows.h>
-#include <cstdio>
+#include "system/SystemConfig.h"
+
 #include <string>
 #include <iostream>
 #include <optional>
 #include <QApplication>
 #include <QDebug>
-#include <QtGlobal>
-
-void utf8MessageHandler(QtMsgType type, const QMessageLogContext& context, const QString& msg)
-{
-	QByteArray utf8Msg = msg.toUtf8();  // explicit UTF-8, no locale involved
-	FILE* stream = (type == QtDebugMsg || type == QtInfoMsg) ? stdout : stderr;
-	fprintf(stream, "%s\n", utf8Msg.constData());
-}
 
 int main(int argc, char* argv[])
 {
-	// force qDebug to output QStrings in UTF-8 instead of down encoding to CP-1252
-	qInstallMessageHandler(utf8MessageHandler);
-	// UTF-8 encoding for non-ascii character display in console (ß,ä,ä,ü,...)
-	SetConsoleOutputCP(CP_UTF8);
-	SetConsoleCP(CP_UTF8);
+	systemConfig::setUTF8Encoding();
 
 	// initialize QApp
 	QApplication app(argc, argv);
