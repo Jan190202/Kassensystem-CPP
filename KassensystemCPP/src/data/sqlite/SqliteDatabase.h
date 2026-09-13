@@ -1,16 +1,8 @@
 #pragma once
-#include <QSqlDatabase>
 #include <string>
 
-class SqliteDatabase
+namespace sqliteDatabase
 {
-public:
-	SqliteDatabase() = default;;
-	bool openDatabase(const std::string& dbPath);
-	void commitChanges();
-	void rollbackChanges();
-
-	QSqlDatabase& getConnection();
-private:
-	void initBlankDatabase(QSqlDatabase&);
-};
+	bool open(const std::string& dbPath);
+	void close();
+}

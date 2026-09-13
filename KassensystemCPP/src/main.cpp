@@ -19,6 +19,7 @@
 
 #include "data/config/PriceListLoader.h"
 #include "data/config/FinancialStateLoader.h"
+#include "data/sqlite/SqliteDatabase.h"
 
 #include "app/RepositoryBundle.h"
 #include "app/ServiceBundle.h"
@@ -43,6 +44,10 @@ int main(int argc, char* argv[])
 	const PriceList priceList = priceListLoader::read();
 	const registerFinancials::State financialStateBefore = financialStateLoader::read();
 	qDebug() << "";
+
+	// open database
+	std::string dbPath = "";
+	sqliteDatabase::open(dbPath);
 
 	// initialize repositories and services
 	PersonRepository* peRep				= new PersonRepoInMem();
@@ -145,8 +150,12 @@ int main(int argc, char* argv[])
 	qDebug() << "Starting UI\n";
 	CashRegisterSystemUI sysUI(serviceBundle, repoBundle);
 	sysUI.show();
+	app.exec();
 
-	return app.exec();
+	// close database
+	sqliteDatabase::close(); // TBD: do on cancel, before app actually closes
+
+	return 0;
 }
 
 /*
