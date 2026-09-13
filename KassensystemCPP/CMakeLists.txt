@@ -29,8 +29,10 @@ add_custom_command(
 
 # Qt-Integration
 find_package(Qt6 REQUIRED COMPONENTS Widgets)
-
 target_link_libraries(KassensystemCPP PRIVATE Qt6::Widgets)
+
+find_package(Qt6 REQUIRED COMPONENTS Sql)
+target_link_libraries(KassensystemCPP PRIVATE Qt6::Sql)
 
 find_program(WINDEPLOYQT_EXECUTABLE windeployqt HINTS "${Qt6_DIR}/../../../bin")
 
