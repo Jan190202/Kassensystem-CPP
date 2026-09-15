@@ -7,7 +7,7 @@ class DebtRepository
 public:
 	DebtRepository() = default;
 	virtual ~DebtRepository() = default;
-	virtual int64_t addDebtEntry(entry::Debt entry) = 0; // add debt entry to database, return associated ID
+	virtual int64_t addDebtEntry(const entry::Debt& entry) = 0; // add debt entry to database, return associated ID
 
 	virtual double getPersonsTotal(int64_t personEntryID) const = 0; // total consumption debt of person (paid and not paid)
 	virtual double getPersonsDue(int64_t personEntryID) const = 0; // due amount a person still needs to pay for consumption

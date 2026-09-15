@@ -53,7 +53,7 @@ std::vector<entry::Consumption> SqliteConsumptionRepository::getConsumptionEntri
 					.nBeer04 = query.value("nBeer04").toInt(),
 					.nSoftdrinks = query.value("nSoftdrinks").toInt(),
 					.nWater = query.value("nWater").toInt(),
-					.otherExpense = query.value("otherExponse").toDouble()
+					.otherExpense = query.value("otherExpense").toDouble()
 				});
 		}
 	}

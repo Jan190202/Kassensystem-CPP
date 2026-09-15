@@ -26,10 +26,7 @@ int64_t SqliteBalanceRepository::addBalanceEntry(const entry::Balance& entry)
 
 	if (query.exec())
 		if (query.next())
-		{
 			return query.value(0).toLongLong();
-		}
-	
 }
 
 std::expected<entry::Balance, GetEntryException> SqliteBalanceRepository::getBalanceEntry(const std::string& description) const
