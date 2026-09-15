@@ -7,7 +7,7 @@ class ConsumptionRepository
 public:
 	ConsumptionRepository() = default;
 	virtual ~ConsumptionRepository() = default;
-	virtual int64_t addConsumptionEntry(entry::Consumption entry) = 0; // add consumption entry to database, return associated ID
+	virtual int64_t addConsumptionEntry(const entry::Consumption& entry) = 0; // add consumption entry to database, return associated ID
 
 	virtual std::vector<entry::Consumption> getConsumptionEntries(int64_t personEntryID) const = 0; // return all consumption entries associated with person
 };

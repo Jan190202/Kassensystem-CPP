@@ -10,7 +10,7 @@
 #include "domain/services/BalanceService.h"
 
 //#include "test/BalanceRepoInMem.h"
-#include "test/ConsumptionRepoInMem.h"
+//#include "test/ConsumptionRepoInMem.h"
 #include "test/CreditRepoInMem.h"
 #include "test/DebtRepoInMem.h"
 #include "test/ShareSettlementRepoInMem.h"
@@ -59,7 +59,7 @@ int main(int argc, char* argv[])
 
 	// initialize repositories and services
 	PersonRepository* peRep				= new PersonRepoInMem();
-	ConsumptionRepository* coRep		= new ConsumptionRepoInMem();
+	ConsumptionRepository* coRep		= new SqliteConsumptionRepository();
 	PaymentRepository* paRep			= new PaymentRepoInMem();
 	CreditRepository* crRep				= new CreditRepoInMem();
 	BalanceRepository* baRep			= new SqliteBalanceRepository();
@@ -88,7 +88,7 @@ int main(int argc, char* argv[])
 	request::Consumption cReq5{ .personInput = "Maja Apfel", .date = QDate(2026,1,1), .otherExpense = 10};
 	request::Consumption cReq6{ .personInput = "Max Birne", .date = QDate(2026,5,5), .otherExpense = 10};
 	request::Consumption cReq7{ .personInput = p1ID, .date = QDate::currentDate(), .otherExpense = 10};
-	request::Consumption cReq8{ .personInput = p2ID, .date = QDate(2024,10,10), .otherExpense = 10};
+	request::Consumption cReq8{ .personInput = p2ID, .date = QDate(2026,5,5), .otherExpense = 10};
 
 	// 6xEarning (>=2026 --> 1,2,9,10, total: 40), 4xSpending (>=2026 --> 3,4,5,6, total: 40), p1ID --> credit: 30
 	request::Balance bReq1{ .type = BalanceType::Earning,  .description = "Eintrag 1", .amount = 10, .date = QDate::currentDate(), .comment = "Kommentar 1", .coveringpersonEntryID = std::nullopt };

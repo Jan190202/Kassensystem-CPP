@@ -56,7 +56,7 @@ void ConsumptionService::addConsumption(const request::Consumption& request)
 	entry::Debt dEntry{ .debtEntryID = 0, .personEntryID = personEntryID, .date = request.date, .amount = amount};
 	int64_t dEntryID = debtRepo->addDebtEntry(dEntry);
 
-	entry::Consumption cEntry{ .consumptionEntryID = 0, .debtEntryID = dEntryID, .nBeer05 = request.nBeer05 , .nBeer04 = request.nBeer04, .nSoftdrinks = request.nSoftdrinks, .nWater = request.nWater };
+	entry::Consumption cEntry{ .consumptionEntryID = 0, .debtEntryID = dEntryID, .nBeer05 = request.nBeer05 , .nBeer04 = request.nBeer04, .nSoftdrinks = request.nSoftdrinks, .nWater = request.nWater, .otherExpense = request.otherExpense };
 	int64_t cEntryID = consumptionRepo->addConsumptionEntry(cEntry);
 }
 
