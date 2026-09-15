@@ -27,7 +27,7 @@ int64_t BalanceService::addBalanceItem(const request::Balance& request)
 		.personEntryID = personEntryID
 	};
 
-	if (request.coveringpersonEntryID.has_value() && entry.type == BalanceType::Spending)
+	if (request.coveringpersonEntryID.has_value() && hasFlag(entry.type, BalanceType::Spending))
 	{
 		addCredit(entry.personEntryID, entry.amount, entry.dateBooked, "Abteilungsausgabe übernommen");
 	}
@@ -53,11 +53,11 @@ std::vector<entry::Balance> BalanceService::getBalanceEntries(BalanceType type, 
 {
 	auto entries = balanceRepo->getBalanceEntries(type, minDate);
 
-	if (type == BalanceType::EarningAndSupplement)
+	if (hasFlag(type, BalanceType::Supplement))
 	{
 		entries.push_back(
 			entry::Balance{
-				.type = BalanceType::Earning,
+				.type = BalanceType::Earning | BalanceType::Supplement,
 				.description = "Einnahmen durch Getränkeverkäufe",
 				.amount = debtRepo->getTotalShare(FinancialShare::Own, minDate),
 				.dateBooked = QDate::currentDate()
@@ -65,7 +65,7 @@ std::vector<entry::Balance> BalanceService::getBalanceEntries(BalanceType type, 
 
 		//entries.push_back(
 		//	entry::Balance{
-		//		.type = BalanceType::Earning,
+		//		.type = BalanceType::Earning | BalanceType::Supplement,
 		//		.description = "Rundungsfehler bei Abrechnung (kum.)",
 		//		.amount = 0, //settlementRepo->getTotalRounding(),
 		//		.dateBooked = QDate::currentDate()

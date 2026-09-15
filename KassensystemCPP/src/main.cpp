@@ -9,13 +9,21 @@
 #include "domain/services/PaymentService.h"
 #include "domain/services/BalanceService.h"
 
-#include "test/BalanceRepoInMem.h"
+//#include "test/BalanceRepoInMem.h"
 #include "test/ConsumptionRepoInMem.h"
 #include "test/CreditRepoInMem.h"
 #include "test/DebtRepoInMem.h"
 #include "test/ShareSettlementRepoInMem.h"
 #include "test/PaymentRepoInMem.h"
 #include "test/PersonRepoInMem.h"
+
+#include "data/sqlite/SqliteBalanceRepository.h";
+#include "data/sqlite/SqliteConsumptionRepository.h";
+#include "data/sqlite/SqliteCreditRepository.h";
+#include "data/sqlite/SqliteDebtRepository.h";
+#include "data/sqlite/SqlitePaymentRepository.h";
+#include "data/sqlite/SqlitePersonRepository.h";
+#include "data/sqlite/SqliteShareSettlementRepository.h";
 
 #include "data/config/PriceListLoader.h"
 #include "data/config/FinancialStateLoader.h"
@@ -54,7 +62,7 @@ int main(int argc, char* argv[])
 	ConsumptionRepository* coRep		= new ConsumptionRepoInMem();
 	PaymentRepository* paRep			= new PaymentRepoInMem();
 	CreditRepository* crRep				= new CreditRepoInMem();
-	BalanceRepository* baRep			= new BalanceRepoInMem();
+	BalanceRepository* baRep			= new SqliteBalanceRepository();
 	ShareSettlementRepository* seRep	= new ShareSettlementRepoInMem();
 	DebtRepository* deRep				= new DebtRepoInMem(paRep, seRep);
 	RepositoryBundle repoBundle{ .personRepo = peRep, .consumptionRepo = coRep, .debtRepo = deRep, .paymentRepo = paRep, .creditRepo = crRep, .balanceRepo = baRep, .shareSettlementRepo = seRep };

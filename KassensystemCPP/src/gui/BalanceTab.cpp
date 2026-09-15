@@ -211,7 +211,7 @@ void BalanceTab::refreshTables(const registerFinancials::Report& report) const
 	std::vector<TableAllocation> allocVec;
 	allocVec.reserve(2);
 
-	allocVec.emplace_back(tblEarnings, BalanceType::EarningAndSupplement );
+	allocVec.emplace_back(tblEarnings, BalanceType::Earning | BalanceType::Supplement );
 	allocVec.emplace_back(tblSpendings, BalanceType::Spending );
 	
 	

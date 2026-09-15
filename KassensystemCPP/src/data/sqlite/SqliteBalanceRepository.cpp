@@ -1,12 +1,11 @@
 #include "SqliteBalanceRepository.h"
 #include <QSqlDatabase>
 #include <QFile>
-#include <QSqlQuery>
 #include <QSqlError>
 #include <QDebug>
 #include <vector>
 
-int64_t SqliteBalanceRepository::addBalanceEntry(entry::Balance entry)
+int64_t SqliteBalanceRepository::addBalanceEntry(const entry::Balance& entry)
 {
 	QSqlQuery query;
 	query.prepare(
@@ -23,13 +22,17 @@ int64_t SqliteBalanceRepository::addBalanceEntry(entry::Balance entry)
 	query.bindValue(":comment", QString::fromStdString(entry.comment));
 	query.bindValue(":personID", entry.personEntryID);
 
+	qDebug() << entry;
+
 	if (query.exec())
 		if (query.next())
+		{
 			return query.value(0).toLongLong();
+		}
 	
 }
 
-std::expected<std::reference_wrapper<const entry::Balance>, GetEntryException> SqliteBalanceRepository::getBalanceEntry(const std::string& description) const
+std::expected<entry::Balance, GetEntryException> SqliteBalanceRepository::getBalanceEntry(const std::string& description) const
 {
 	QSqlQuery query;
 	query.prepare(
@@ -46,16 +49,7 @@ std::expected<std::reference_wrapper<const entry::Balance>, GetEntryException> S
 		{
 			if (foundEntry.has_value()) return std::unexpected(GetEntryException::MultipleEntriesFound);
 
-			foundEntry = entry::Balance{
-				.balanceEntryID = query.value("ID").toLongLong(),
-				.type = static_cast<BalanceType>(query.value("type").toInt()),
-				.description = query.value("description").toString().toStdString(),
-				.amount = query.value("amount").toDouble(),
-				.dateBooked = query.value("dateBooked").toDate(),
-				.dateAdded = query.value("dateAdded").toDate(),
-				.comment = query.value("comment").toString().toStdString(),
-				.personEntryID = query.value("personID").toLongLong()
-			};
+			foundEntry = getEntryFromQuery(query);
 		}
 	}
 	
@@ -66,5 +60,52 @@ std::expected<std::reference_wrapper<const entry::Balance>, GetEntryException> S
 
 std::vector<entry::Balance> SqliteBalanceRepository::getBalanceEntries(BalanceType type, const QDate& minDate) const
 {
+	bool isTypeSpecific = hasFlag(type, BalanceType::Earning) ^ hasFlag(type, BalanceType::Spending); // either Earning or Spending, but not both
+	
+	QString sqlStatement =
+		"SELECT * "
+		"FROM Balance "
+		"WHERE Balance.dateBooked >= :minDate";
 
+	if (isTypeSpecific)
+	{
+		sqlStatement += " AND Balance.type = :type";
+	}
+
+	QSqlQuery query;
+	query.prepare(sqlStatement);
+	query.bindValue(":minDate", minDate.toString(Qt::ISODate));
+	
+	if (isTypeSpecific)
+	{
+		query.bindValue(":type", 
+			static_cast<uint8_t>(type & (BalanceType::Earning | BalanceType::Spending))); // only flag bits for Earning or Spending are left
+	}
+	
+	std::vector<entry::Balance> entries;
+
+	if (query.exec())
+	{
+		while (query.next())
+		{
+			entries.emplace_back(getEntryFromQuery(query));
+		}
+	}
+
+	return entries;
+}
+
+entry::Balance SqliteBalanceRepository::getEntryFromQuery(const QSqlQuery& query) const
+{
+	return entry::Balance
+	{
+		.balanceEntryID = query.value("ID").toLongLong(),
+		.type = static_cast<BalanceType>(query.value("type").toUInt()),
+		.description = query.value("description").toString().toStdString(),
+		.amount = query.value("amount").toDouble(),
+		.dateBooked = query.value("dateBooked").toDate(),
+		.dateAdded = query.value("dateAdded").toDate(),
+		.comment = query.value("comment").toString().toStdString(),
+		.personEntryID = query.value("personID").toLongLong()
+	};
 }
