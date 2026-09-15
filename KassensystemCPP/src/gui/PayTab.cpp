@@ -297,11 +297,11 @@ void PayTab::refreshTable(int64_t personEntryID)
 
 	// create items and add them to table
 	int rowCount = drEntries.size();
-	int columnCount = 6;
+	int columnCount = 7;
 
 	tblConsumption->setRowCount(rowCount);
 	tblConsumption->setColumnCount(columnCount);
-	tblConsumption->setHorizontalHeaderLabels(QtUtils::strVecToQStrList({ "Zeitraum", "Bezahlt / Gesamt (" + Utils::eurSymbol() + ")", "Bier (0.5l)", "Bier (0.4l)", "Wasser", "Softdrinks"}));
+	tblConsumption->setHorizontalHeaderLabels(QtUtils::strVecToQStrList({ "Zeitraum", "Bezahlt / Gesamt (" + Utils::eurSymbol() + ")", "Bier (0.5l)", "Bier (0.4l)", "Wasser", "Softdrinks", "Sonstiges (" + Utils::eurSymbol() + ")"}));
 
 	QColor rowColor;
 	for (size_t row = 0; row < drEntries.size(); row++)
@@ -333,6 +333,7 @@ void PayTab::refreshTable(int64_t personEntryID)
 		QTableWidgetItem* beer04Item;
 		QTableWidgetItem* softdrinksItem;
 		QTableWidgetItem* waterItem;
+		QTableWidgetItem* otherItem;
 
 		if (cEntryMatching.has_value())
 		{
@@ -340,6 +341,7 @@ void PayTab::refreshTable(int64_t personEntryID)
 			beer04Item		= new QTableWidgetItem(QString::number(cEntryMatching.value().nBeer04));
 			softdrinksItem	= new QTableWidgetItem(QString::number(cEntryMatching.value().nSoftdrinks));
 			waterItem		= new QTableWidgetItem(QString::number(cEntryMatching.value().nWater));
+			otherItem		= new QTableWidgetItem(QString::number(cEntryMatching.value().otherExpense));
 		}
 		else
 		{
@@ -349,6 +351,7 @@ void PayTab::refreshTable(int64_t personEntryID)
 			beer04Item		= new QTableWidgetItem(content);
 			softdrinksItem	= new QTableWidgetItem(content);
 			waterItem		= new QTableWidgetItem(content);
+			otherItem		= new QTableWidgetItem(content);
 		}
 
 		dateItem		->setTextAlignment(Qt::AlignHCenter | Qt::AlignVCenter);
@@ -357,6 +360,7 @@ void PayTab::refreshTable(int64_t personEntryID)
 		beer04Item		->setTextAlignment(Qt::AlignHCenter | Qt::AlignVCenter);
 		softdrinksItem	->setTextAlignment(Qt::AlignHCenter | Qt::AlignVCenter);
 		waterItem		->setTextAlignment(Qt::AlignHCenter | Qt::AlignVCenter);
+		otherItem		->setTextAlignment(Qt::AlignHCenter | Qt::AlignVCenter);
 
 		tblConsumption->setItem(row, 0, dateItem);
 		tblConsumption->setItem(row, 1, infoItem);
@@ -364,6 +368,7 @@ void PayTab::refreshTable(int64_t personEntryID)
 		tblConsumption->setItem(row, 3, beer04Item);
 		tblConsumption->setItem(row, 4, softdrinksItem);
 		tblConsumption->setItem(row, 5, waterItem);
+		tblConsumption->setItem(row, 6, otherItem);
 
 		for (int col = 0; col < columnCount; col++) tblConsumption->item(row, col)->setBackground(rowColor);
 	}
