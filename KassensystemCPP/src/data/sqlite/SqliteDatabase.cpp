@@ -42,7 +42,7 @@ namespace sqliteDatabase
 			creationQueries.emplace_back(
 				"CREATE TABLE Balance ("
 				"ID				INTEGER PRIMARY KEY,"
-				"balanceType	INTEGER NOT NULL,"
+				"type			INTEGER NOT NULL,"
 				"description	TEXT,"
 				"amount			REAL NOT NULL,"
 				"dateBooked		TEXT NOT NULL,"
