@@ -129,11 +129,12 @@ double SqliteDebtRepository::getForeignDue() const
 	QSqlQuery query;
 	query.prepare(
 		"WITH SettledShares AS ( "
-			"SELECT SUM(ShareSettlement.amount) as total "
+			"SELECT COALESCE(SUM(ShareSettlement.amount),0) as total "
 			"FROM ShareSettlement "
 		") "
 		"SELECT SUM(Debt.amount * Debt.foreignShare) - SettledShares.total AS foreignDue "
 		"FROM Debt "
+		"CROSS JOIN SettledShares"
 	);
 
 	if (query.exec())
@@ -142,6 +143,7 @@ double SqliteDebtRepository::getForeignDue() const
 			qDebug() << "ForeignDue: " << query.value(0).toDouble();;
 			return query.value(0).toDouble();
 		}
+	qWarning() << "Query failed:" << query.lastError().text();
 }
 
 std::vector<entry::Outstanding> SqliteDebtRepository::getPersonsOutstandingEntries(int64_t personEntryID, FilterType type) const

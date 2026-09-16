@@ -76,14 +76,14 @@ double SqlitePaymentRepository::getTotalAllocatedPayments(const QDate& minDate) 
 {
 	QSqlQuery query;
 	query.prepare(
-		"SELECT SUM(amount) AS total "
+		"SELECT SUM(PaymentAllocation.amount) AS total "
 		"FROM PaymentAllocation "
 		"LEFT OUTER JOIN Payment ON PaymentAllocation.paymentID = Payment.ID "
-		"WHERE Payment.date >= :minDate"
+		"WHERE Payment.date >= :minDate "
 	);
 	query.bindValue(":minDate", minDate.toString(Qt::ISODate));
 
 	if (query.exec())
 		if (query.next())
-			return query.value(0).toLongLong();
+			return query.value(0).toDouble();
 }
