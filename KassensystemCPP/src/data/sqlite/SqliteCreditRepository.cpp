@@ -31,9 +31,9 @@ double SqliteCreditRepository::getPersonsCredit(int64_t personEntryID) const
 	query.prepare(
 		"SELECT SUM(amount) "
 		"FROM Credit "
-		"WHERE ID = :personID "
+		"WHERE personID = :personEntryID "
 	);
-	query.bindValue(":personID", personEntryID);
+	query.bindValue(":personEntryID", personEntryID);
 
 	if (query.exec())
 		if (query.next())

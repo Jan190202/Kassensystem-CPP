@@ -14,7 +14,7 @@
 //#include "test/CreditRepoInMem.h"
 //#include "test/DebtRepoInMem.h"
 #include "test/ShareSettlementRepoInMem.h"
-#include "test/PaymentRepoInMem.h"
+//#include "test/PaymentRepoInMem.h"
 #include "test/PersonRepoInMem.h"
 
 #include "data/sqlite/SqliteBalanceRepository.h";
@@ -60,11 +60,11 @@ int main(int argc, char* argv[])
 	// initialize repositories and services
 	PersonRepository* peRep				= new PersonRepoInMem();
 	ConsumptionRepository* coRep		= new SqliteConsumptionRepository();
-	PaymentRepository* paRep			= new PaymentRepoInMem();
+	DebtRepository* deRep				= new SqliteDebtRepository();
+	PaymentRepository* paRep			= new SqlitePaymentRepository();
 	CreditRepository* crRep				= new SqliteCreditRepository();
 	BalanceRepository* baRep			= new SqliteBalanceRepository();
 	ShareSettlementRepository* seRep	= new ShareSettlementRepoInMem();
-	DebtRepository* deRep				= new SqliteDebtRepository();
 	RepositoryBundle repoBundle{ .personRepo = peRep, .consumptionRepo = coRep, .debtRepo = deRep, .paymentRepo = paRep, .creditRepo = crRep, .balanceRepo = baRep, .shareSettlementRepo = seRep };
 
 	ConsumptionService		coSer(repoBundle, priceList);
