@@ -7,7 +7,7 @@ class CreditRepository
 public:
 	CreditRepository() = default;
 	virtual ~CreditRepository() = default;
-	virtual int64_t addCreditEntry(entry::Credit entry) = 0; // add credit entry to database, return associated ID
+	virtual int64_t addCreditEntry(const entry::Credit& entry) = 0; // add credit entry to database, return associated ID
 
 	virtual double getPersonsCredit(int64_t personEntryID) const = 0; // summed credits of every entry associated with person
 	virtual double getTotalDepositedCredit(const QDate& minDate) const = 0; // summed credits of every entry in database at or after minDate

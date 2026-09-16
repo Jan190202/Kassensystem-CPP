@@ -11,7 +11,7 @@
 
 //#include "test/BalanceRepoInMem.h"
 //#include "test/ConsumptionRepoInMem.h"
-#include "test/CreditRepoInMem.h"
+//#include "test/CreditRepoInMem.h"
 //#include "test/DebtRepoInMem.h"
 #include "test/ShareSettlementRepoInMem.h"
 #include "test/PaymentRepoInMem.h"
@@ -61,7 +61,7 @@ int main(int argc, char* argv[])
 	PersonRepository* peRep				= new PersonRepoInMem();
 	ConsumptionRepository* coRep		= new SqliteConsumptionRepository();
 	PaymentRepository* paRep			= new PaymentRepoInMem();
-	CreditRepository* crRep				= new CreditRepoInMem();
+	CreditRepository* crRep				= new SqliteCreditRepository();
 	BalanceRepository* baRep			= new SqliteBalanceRepository();
 	ShareSettlementRepository* seRep	= new ShareSettlementRepoInMem();
 	DebtRepository* deRep				= new SqliteDebtRepository();
