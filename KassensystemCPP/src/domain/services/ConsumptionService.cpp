@@ -109,11 +109,11 @@ std::expected< PersonStringSpecifiers, validityError::Name > ConsumptionService:
 	}
 
 	// parse first and last name
-	std::regex namePattern(R"(^\s*(\w+)\s+(\w+)\s*$)");
+	std::regex namePattern(R"(^\s*([\w\x80-\xFF]+)\s+([\w\x80-\xFF]+)\s*$)"); // [\w\x80-\xFF]+ --> ascii-characters \w or specific multi-byte sequences that include german umlauts (ß, ö, Ö, ä, Ä, ü, Ü)
 	std::smatch nameMatches;
 	if (!std::regex_match(namePart, nameMatches, namePattern)) // namePattern doesn't have exactly two words
 	{
-		std::regex oneWordCheck(R"(^\s*\w+\s*$)");
+		std::regex oneWordCheck(R"(^\s*[\w\x80-\xFF]+\s*$)");
 		if (std::regex_match(namePart, oneWordCheck))  // namePattern has exactly one word
 		{
 			return std::unexpected(FirstOrLastNameMissing);
