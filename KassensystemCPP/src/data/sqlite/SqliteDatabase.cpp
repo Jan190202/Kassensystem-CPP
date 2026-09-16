@@ -141,7 +141,7 @@ namespace sqliteDatabase
 		bool dbExists = QFile::exists(dbPath);
 		if (!dbExists) qWarning() << "Specified path for database doesn't exist. Creating blank database!";
 
-		db.setDatabaseName(":memory:"); // dbPath later
+		db.setDatabaseName(dbPath); // or ":memory:" for in-memory database
 
 		bool dbSuccessfullyOpened = db.open(); // opens blank database if !dbExists
 		if (!dbSuccessfullyOpened)

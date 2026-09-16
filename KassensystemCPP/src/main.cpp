@@ -61,6 +61,8 @@ int main(int argc, char* argv[])
 	// open database
 	SyncManager syncManager{};
 	syncManager.setupDatabase();
+	qDebug() << "Local database: " << syncManager.getLocalDatabasePath();
+	qDebug() << "Remote database: " << syncManager.getRemoteDatabasePath();
 	std::string dbPath = syncManager.getLocalDatabasePath();
 	sqliteDatabase::open(dbPath);
 

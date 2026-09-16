@@ -1,8 +1,9 @@
 #pragma once
 #include "data/sqlite/SqliteDatabase.h"
-#include <string>
 #include <QString>
 #include <QStandardPaths>
+#include <string>
+#include <filesystem>
 
 class SyncManager
 {
@@ -10,12 +11,11 @@ public:
 	SyncManager();
 	void setupDatabase();
 
-	std::string getLocalDatabasePath();
-	std::string getRemoteDatabasePath();
-
-	void setLocalDatabasePath(std::string path);
-	void setRemoteDatabasePath(std::string path);
+	std::string getLocalDatabasePath() const;
+	std::string getRemoteDatabasePath() const;
 private:
-	std::string localDatabasePath = QStandardPaths::writableLocation(QStandardPaths::AppDataLocation).toStdString();
-	std::string remoteDatabasePath;
+	std::filesystem::path localDatabasePath;
+	std::filesystem::path remoteDatabasePath;
+
+	std::filesystem::path getOneDrivePath() const;
 };
