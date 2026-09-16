@@ -24,11 +24,11 @@ void ConsumptionService::addConsumption(const request::Consumption& request)
 			PersonStringSpecifiers spec = result.value();
 			personEntryID = personRepo->addPersonEntry(
 				entry::Person{
+					.personEntryID = 0,
 					.firstName = spec.firstName,
 					.lastName = spec.lastName,
 					.nickName = spec.nickName,
-					.info = spec.info,
-					.personEntryID = 0
+					.info = spec.info
 				});
 		}
 		else

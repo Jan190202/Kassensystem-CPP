@@ -14,8 +14,8 @@ namespace entry
 {
 	struct Person
 	{
-		std::string firstName, lastName, nickName, info;
 		int64_t personEntryID;
+		std::string firstName, lastName, nickName, info;
 
 		std::string getFirstName() const;
 		std::string getLastName() const;

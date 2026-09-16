@@ -15,7 +15,7 @@
 //#include "test/DebtRepoInMem.h"
 //#include "test/ShareSettlementRepoInMem.h"
 //#include "test/PaymentRepoInMem.h"
-#include "test/PersonRepoInMem.h"
+//#include "test/PersonRepoInMem.h"
 
 #include "data/sqlite/SqliteBalanceRepository.h";
 #include "data/sqlite/SqliteConsumptionRepository.h";
@@ -58,7 +58,7 @@ int main(int argc, char* argv[])
 	sqliteDatabase::open(dbPath);
 
 	// initialize repositories and services
-	PersonRepository* peRep				= new PersonRepoInMem();
+	PersonRepository* peRep				= new SqlitePersonRepository();
 	ConsumptionRepository* coRep		= new SqliteConsumptionRepository();
 	DebtRepository* deRep				= new SqliteDebtRepository();
 	PaymentRepository* paRep			= new SqlitePaymentRepository();
