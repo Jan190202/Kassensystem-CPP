@@ -29,6 +29,8 @@
 #include "data/config/FinancialStateLoader.h"
 #include "data/sqlite/SqliteDatabase.h"
 
+#include "data/storage/SyncManager.h"
+
 #include "app/RepositoryBundle.h"
 #include "app/ServiceBundle.h"
 
@@ -38,6 +40,8 @@
 #include <iostream>
 #include <optional>
 #include <QApplication>
+#include <QStandardPaths>
+#include <QDir>
 #include <QDebug>
 
 int main(int argc, char* argv[])
@@ -46,6 +50,7 @@ int main(int argc, char* argv[])
 
 	// initialize QApp
 	QApplication app(argc, argv);
+	QCoreApplication::setApplicationName("KassensystemSVU");
 
 	// load read-only data
 	qDebug() << "Reading config:";
@@ -54,7 +59,9 @@ int main(int argc, char* argv[])
 	qDebug() << "";
 
 	// open database
-	std::string dbPath = "";
+	SyncManager syncManager{};
+	syncManager.setupDatabase();
+	std::string dbPath = syncManager.getLocalDatabasePath();
 	sqliteDatabase::open(dbPath);
 
 	// initialize repositories and services
