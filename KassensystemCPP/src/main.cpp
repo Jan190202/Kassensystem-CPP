@@ -17,19 +17,23 @@
 //#include "test/PaymentRepoInMem.h"
 //#include "test/PersonRepoInMem.h"
 
-#include "data/sqlite/SqliteBalanceRepository.h";
-#include "data/sqlite/SqliteConsumptionRepository.h";
-#include "data/sqlite/SqliteCreditRepository.h";
-#include "data/sqlite/SqliteDebtRepository.h";
-#include "data/sqlite/SqlitePaymentRepository.h";
-#include "data/sqlite/SqlitePersonRepository.h";
-#include "data/sqlite/SqliteShareSettlementRepository.h";
+#include "data/sqlite/repositories/SqliteBalanceRepository.h";
+#include "data/sqlite/repositories/SqliteConsumptionRepository.h";
+#include "data/sqlite/repositories/SqliteCreditRepository.h";
+#include "data/sqlite/repositories/SqliteDebtRepository.h";
+#include "data/sqlite/repositories/SqlitePaymentRepository.h";
+#include "data/sqlite/repositories/SqlitePersonRepository.h";
+#include "data/sqlite/repositories/SqliteShareSettlementRepository.h";
 
 #include "data/config/PriceListLoader.h"
 #include "data/config/FinancialStateLoader.h"
 #include "data/sqlite/SqliteDatabase.h"
 
-#include "data/storage/SyncManager.h"
+#include "data/sqlite/storage/SyncManager.h"
+#include "data/sqlite/storage/onedrivesync/OneDriveSyncManager.h"
+
+#include "domain/SessionController.h"
+#include "data/sqlite/sessioncontrol/SqliteSessionController.h"
 
 #include "app/RepositoryBundle.h"
 #include "app/ServiceBundle.h"
@@ -46,6 +50,7 @@
 
 int main(int argc, char* argv[])
 {
+	// configure system
 	systemConfig::setUTF8Encoding();
 
 	// initialize QApp
@@ -59,12 +64,16 @@ int main(int argc, char* argv[])
 	qDebug() << "";
 
 	// open database
-	SyncManager syncManager{};
-	syncManager.setupDatabase();
+	OneDriveSyncManager syncManager{};
+	syncManager.setup();
 	qDebug() << "Local database: " << syncManager.getLocalDatabasePath();
 	qDebug() << "Remote database: " << syncManager.getRemoteDatabasePath();
 	std::string dbPath = syncManager.getLocalDatabasePath();
 	sqliteDatabase::open(dbPath);
+
+	// create session control
+	SqliteSessionController sqliteController{ syncManager };
+	SessionController& controller = sqliteController;
 
 	// initialize repositories and services
 	PersonRepository* peRep				= new SqlitePersonRepository();
@@ -170,7 +179,7 @@ int main(int argc, char* argv[])
 	app.exec();
 
 	// close database
-	sqliteDatabase::close(); // TBD: do on cancel, before app actually closes
+	controller.close(); // TBD: do on cancel, before app actually closes
 
 	return 0;
 }

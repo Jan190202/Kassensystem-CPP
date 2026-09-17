@@ -1,16 +1,16 @@
 #pragma once
-#include "data/sqlite/SqliteDatabase.h"
-#include <QString>
-#include <QStandardPaths>
+#include "data/sqlite/storage/SyncManager.h"
 #include <string>
 #include <filesystem>
 
-class SyncManager
+class OneDriveSyncManager : public SyncManager
 {
 public:
-	SyncManager();
-	void setupDatabase(); // create and cleanup working directories, pull remote database to local
-	void sync(); // push the local database to remote and backup if changes were made
+	OneDriveSyncManager() = default;
+	virtual ~OneDriveSyncManager() = default; 
+
+	virtual void setup() override;// create and cleanup working directories, pull remote database to local
+	virtual void sync() override; // push the local database to remote and backup if changes were made
 
 	std::string getLocalDatabasePath() const;
 	std::string getRemoteDatabasePath() const;

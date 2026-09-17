@@ -156,11 +156,6 @@ namespace sqliteDatabase
 
 		return true;
 	}
-
-	void close()
-	{
-		QSqlDatabase::database().close();
-	}
 }
 
 

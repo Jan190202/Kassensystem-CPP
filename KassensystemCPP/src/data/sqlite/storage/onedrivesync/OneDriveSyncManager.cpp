@@ -1,12 +1,13 @@
-#include "SyncManager.h"
+#include "OneDriveSyncManager.h"
+#include <QSqlDatabase>
+#include <QSqlQuery>
+#include <QStandardPaths>
 #include <QDatetime>
 #include <QDebug>
 
 namespace fs = std::filesystem;
 
-SyncManager::SyncManager() {}
-
-void SyncManager::setupDatabase()
+void OneDriveSyncManager::setup()
 {
 	fs::path targetLocal = QStandardPaths::writableLocation(QStandardPaths::AppDataLocation).toStdString();
 	fs::path targetRemote = getOneDrivePath() / "KassensystemSVU";
@@ -28,7 +29,7 @@ void SyncManager::setupDatabase()
 	pullFromRemote();
 }
 
-void SyncManager::sync()
+void OneDriveSyncManager::sync()
 {
 	bool databaseChanged = true; // TBD: check if local database changed
 	if (databaseChanged) 
@@ -38,7 +39,7 @@ void SyncManager::sync()
 	}
 }
 
-void SyncManager::cleanupLocalDir()
+void OneDriveSyncManager::cleanupLocalDir()
 {
 	// clear for now
 	for (const auto& entry : fs::directory_iterator(localDatabasePath.parent_path())) 
@@ -47,7 +48,7 @@ void SyncManager::cleanupLocalDir()
 	};
 }
 
-void SyncManager::pullFromRemote()
+void OneDriveSyncManager::pullFromRemote()
 {
 	if (fs::exists(remoteDatabasePath))
 	{
@@ -59,12 +60,20 @@ void SyncManager::pullFromRemote()
 	}
 }
 
-void SyncManager::pushToRemote()
+void OneDriveSyncManager::pushToRemote()
 {
-	fs::copy_file(localDatabasePath, remoteDatabasePath, fs::copy_options::overwrite_existing);
+	// safe upload with possibly open transaction, needs a seperate connection (not the one with open transaction)
+	QSqlDatabase syncDb = QSqlDatabase::addDatabase("QSQLITE", "syncConnection");
+	syncDb.setDatabaseName(QString::fromStdString(localDatabasePath.string()));
+	syncDb.open();
+
+	QSqlQuery(syncDb).exec("VACUUM INTO '" + QString::fromStdString(remoteDatabasePath.string()) + "'");
+
+	syncDb.close();
+	QSqlDatabase::removeDatabase("syncConnection");
 }
 
-void SyncManager::pushToBackup()
+void OneDriveSyncManager::pushToBackup()
 {
 	fs::path targetRemoteBackup = getOneDrivePath() / "KassensystemSVU" / "Backups";
 	if (!fs::is_directory(targetRemoteBackup))
@@ -74,20 +83,29 @@ void SyncManager::pushToBackup()
 
 	std::string backupDatabaseFileName = "registerData_" + QDateTime::currentDateTime().toString("dd.MM.yy_hh.mm.ss").toStdString() + ".db"; // e.g. registerData_13.09.26_13.27.03.db
 	remoteBackupDatabasePath = (targetRemoteBackup / backupDatabaseFileName).make_preferred();
-	fs::copy_file(localDatabasePath, remoteBackupDatabasePath, fs::copy_options::overwrite_existing);
+
+	// safe upload with possibly open transaction, needs a seperate connection (not the one with open transaction)
+	QSqlDatabase syncDb = QSqlDatabase::addDatabase("QSQLITE", "syncConnection");
+	syncDb.setDatabaseName(QString::fromStdString(localDatabasePath.string()));
+	syncDb.open();
+
+	QSqlQuery(syncDb).exec("VACUUM INTO '" + QString::fromStdString(remoteBackupDatabasePath.string()) + "'");
+
+	syncDb.close();
+	QSqlDatabase::removeDatabase("syncConnection");
 }
 
-std::string SyncManager::getLocalDatabasePath() const
+std::string OneDriveSyncManager::getLocalDatabasePath() const
 {
 	return localDatabasePath.string();
 }
 
-std::string SyncManager::getRemoteDatabasePath() const
+std::string OneDriveSyncManager::getRemoteDatabasePath() const
 {
 	return remoteDatabasePath.string();
 }
 
-fs::path SyncManager::getOneDrivePath() const
+fs::path OneDriveSyncManager::getOneDrivePath() const
 {
 	// general or private onedrive
 	if (const char* env_p = std::getenv("OneDrive")) 
