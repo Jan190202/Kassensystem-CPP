@@ -317,9 +317,17 @@ namespace registerFinancials
 
 	struct Report
 	{
+		struct Details
+		{
+			double departmentEarnings, departmentSpendings;
+			double consumptionOwnShare;
+			double paidDebt, settledValue, depositedCredit;
+		};
+
 		registerFinancials::State stateBefore, stateAfter;
 		double savingsDiff, cashDiff;
 		double totalEarnings, totalSpendings;
+		Details details;
 	};
 }
 

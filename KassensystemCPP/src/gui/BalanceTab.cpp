@@ -259,6 +259,32 @@ void BalanceTab::refreshTables(const registerFinancials::Report& report) const
 
 void BalanceTab::refreshLables(const registerFinancials::Report& report) const
 {
+	auto row = [&](bool addsPositively, double num, QString desc, bool isLast) -> QString
+		{
+			QString color = addsPositively ? "#2e8b57" : "#c0392b"; // green / red
+			QString pre = addsPositively ? "+" : "-";
+			QString val = num >= 0 ? QtUtils::toCurrencyFormat(num) : ("(" + QtUtils::toCurrencyFormat(num) + ")");
+
+			return QString(
+				"<tr>"
+				"<td style=\"color:%1; font-weight:bold; padding-right:4px;\">%2</td>"
+				"<td align=\"right\" style=\"font-weight:bold; padding-right:8px;\">%3</td>"
+				"<td>%4</td>"
+				"</tr>"
+			).arg(color, pre, val, desc); // QString supports rich text, HTML-formatted
+		};
+
+	auto& d = report.details;
+
+	QString cashExplanation =
+		"<table cellspacing=\"2\" cellpadding=\"0\">" +
+		row(true, d.departmentEarnings, "Einnahmen (ohne Verkäufe)", false) +
+		row(false, d.departmentSpendings, "Ausgaben", false) +
+		row(true, d.paidDebt, "bezahlte Verbräuche", false) +
+		row(false, d.settledValue, "85%-Abgabe", false) +
+		row(true, d.depositedCredit, "Guthaben", true) +
+		"</table>";
+
 	lEarnings->setText(QtUtils::toCurrencyFormat(report.totalEarnings));
 	lSpendings->setText(QtUtils::toCurrencyFormat(report.totalSpendings));
 
@@ -269,6 +295,7 @@ void BalanceTab::refreshLables(const registerFinancials::Report& report) const
 
 	lSavingsDifference->setText(QtUtils::toCurrencyFormat(report.savingsDiff));
 	lCashDifference->setText(QtUtils::toCurrencyFormat(report.cashDiff));
+	lCashDifference->setToolTip(cashExplanation);
 
 	afterBox->setTitle(formatHeader(report.stateAfter.date));
 	lSavingsAfter->setText(QtUtils::toCurrencyFormat(report.stateAfter.savings));

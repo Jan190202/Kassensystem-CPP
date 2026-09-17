@@ -118,7 +118,15 @@ registerFinancials::Report BalanceService::getReport() const
 		.savingsDiff = savingsDiff,
 		.cashDiff = cashDiff,
 		.totalEarnings = departmentEarnings + consumptionOwnShare,
-		.totalSpendings = departmentSpendings
+		.totalSpendings = departmentSpendings,
+		.details = registerFinancials::Report::Details{
+			.departmentEarnings = departmentEarnings,
+			.departmentSpendings = departmentSpendings,
+			.consumptionOwnShare = consumptionOwnShare,
+			.paidDebt = paidDebt,
+			.settledValue = settledValue,
+			.depositedCredit = depositedCredit
+		}	
 	};
 
 	return report;
