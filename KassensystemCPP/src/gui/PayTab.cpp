@@ -174,7 +174,7 @@ void PayTab::initialize()
 			}
 		});
 
-	connect(nameSelect, &QComboBox::currentTextChanged, this, [&]()
+	connect(nameSelect, &QComboBox::currentIndexChanged, this, [&]()
 		{
 			nameChanged();
 		});
