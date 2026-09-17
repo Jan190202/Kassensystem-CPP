@@ -13,6 +13,10 @@ file(GLOB_RECURSE SOURCES CONFIGURE_DEPENDS src/*.cpp)
 file(GLOB_RECURSE HEADERS CONFIGURE_DEPENDS src/*.h)
 add_executable(KassensystemCPP ${SOURCES} ${HEADERS})
 
+set_target_properties(KassensystemCPP PROPERTIES
+    WIN32_EXECUTABLE $<CONFIG:Release>
+)
+
 target_include_directories(KassensystemCPP PRIVATE src) 
 	# src als root pfad für die include suche hinzufügen 
 	# -> relative pfade müsse nicht von jeder includierenden Datei definiert werden (z.B. #include "gui/Kassensystem.h" statt #include "../logic/beispiel.h")
@@ -40,5 +44,14 @@ add_custom_command(TARGET KassensystemCPP POST_BUILD
     COMMAND "${WINDEPLOYQT_EXECUTABLE}" 
         "$<TARGET_FILE:KassensystemCPP>"
         --no-translations
-    COMMENT "Deploying Qt dependencies..."
+)
+
+target_compile_definitions(KassensystemCPP PRIVATE
+    $<$<CONFIG:Release>:QT_NO_DEBUG_OUTPUT>
+)
+target_compile_definitions(KassensystemCPP PRIVATE
+    $<$<CONFIG:Release>:QT_NO_INFO_OUTPUT>
+)
+target_compile_definitions(KassensystemCPP PRIVATE
+    $<$<CONFIG:Release>:QT_NO_WARNING_OUTPUT>
 )
