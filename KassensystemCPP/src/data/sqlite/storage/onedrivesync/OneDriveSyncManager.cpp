@@ -62,6 +62,8 @@ void OneDriveSyncManager::pullFromRemote()
 
 void OneDriveSyncManager::pushToRemote()
 {
+	fs::remove(remoteDatabasePath);
+	
 	// safe upload with possibly open transaction, needs a seperate connection (not the one with open transaction)
 	QSqlDatabase syncDb = QSqlDatabase::addDatabase("QSQLITE", "syncConnection");
 	syncDb.setDatabaseName(QString::fromStdString(localDatabasePath.string()));
@@ -83,6 +85,11 @@ void OneDriveSyncManager::pushToBackup()
 
 	std::string backupDatabaseFileName = "registerData_" + QDateTime::currentDateTime().toString("dd.MM.yy_hh'h'mm'min'ss's'").toStdString() + ".db"; // e.g. registerData_13.09.26_13.27.03.db
 	remoteBackupDatabasePath = (targetRemoteBackup / backupDatabaseFileName).make_preferred();
+
+	if (fs::exists(remoteBackupDatabasePath)) // in the rare case multiple backups are made in the same second, the last one wins
+	{
+		fs::remove(remoteBackupDatabasePath);
+	}
 
 	// safe upload with possibly open transaction, needs a seperate connection (not the one with open transaction)
 	QSqlDatabase syncDb = QSqlDatabase::addDatabase("QSQLITE", "syncConnection");
