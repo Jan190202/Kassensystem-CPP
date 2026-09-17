@@ -27,7 +27,7 @@ int64_t SqliteShareSettlementRepository::addShareSettlementAllocationEntry(const
 {
 	QSqlQuery query;
 	query.prepare(
-		"INSERT INTO PaymentAllocation "
+		"INSERT INTO ShareSettlementAllocation "
 		"(debtID, shareSettlementID, amount) "
 		"VALUES (:debtID, :shareSettlementID, :amount) "
 		"RETURNING ID "
