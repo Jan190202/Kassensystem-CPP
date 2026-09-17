@@ -20,7 +20,11 @@ int64_t SqliteBalanceRepository::addBalanceEntry(const entry::Balance& entry)
 	query.bindValue(":dateBooked", entry.dateBooked.toString(Qt::ISODate));
 	query.bindValue(":dateAdded", entry.dateAdded.toString(Qt::ISODate));
 	query.bindValue(":comment", QString::fromStdString(entry.comment));
-	query.bindValue(":personID", entry.personEntryID);
+
+	if (entry.personEntryID.has_value())
+		query.bindValue(":personID", entry.personEntryID.value());
+	else
+		query.bindValue(":personID", QVariant(QMetaType::fromType<qlonglong>()));
 
 	qDebug() << entry;
 

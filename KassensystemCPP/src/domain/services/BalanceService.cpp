@@ -6,16 +6,6 @@ BalanceService::BalanceService(const RepositoryBundle& repoBundle, const registe
 
 int64_t BalanceService::addBalanceItem(const request::Balance& request)
 {
-	int64_t personEntryID{};
-	if (request.coveringpersonEntryID.has_value())
-	{
-		personEntryID = request.coveringpersonEntryID.value();
-	}
-	else
-	{
-		personEntryID = -1;
-	}
-	
 	entry::Balance entry{
 		.balanceEntryID = 0,
 		.type = request.type,
@@ -24,12 +14,12 @@ int64_t BalanceService::addBalanceItem(const request::Balance& request)
 		.dateBooked = request.date,
 		.dateAdded = QDate::currentDate(),
 		.comment = request.comment,
-		.personEntryID = personEntryID
+		.personEntryID = request.coveringpersonEntryID
 	};
 
 	if (request.coveringpersonEntryID.has_value() && hasFlag(entry.type, BalanceType::Spending))
 	{
-		addCredit(entry.personEntryID, entry.amount, entry.dateBooked, "Abteilungsausgabe übernommen");
+		addCredit(entry.personEntryID.value(), entry.amount, entry.dateBooked, "Abteilungsausgabe übernommen");
 	}
 	
 	return balanceRepo->addBalanceEntry(entry);

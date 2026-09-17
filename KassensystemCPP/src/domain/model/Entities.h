@@ -48,7 +48,7 @@ namespace entry
 		QDate dateBooked;
 		QDate dateAdded;
 		std::string comment;
-		int64_t personEntryID;
+		std::optional<int64_t> personEntryID;
 
 		friend std::ostream& operator<<(std::ostream& out, const Balance& entry)
 		{
@@ -59,7 +59,7 @@ namespace entry
 				<< "dateBooked: " << entry.dateBooked.toString("dd.MM.yyyy").toStdString() << ", "
 				<< "dateAdded: " << entry.dateAdded.toString("dd.MM.yyyy").toStdString() << ", "
 				<< "comment: " << entry.comment << ", "
-				<< "personEntryID: " << entry.personEntryID;
+				<< "personEntryID: " << (entry.personEntryID.has_value() ? std::to_string(entry.personEntryID.value()) : "NULL");
 
 			return out;
 		}
