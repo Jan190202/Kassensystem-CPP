@@ -174,14 +174,11 @@ int main(int argc, char* argv[])
 
 	// start UI
 	qDebug() << "Starting UI\n";
-	CashRegisterSystemUI sysUI(serviceBundle, repoBundle);
+	CashRegisterSystemUI sysUI(serviceBundle, repoBundle, controller);
 	sysUI.show();
-	app.exec();
+	int returnValue = app.exec();
 
-	// close database
-	controller.close(); // TBD: do on cancel, before app actually closes
-
-	return 0;
+	return returnValue;
 }
 
 /*

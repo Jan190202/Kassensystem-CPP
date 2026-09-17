@@ -8,9 +8,9 @@ public:
 	SqliteSessionController(SyncManager& syncManager);
 	virtual ~SqliteSessionController() = default;
 
-	virtual void save() override;
-	virtual void sync() override;
-	virtual void close() override;
+	virtual void save() const override;
+	virtual void sync() const override;
+	virtual void close() const override;
 private:
 	SyncManager& syncManager;
 };

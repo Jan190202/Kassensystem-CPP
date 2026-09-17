@@ -1,8 +1,9 @@
-﻿#pragma once
+#pragma once
 #include "BaseTab.h"
 #include "GuiTypes.h"
 #include "app/ServiceBundle.h"
 #include "app/RepositoryBundle.h"
+#include "domain/SessionController.h"
 #include <QMainWindow>
 #include <array>
 
@@ -12,7 +13,7 @@ class CashRegisterSystemUI : public QMainWindow
 {
 	Q_OBJECT
 public:
-	CashRegisterSystemUI(const ServiceBundle& serviceBundle, const RepositoryBundle& repoBundle, QWidget* parent = nullptr);
+	CashRegisterSystemUI(const ServiceBundle& serviceBundle, const RepositoryBundle& repoBundle, const SessionController& controller, QWidget* parent = nullptr);
 private:
 	std::array<BaseTab*, 3> tabs;
 	LowerButtonBundle lowerButtons;
@@ -21,6 +22,6 @@ private:
 	int activeTab = 0;
 	std::array<bool, 3> loadedTabs = {false};
 
-	void initUi(const ServiceBundle& serviceBundle, const RepositoryBundle& repoBundle);
+	void initUi(const ServiceBundle& serviceBundle, const RepositoryBundle& repoBundle, const SessionController& controller);
 	void changeTab(TabIndex idx);
 };

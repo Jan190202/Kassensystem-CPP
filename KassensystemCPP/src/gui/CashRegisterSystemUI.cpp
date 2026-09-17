@@ -1,4 +1,4 @@
-﻿#include "CashRegisterSystemUI.h"
+#include "CashRegisterSystemUI.h"
 #include "AddTab.h"
 #include "PayTab.h"
 #include "BalanceTab.h"
@@ -10,14 +10,14 @@
 #include <QMainWindow>
 #include <QDebug>
 
-CashRegisterSystemUI::CashRegisterSystemUI(const ServiceBundle& serviceBundle, const RepositoryBundle& repoBundle, QWidget* parent) : QMainWindow(parent)
+CashRegisterSystemUI::CashRegisterSystemUI(const ServiceBundle& serviceBundle, const RepositoryBundle& repoBundle, const SessionController& controller, QWidget* parent) : QMainWindow(parent)
 {
 	setWindowTitle(QStringLiteral("Kassensystem"));
 	resize(1000, 600);
-	initUi(serviceBundle, repoBundle);
+	initUi(serviceBundle, repoBundle, controller);
 }
 
-void CashRegisterSystemUI::initUi(const ServiceBundle& serviceBundle, const RepositoryBundle& repoBundle)
+void CashRegisterSystemUI::initUi(const ServiceBundle& serviceBundle, const RepositoryBundle& repoBundle, const SessionController& controller)
 {
 	//main widget for all contents
 	QWidget*		central		= new QWidget(this);
@@ -57,7 +57,13 @@ void CashRegisterSystemUI::initUi(const ServiceBundle& serviceBundle, const Repo
 			changeTab(static_cast<TabIndex>(idx));
 		});
 
-	connect(lowerButtons.btnCancel, &QPushButton::clicked, qApp, &QCoreApplication::quit);
+	connect(lowerButtons.btnCancel, &QPushButton::clicked, this, [&]() 
+		{
+			controller.close(); 
+			qApp->quit(); 
+		});
+
+	connect(lowerButtons.btnSave, &QPushButton::clicked, this, [&]() {controller.save();});
 }
 
 void CashRegisterSystemUI::changeTab(TabIndex activeTab)

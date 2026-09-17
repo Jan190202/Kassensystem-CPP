@@ -6,7 +6,7 @@ public:
 	SessionController() = default;
 	virtual ~SessionController() = default;
 
-	virtual void save() = 0;
-	virtual void sync() = 0;
-	virtual void close() = 0;
+	virtual void save() const = 0;
+	virtual void sync() const = 0;
+	virtual void close() const = 0;
 };
