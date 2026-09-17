@@ -81,7 +81,7 @@ void OneDriveSyncManager::pushToBackup()
 		fs::create_directories(targetRemoteBackup);
 	}
 
-	std::string backupDatabaseFileName = "registerData_" + QDateTime::currentDateTime().toString("dd.MM.yy_hh.mm.ss").toStdString() + ".db"; // e.g. registerData_13.09.26_13.27.03.db
+	std::string backupDatabaseFileName = "registerData_" + QDateTime::currentDateTime().toString("dd.MM.yy_hh'h'mm'min'ss's'").toStdString() + ".db"; // e.g. registerData_13.09.26_13.27.03.db
 	remoteBackupDatabasePath = (targetRemoteBackup / backupDatabaseFileName).make_preferred();
 
 	// safe upload with possibly open transaction, needs a seperate connection (not the one with open transaction)

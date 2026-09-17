@@ -63,7 +63,11 @@ void CashRegisterSystemUI::initUi(const ServiceBundle& serviceBundle, const Repo
 			qApp->quit(); 
 		});
 
-	connect(lowerButtons.btnSave, &QPushButton::clicked, this, [&]() {controller.save();});
+	connect(lowerButtons.btnSave, &QPushButton::clicked, this, [&]() 
+		{
+			controller.save();
+			controller.sync();
+		});
 }
 
 void CashRegisterSystemUI::changeTab(TabIndex activeTab)
