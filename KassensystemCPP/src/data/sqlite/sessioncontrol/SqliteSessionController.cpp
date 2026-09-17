@@ -18,4 +18,5 @@ void SqliteSessionController::sync() const
 void SqliteSessionController::close() const
 {
 	QSqlDatabase::database().close();
+	syncManager.cleanup();
 }

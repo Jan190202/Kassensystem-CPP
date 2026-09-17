@@ -8,4 +8,5 @@ public:
 
 	virtual void setup() = 0;
 	virtual void sync() = 0;
+	virtual void cleanup() = 0;
 };

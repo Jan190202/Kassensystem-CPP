@@ -39,6 +39,11 @@ void OneDriveSyncManager::sync()
 	}
 }
 
+void OneDriveSyncManager::cleanup()
+{
+	cleanupLocalDir();
+}
+
 void OneDriveSyncManager::cleanupLocalDir()
 {
 	// clear for now
