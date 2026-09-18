@@ -15,6 +15,7 @@ add_executable(KassensystemCPP ${SOURCES} ${HEADERS})
 
 set_target_properties(KassensystemCPP PROPERTIES
     WIN32_EXECUTABLE $<CONFIG:Release>
+    RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/dist
 )
 
 target_include_directories(KassensystemCPP PRIVATE src) 
