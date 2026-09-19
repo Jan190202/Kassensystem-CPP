@@ -105,7 +105,10 @@ int main(int argc, char* argv[])
 * - BalanceTab:
 *	- add basic calculator in balanceTab for cash counting
 *	- add info-icons (clickable/tooltip) -> get details on report calculation
+*		-> cashDiff (done)
+*		-> explanation for difference between current cash and current savings
 *	- remove consumption earnings from earnings table, display them in seperate section with more information
 * - add buttons in PayTab: "Redeem All Credits", "Export Debts (CSV/CopyToClipboard/URL)"
 * - add new tab for manual database changes (dropDown for which repository + QTableView)
+* - web-API: get debt per person
 */ 
