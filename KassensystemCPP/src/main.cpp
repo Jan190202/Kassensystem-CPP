@@ -103,16 +103,24 @@ int main(int argc, char* argv[])
 *	- apply (save) button only active when changes were made
 *	- "changes" window to show applied changes for inspection before saving
 * - BalanceTab:
+*	- display three decimals for savings
+*	- share settlement: "advanced mode": allow three decimals, date and comment
 *	- add basic calculator in balanceTab for cash counting
 *	- add info-icons (clickable/tooltip) -> get details on report calculation
 *		-> cashDiff (done)
 *		-> explanation for difference between current cash and current savings
 *	- remove consumption earnings from earnings table, display them in seperate section with more information
-* - add buttons in PayTab: "Redeem All Credits", "Export Debts (CSV/CopyToClipboard/URL)"
+* - PayTab:
+*	- functionality to add new person
+*	- functionality to add credit to person apart from overpayment (amount, date, comment, ...)
+*	- add buttons: "Redeem All Credits", "Export Debts (CSV/CopyToClipboard/URL)"
+* - Add "Unknown Date" and "Initialization" date option to consumptions (maybe also debt, sharesettlement, etc.)
 * - add new tab for manual database changes (dropDown for which repository + QTableView)
 * - web-API: get debt per person
 * - general architecture:
 *	- predefining cash, foreign cash, savings in state before, previous debts and credits all at the same time is redundant
 		-> cash at specific time stamp would be enough as database entries from before arent cleared
 *		-> allow cash amount validation at any time, which either: refreshes state before, or, better: create new database saving the validation checks
+*		-> balance statistics are still displayed from beginning of year (if avaliable) to today
+* 
 */ 
