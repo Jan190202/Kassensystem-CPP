@@ -111,4 +111,8 @@ int main(int argc, char* argv[])
 * - add buttons in PayTab: "Redeem All Credits", "Export Debts (CSV/CopyToClipboard/URL)"
 * - add new tab for manual database changes (dropDown for which repository + QTableView)
 * - web-API: get debt per person
+* - general architecture:
+*	- predefining cash, foreign cash, savings in state before, previous debts and credits all at the same time is redundant
+		-> cash at specific time stamp would be enough as database entries from before arent cleared
+*		-> allow cash amount validation at any time, which either: refreshes state before, or, better: create new database saving the validation checks
 */ 
