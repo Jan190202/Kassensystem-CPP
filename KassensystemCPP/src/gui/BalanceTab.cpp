@@ -309,12 +309,6 @@ void BalanceTab::apply()
 	// TBD
 }
 
-void BalanceTab::save()
-{
-	apply();
-	// TBD
-}
-
 QString BalanceTab::formatHeader(const QDate& date) const
 {
 	return QStringLiteral("Stand %1").arg(date.toString("dd.MM.yyyy"));

@@ -249,12 +249,6 @@ void PayTab::apply()
 	refresh();
 }
 
-void PayTab::save()
-{
-	apply();
-	// TBD
-}
-
 void PayTab::redeemCredit()
 {
 	int64_t personEntryID = nameSelect->currentData().toLongLong();
@@ -296,8 +290,8 @@ void PayTab::refreshTable(int64_t personEntryID)
 		});
 
 	// create items and add them to table
-	int rowCount = drEntries.size();
-	int columnCount = 7;
+	const int rowCount = drEntries.size();
+	const int columnCount = 7;
 
 	tblConsumption->setRowCount(rowCount);
 	tblConsumption->setColumnCount(columnCount);
@@ -319,7 +313,7 @@ void PayTab::refreshTable(int64_t personEntryID)
 		std::optional<entry::Consumption> cEntryMatching;
 		for (auto& cEntry : cEntries)
 		{
-			if (cEntry.debtEntryID = drEntry.debtEntryID)
+			if (cEntry.debtEntryID == drEntry.debtEntryID)
 			{
 				cEntryMatching = cEntry;
 				break;

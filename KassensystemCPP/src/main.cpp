@@ -101,6 +101,7 @@ int main(int argc, char* argv[])
 * - class PendingChangeLog with entries PendingChanges for change tracking before saving/syncing
 *	- new button: sync -> save saves to local copy of database, sync pushes it to remote
 *	- apply (save) button only active when changes were made
+*	- save button only active when applied 
 *	- "changes" window to show applied changes for inspection before saving
 * - BalanceTab:
 *	- share settlement: "advanced mode": allow three decimals, date and comment
@@ -131,9 +132,6 @@ int main(int argc, char* argv[])
 * - add optional "commit" message at saving for easier change tracking (new database)
 * Bugs:
 * - AddTab 
-*	-> save doesn't seem to apply current tag entries
 *	-> add scroll bar instead of increasing height of window with too many entries
 *	-> initial name not first name in list, but blank
-* - PayTab
-*	-> Total/Paid is right, but consumption entry seems wrong (seen in otherExense of first entry equaling otherExpense of second entry)
 */ 

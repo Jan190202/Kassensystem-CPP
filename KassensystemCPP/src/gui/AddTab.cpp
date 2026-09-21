@@ -198,12 +198,6 @@ void AddTab::apply()
 	}
 }
 
-void AddTab::save()
-{
-	apply();
-	// TBD
-}
-
 void AddTab::handleInputValidityError(const validityError::Code& errorCode) const
 {
 	using namespace validityError;

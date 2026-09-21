@@ -21,7 +21,6 @@ public:
 	virtual void initialize() override;
 	virtual void refresh() override;
 	virtual void apply() override;
-	virtual void save() override;
 private slots:
 	void addEntry();
 
