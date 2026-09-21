@@ -103,7 +103,6 @@ int main(int argc, char* argv[])
 *	- apply (save) button only active when changes were made
 *	- "changes" window to show applied changes for inspection before saving
 * - BalanceTab:
-*	- display three decimals for savings
 *	- share settlement: "advanced mode": allow three decimals, date and comment
 *	- add basic calculator in balanceTab for cash counting
 *	- add info-icons (clickable/tooltip) -> get details on report calculation

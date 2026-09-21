@@ -37,14 +37,14 @@ void BalanceTab::initialize()
 	lCashDifference		= new QLabel(QtUtils::toCurrencyFormat(0.0), this);
 	lCashAfter			= new QLabel(QtUtils::toCurrencyFormat(0.0), this);
 
-	lSavingsBefore		= new QLabel(QtUtils::toCurrencyFormat(0.0), this);
-	lSavingsDifference	= new QLabel(QtUtils::toCurrencyFormat(0.0), this);
-	lSavingsAfter		= new QLabel(QtUtils::toCurrencyFormat(0.0), this);
+	lSavingsBefore		= new QLabel(QtUtils::toCurrencyFormat(0.0,3), this);
+	lSavingsDifference	= new QLabel(QtUtils::toCurrencyFormat(0.0,3), this);
+	lSavingsAfter		= new QLabel(QtUtils::toCurrencyFormat(0.0,3), this);
 
-	lForeignBefore		= new QLabel(QtUtils::toCurrencyFormat(0.0), this);
-	lForeignAfter		= new QLabel(QtUtils::toCurrencyFormat(0.0), this);
+	lForeignBefore		= new QLabel(QtUtils::toCurrencyFormat(0.0,3), this);
+	lForeignAfter		= new QLabel(QtUtils::toCurrencyFormat(0.0,3), this);
 
-	lEarnings			= new QLabel(QtUtils::toCurrencyFormat(0.0), this);
+	lEarnings			= new QLabel(QtUtils::toCurrencyFormat(0.0,3), this);
 	lSpendings			= new QLabel(QtUtils::toCurrencyFormat(0.0), this);
 
 	const auto configureAmount = [](QLabel* label)
@@ -285,20 +285,20 @@ void BalanceTab::refreshLables(const registerFinancials::Report& report) const
 		row(true, d.depositedCredit, "Guthaben", true) +
 		"</table>";
 
-	lEarnings->setText(QtUtils::toCurrencyFormat(report.totalEarnings));
+	lEarnings->setText(QtUtils::toCurrencyFormat(report.totalEarnings, 3));
 	lSpendings->setText(QtUtils::toCurrencyFormat(report.totalSpendings));
 
 	beforeBox->setTitle(formatHeader(report.stateBefore.date));
 	lCashBefore->setText(QtUtils::toCurrencyFormat(report.stateBefore.cash));
-	lSavingsBefore->setText(QtUtils::toCurrencyFormat(report.stateBefore.savings));
-	lForeignBefore->setText(QtUtils::toCurrencyFormat(report.stateBefore.foreignCash));
+	lSavingsBefore->setText(QtUtils::toCurrencyFormat(report.stateBefore.savings, 3));
+	lForeignBefore->setText(QtUtils::toCurrencyFormat(report.stateBefore.foreignCash, 3));
 
-	lSavingsDifference->setText(QtUtils::toCurrencyFormat(report.savingsDiff));
+	lSavingsDifference->setText(QtUtils::toCurrencyFormat(report.savingsDiff, 3));
 	lCashDifference->setText(QtUtils::toCurrencyFormat(report.cashDiff));
 	lCashDifference->setToolTip(cashExplanation);
 
 	afterBox->setTitle(formatHeader(report.stateAfter.date));
-	lSavingsAfter->setText(QtUtils::toCurrencyFormat(report.stateAfter.savings));
+	lSavingsAfter->setText(QtUtils::toCurrencyFormat(report.stateAfter.savings, 3));
 	lCashAfter->setText(QtUtils::toCurrencyFormat(report.stateAfter.cash));
 	lForeignAfter->setText(QtUtils::toCurrencyFormat(report.stateAfter.foreignCash, 3));
 }
