@@ -34,6 +34,8 @@ AddTabEntry::AddTabEntry(std::vector<entry::Person>& personVec, QWidget* parent)
 	dropDownCompleter->setCompletionMode(QCompleter::InlineCompletion);
 	nameSelect->setCompleter(dropDownCompleter);
 	nameSelect->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
+	nameSelect->setPlaceholderText("");
+	nameSelect->setCurrentIndex(-1);
 
 	spinboxBeer05 = new QSpinBox(parent);
 	spinboxBeer04 = new QSpinBox(parent);
@@ -152,7 +154,7 @@ ConsumptionInputs AddTabEntry::getEntryInputs() const
 	}
 	else
 	{
-		personInput = nameSelect->currentText().toStdString();
+		personInput = nameSelect->currentText().toStdString(); // covers unaltered/empty entries with placeholder text "" -> text validator returns error
 	}
 
 	return ConsumptionInputs{

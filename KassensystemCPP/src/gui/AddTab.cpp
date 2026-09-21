@@ -208,6 +208,11 @@ void AddTab::handleInputValidityError(const validityError::Code& errorCode) cons
 		errorQStr += QStringLiteral("Name: ");
 		switch (std::get<Name>(errorCode))
 		{
+		case Name::Empty:
+		{
+			errorQStr += QStringLiteral("Kein Name angegeben");
+			break;
+		}
 		case Name::FirstOrLastNameMissing:
 		{
 			errorQStr += QStringLiteral("Vor- oder Nachname fehlt");

@@ -73,6 +73,8 @@ double ConsumptionService::calculateDebt(const request::Consumption& request) co
 std::expected< PersonStringSpecifiers, validityError::Name > ConsumptionService::isValidNameFormat(const std::string& nameRequest) const
 {
 	using enum validityError::Name;
+
+	if (nameRequest.empty()) return std::unexpected(Empty);
 	
 	PersonStringSpecifiers result;
 

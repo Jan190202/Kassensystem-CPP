@@ -10,6 +10,7 @@ namespace validityError
 {
 	enum Name
 	{
+		Empty,
 		FirstOrLastNameMissing,
 		UnbalancedParentheses,
 		InvalidNicknameFormat,

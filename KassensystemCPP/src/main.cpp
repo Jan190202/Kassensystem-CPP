@@ -133,5 +133,4 @@ int main(int argc, char* argv[])
 * Bugs:
 * - AddTab 
 *	-> add scroll bar instead of increasing height of window with too many entries
-*	-> initial name not first name in list, but blank
 */ 
