@@ -14,6 +14,9 @@
 #include <QSpacerItem>
 #include <QMessageBox>
 #include <QDebug>
+#include <QScrollArea>
+#include <QScrollBar>
+#include <QTimer>
 #include <algorithm>
 #include <string>
 
@@ -42,10 +45,10 @@ void AddTab::initialize()
 		QStringLiteral("Wasser"),
 		QStringLiteral("Sonstiges"),
 		QStringLiteral("Kosten"),
-		QString()
+		QStringLiteral("")
 	};
 
-	for (int column = 0; column < headers.size() - 1; ++column)
+	for (int column = 0; column < headers.size(); ++column)
 	{
 		auto* headerLabel = new QLabel(headers.at(column), this);
 		headerLabel->setAlignment(Qt::AlignCenter);
@@ -57,26 +60,23 @@ void AddTab::initialize()
 		entriesGrid->addWidget(headerLabel, 0, column);
 	}
 
-	entriesGrid->setColumnMinimumWidth(0, 140); 
-	entriesGrid->setColumnMinimumWidth(1, 105);
-	entriesGrid->setColumnMinimumWidth(2, 105);
-	entriesGrid->setColumnMinimumWidth(3, 105);
-	entriesGrid->setColumnMinimumWidth(4, 105);
-	entriesGrid->setColumnMinimumWidth(5, 125); 
-	entriesGrid->setColumnMinimumWidth(6, 75); 
-	entriesGrid->setColumnMinimumWidth(7, 36);
+	entriesGrid->setColumnMinimumWidth(0, 120);
+	entriesGrid->setColumnMinimumWidth(1, 80);
+	entriesGrid->setColumnMinimumWidth(2, 80);
+	entriesGrid->setColumnMinimumWidth(3, 80);
+	entriesGrid->setColumnMinimumWidth(4, 80);
+	entriesGrid->setColumnMinimumWidth(5, 120);
+	entriesGrid->setColumnMinimumWidth(6, 60);
+	entriesGrid->setColumnMinimumWidth(7, 30);
 
-	entriesGrid->setColumnStretch(0, 2);
-	entriesGrid->setColumnStretch(1, 1);
-	entriesGrid->setColumnStretch(2, 1);
-	entriesGrid->setColumnStretch(3, 1);
-	entriesGrid->setColumnStretch(4, 1);
-	entriesGrid->setColumnStretch(5, 1);
-	entriesGrid->setColumnStretch(6, 1);
+	entriesGrid->setColumnStretch(0, 1);
+	entriesGrid->setColumnStretch(1, 0);
+	entriesGrid->setColumnStretch(2, 0);
+	entriesGrid->setColumnStretch(3, 0);
+	entriesGrid->setColumnStretch(4, 0);
+	entriesGrid->setColumnStretch(5, 0);
+	entriesGrid->setColumnStretch(6, 0);
 	entriesGrid->setColumnStretch(7, 0);
-
-	auto* columnSpacer = new QSpacerItem(36, 0, QSizePolicy::Fixed, QSizePolicy::Minimum);
-	entriesGrid->addItem(columnSpacer, 0, 7);
 
 	auto* monthLayout = new QHBoxLayout();
 	monthLayout->setContentsMargins(0, 0, 0, 0);
@@ -84,14 +84,26 @@ void AddTab::initialize()
 	monthLayout->addWidget(new QLabel(QStringLiteral("Abrechnungsmonat"), this));
 	monthLayout->addWidget(monthSelection, 1);
 
+	auto* entriesContainer = new QWidget(); // for scroll area
+	auto* containerLayout = new QVBoxLayout(entriesContainer);
+	containerLayout->setContentsMargins(0, 0, 0, 0);
+	containerLayout->addLayout(entriesGrid);
+	containerLayout->addStretch();
+
+	auto* scrollArea = new QScrollArea(this);
+	scrollArea->setWidgetResizable(true);
+	scrollArea->setFrameShape(QFrame::NoFrame);
+	scrollArea->setWidget(entriesContainer);
+
+	entriesContainer->setAutoFillBackground(false);
+	scrollArea->viewport()->setAutoFillBackground(false);
+
 	addTabMainLayout = new QVBoxLayout(this);
 	addTabMainLayout->setContentsMargins(18, 18, 18, 18);
 	addTabMainLayout->setSpacing(14);
-
 	addTabMainLayout->addLayout(monthLayout);
-	addTabMainLayout->addLayout(entriesGrid);
+	addTabMainLayout->addWidget(scrollArea);
 	addTabMainLayout->addWidget(btnAddEntry);
-	addTabMainLayout->addStretch();
 
 	btnAddEntry->setFocus(Qt::TabFocusReason);
 

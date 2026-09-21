@@ -33,7 +33,6 @@ AddTabEntry::AddTabEntry(std::vector<entry::Person>& personVec, QWidget* parent)
 	dropDownCompleter->setCaseSensitivity(Qt::CaseInsensitive);
 	dropDownCompleter->setCompletionMode(QCompleter::InlineCompletion);
 	nameSelect->setCompleter(dropDownCompleter);
-	nameSelect->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
 	nameSelect->setPlaceholderText("");
 	nameSelect->setCurrentIndex(-1);
 
@@ -47,7 +46,6 @@ AddTabEntry::AddTabEntry(std::vector<entry::Person>& personVec, QWidget* parent)
 			spinBox->setMinimum(0);
 			spinBox->setMaximum(99);
 			spinBox->setValue(0);
-			spinBox->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
 		};
 
 	configureCountSpinBox(spinboxBeer05);
@@ -61,7 +59,6 @@ AddTabEntry::AddTabEntry(std::vector<entry::Person>& personVec, QWidget* parent)
 	spinboxCustom->setDecimals(2);
 	spinboxCustom->setSingleStep(0.5);
 	spinboxCustom->setSuffix(QStringLiteral(" ") + QtUtils::eurSymbol());
-	spinboxCustom->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
 
 	lCost = new QLabel(QtUtils::toCurrencyFormat(entryCost), parent);
 	lCost->setAlignment(Qt::AlignCenter);
@@ -69,7 +66,35 @@ AddTabEntry::AddTabEntry(std::vector<entry::Person>& personVec, QWidget* parent)
 
 	btnRemove = new QPushButton(QStringLiteral("−"), parent);
 	btnRemove->setToolTip(QStringLiteral("Eintrag entfernen"));
-	btnRemove->setFixedWidth(36);
+	//btnRemove->setFixedWidth(36);
+
+	// can be adjusted later
+	nameSelect			->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
+	spinboxBeer05		->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
+	spinboxBeer04		->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
+	spinboxSoftdrinks	->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
+	spinboxWater		->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
+	spinboxCustom		->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
+	lCost				->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
+	btnRemove			->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
+
+	nameSelect			->setMinimumWidth(120);
+	spinboxBeer05		->setMinimumWidth(80);
+	spinboxBeer04		->setMinimumWidth(80);
+	spinboxSoftdrinks	->setMinimumWidth(80);
+	spinboxWater		->setMinimumWidth(80);
+	spinboxCustom		->setMinimumWidth(120);
+	lCost				->setMinimumWidth(60);
+	btnRemove			->setMinimumWidth(30);
+
+	nameSelect			->setMaximumWidth(QWIDGETSIZE_MAX);
+	spinboxBeer05		->setMaximumWidth(80);
+	spinboxBeer04		->setMaximumWidth(80);
+	spinboxSoftdrinks	->setMaximumWidth(80);
+	spinboxWater		->setMaximumWidth(80);
+	spinboxCustom		->setMaximumWidth(120);
+	lCost				->setMaximumWidth(60);
+	btnRemove			->setMaximumWidth(30);
 
 	connect(btnRemove, &QPushButton::clicked, this, [this]() { emit remove(this); });
 
