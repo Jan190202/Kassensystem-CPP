@@ -14,22 +14,22 @@ class QDoubleSpinBox;
 class QCheckBox;
 class QComboBox;
 
-struct dlgInputs
-{
-	std::string description;
-	double amount;
-	QDate date;
-	std::string comment;
-	std::optional<int64_t> coveringpersonEntryID;
-};
-
 class BalanceTabDialog : public QDialog
 {
 	Q_OBJECT
 public:
+	struct inputs
+	{
+		std::string description;
+		double amount;
+		QDate date;
+		std::string comment;
+		std::optional<int64_t> coveringpersonEntryID;
+	};
+
 	BalanceTabDialog(BtnIndex mode, std::vector<entry::Person>& personVec, QWidget* parent);
 
-	dlgInputs getInputs() const;
+	BalanceTabDialog::inputs getInputs() const;
 
 private:
 	QLineEdit*		edtDescription;

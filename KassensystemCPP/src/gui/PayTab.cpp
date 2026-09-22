@@ -1,5 +1,6 @@
 #include "PayTab.h"
 #include "qtutils/QtConversions.h"
+#include "PayTabAddCreditDialog.h"
 #include <QButtonGroup>
 #include <QCheckBox>
 #include <QComboBox>
@@ -15,6 +16,7 @@
 #include <QTableWidget>
 #include <QVBoxLayout>
 #include <QColor>
+#include <QInputDialog>
 #include <algorithm>
 
 PayTab::PayTab(const LowerButtonBundle& lowerButtons, PaymentService& paymentService, PersonRepository* personRepo, ConsumptionRepository* consumptionRepo, DebtRepository* debtRepo, CreditRepository* creditRepo, QWidget* parent) 
@@ -52,8 +54,10 @@ void PayTab::initialize()
 	dueFont.setBold(true);
 	dueNumLabel->setFont(dueFont);
 
-	btnUseCredit = new QPushButton(QStringLiteral("Refresh"), this);
+	btnUseCredit = new QPushButton(QStringLiteral("Anwenden"), this);
 	btnUseCredit->setEnabled(false);
+
+	btnAddCredit = new QPushButton(QStringLiteral("+"), this);
 
 	// payment
 	paymentSpinBox = new QDoubleSpinBox(this);
@@ -102,9 +106,11 @@ void PayTab::initialize()
 
 	auto* creditLayout = new QHBoxLayout();
 	creditLayout->setContentsMargins(0, 0, 0, 0);
-	creditLayout->setSpacing(8);
+	creditLayout->setSpacing(3);
 	creditLayout->addWidget(creditNumLabel, 1);
 	creditLayout->addWidget(btnUseCredit);
+	creditLayout->addWidget(btnAddCredit);
+	btnAddCredit->setFixedWidth(30);
 
 	summaryLayout->addRow(creditTextLabel, creditLayout);
 
@@ -157,6 +163,11 @@ void PayTab::initialize()
 	connect(btnUseCredit, &QPushButton::clicked, this, [&]()
 		{
 			redeemCredit();
+		});
+
+	connect(btnAddCredit, &QPushButton::clicked, this, [&]()
+		{
+			addCredit();
 		});
 
 	connect(fullPaymentCheckBox, &QCheckBox::checkStateChanged, this, [&](Qt::CheckState state)
@@ -272,6 +283,27 @@ void PayTab::redeemCredit()
 		.amount = redemptionAmount,
 		.overpaymentType = OverpaymentDisposition::Credit
 		});
+
+	refresh();
+}
+
+void PayTab::addCredit()
+{
+	int64_t personEntryID = nameSelect->currentData().toLongLong();
+	PayTabAddCreditDialog::inputs inputs;
+
+	auto* inputDialog = new PayTabAddCreditDialog(this);
+	if (inputDialog->exec() == QDialog::Accepted)
+	{
+		// inputs given and OK pressed
+		inputs = inputDialog->getInputs();
+		qInfo() << inputs.amount;
+		qInfo() << inputs.date;
+		qInfo() << inputs.description;
+	}
+	else { return; } // cancel pressed
+
+	paymentService.addCredit(personEntryID, inputs.amount, inputs.date, inputs.description);
 
 	refresh();
 }

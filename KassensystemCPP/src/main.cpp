@@ -113,7 +113,6 @@ int main(int argc, char* argv[])
 *	- BalanceTabDialog: option for adding any number of people with custom amounts (e.g. for coverage of entry fees for multiple people; currently, multiple entries necessary)
 * - PayTab:
 *	- functionality to add new person
-*	- functionality to add credit to person apart from overpayment (amount, date, comment, ...)
 *	- make drop down editable for faster finding
 *	- add buttons: "Redeem All Credits", "Export Debts (CSV/CopyToClipboard/URL)"
 * - Add "Unknown Date" and "Initialization" date option to consumptions (maybe also debt, sharesettlement, etc.)
@@ -125,7 +124,6 @@ int main(int argc, char* argv[])
 *		-> allow cash amount validation at any time, which either: refreshes state before, or, better: create new database saving the validation checks
 *		-> balance statistics are still displayed from beginning of year (if avaliable) to today
 * - add assets (icons, button icons, ...)
-* - allow placeholder or unsufficiently known names, defined by new syntax like -Place holder name-, allow special names (Gäste, Abteilung, ...)
 *	- display current player base by pulling from the web for name finding/spelling:
 *		-> https://www.mytischtennis.de/click-tt/ByTTV/26--27/verein/102084/SV_Untereuerheim/meldungendetails/E/vr
 *		-> https://www.mytischtennis.de/click-tt/ByTTV/26--27/verein/102084/SV_Untereuerheim/meldungendetails/MJ19/vr

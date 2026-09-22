@@ -166,7 +166,7 @@ void BalanceTab::initialize()
 
 void BalanceTab::addEntry(BtnIndex mode)
 {
-	dlgInputs inputs;
+	BalanceTabDialog::inputs inputs;
 
 	std::vector<entry::Person> personVec = personRepo->getAllPersonEntries();
 	auto* inputDialog = new BalanceTabDialog(mode, personVec, this);

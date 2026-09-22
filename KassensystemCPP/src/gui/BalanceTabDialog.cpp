@@ -143,9 +143,9 @@ BalanceTabDialog::BalanceTabDialog(BtnIndex mode, std::vector<entry::Person>& pe
 	adjustSize();
 }
 
-dlgInputs BalanceTabDialog::getInputs() const
+BalanceTabDialog::inputs BalanceTabDialog::getInputs() const
 {
-	return dlgInputs{
+	return BalanceTabDialog::inputs{
 		.description = edtDescription->text().toStdString(),
 		.amount = edtCost->value(),
 		.date = edtDate->date(),

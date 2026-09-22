@@ -28,6 +28,7 @@ public:
 private:
 	void nameChanged();
 	void redeemCredit();
+	void addCredit();
 	void refreshTable(int64_t personEntryID);
 
 	QComboBox*		nameSelect			= nullptr;
@@ -36,6 +37,7 @@ private:
 	QLabel*			dueNumLabel			= nullptr;
 	QLabel*			creditNumLabel		= nullptr;
 	QPushButton*	btnUseCredit		= nullptr;
+	QPushButton*	btnAddCredit		= nullptr;
 	QDoubleSpinBox* paymentSpinBox		= nullptr;
 	QCheckBox*		fullPaymentCheckBox = nullptr;
 	QRadioButton*	btnSurplusToCredit	= nullptr;
