@@ -19,6 +19,7 @@
 #include <QColor>
 #include <QInputDialog>
 #include <QMessageBox>
+#include <QCompleter>
 #include <algorithm>
 
 PayTab::PayTab(const LowerButtonBundle& lowerButtons, PaymentService& paymentService, PersonRepository* personRepo, ConsumptionRepository* consumptionRepo, DebtRepository* debtRepo, CreditRepository* creditRepo, QWidget* parent) 
@@ -29,7 +30,14 @@ void PayTab::initialize()
 	// name selection
 	nameSelect = new QComboBox(this);
 	nameSelect->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
-	nameSelect->setEditable(false);
+	nameSelect->setEditable(true);
+	nameSelect->setCurrentIndex(-1);
+
+	auto* completer = new QCompleter(nameSelect->model(), nameSelect);
+	completer->setCaseSensitivity(Qt::CaseInsensitive);
+	completer->setCompletionMode(QCompleter::PopupCompletion);
+	completer->setFilterMode(Qt::MatchContains);
+	nameSelect->setCompleter(completer);
 
 	btnAddPerson = new QPushButton(QStringLiteral("+"), this);
 
@@ -190,6 +198,20 @@ void PayTab::initialize()
 
 	refresh();
 
+	connect(nameSelect->lineEdit(), &QLineEdit::editingFinished, nameSelect, [&]() 
+		{
+			int idx = nameSelect->findText(nameSelect->currentText(), Qt::MatchFixedString);
+			
+			if (idx == -1) 
+			{
+				nameSelect->setCurrentIndex(nameSelect->currentIndex()); 
+			}
+			else 
+			{
+				nameSelect->setCurrentIndex(idx);
+			}
+		});
+
 	connect(lowerButtons.btnApply, &QPushButton::clicked, this, [&]()
 		{
 			apply();
@@ -265,13 +287,17 @@ void PayTab::nameChanged()
 void PayTab::refresh()
 {
 	// refresh name list (clear and rebuild from database), in case it was altered
-	// try to keep name loaded before
+	// try to keep name loaded before, or placeholder
 	// refresh tab for current name
+
+	bool isPlaceholder = false;
+	if (nameSelect->currentIndex() == -1) isPlaceholder = true;
 
 	int64_t oldID = nameSelect->currentData().toLongLong();
 
 	nameSelect->clear();
 	
+	// get all person entries and add them in alphabetical order
 	std::vector<entry::Person> personVec = personRepo->getAllPersonEntries();
 	std::sort(personVec.begin(), personVec.end(), [](const entry::Person& a, const entry::Person& b) 
 		{
@@ -287,9 +313,18 @@ void PayTab::refresh()
 		if (itemID == oldID) indexForOldID = personVec.size()-i-1; // == 0 ... size()-1
 	}
 
-	if (indexForOldID.has_value()) nameSelect->setCurrentIndex(indexForOldID.value());
-			
-	nameChanged();
+	if (isPlaceholder) // set to placeholder again
+	{
+		nameSelect->setCurrentIndex(-1);
+	}
+	else // set to last selected person, if found
+	{
+		if (indexForOldID.has_value()) nameSelect->setCurrentIndex(indexForOldID.value());
+		nameChanged();
+	}
+
+	nameSelect->setFocus(Qt::TabFocusReason);
+	nameSelect->lineEdit()->selectAll();
 }
 
 void PayTab::apply()
