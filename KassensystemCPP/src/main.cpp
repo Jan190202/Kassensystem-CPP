@@ -112,7 +112,7 @@ int main(int argc, char* argv[])
 *	- remove consumption earnings from earnings table, display them in seperate section with more information
 *	- BalanceTabDialog: option for adding any number of people with custom amounts (e.g. for coverage of entry fees for multiple people; currently, multiple entries necessary)
 * - PayTab:
-*	- "Export Debts (CSV/CopyToClipboard/URL)"
+*	- "Export Debts (CSV/CopyToClipboard/URL), sorted by name or debt"
 * - Add "Unknown Date" and "Initialization" date option to consumptions (maybe also debt, sharesettlement, etc.)
 * - add new tab for manual database changes (dropDown for which repository + QTableView) with live SQL statement support for filtering / changing
 * - web-API: get debt per person

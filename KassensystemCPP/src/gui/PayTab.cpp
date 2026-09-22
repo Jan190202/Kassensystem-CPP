@@ -41,6 +41,8 @@ void PayTab::initialize()
 
 	btnAddPerson = new QPushButton(QStringLiteral("+"), this);
 
+	btnExport = new QPushButton(QStringLiteral("Exp"), this);
+
 	// overview
 	auto* totalTextLabel	= new QLabel(QStringLiteral("Gesamt"), this);
 	auto* paidTextLabel		= new QLabel(QStringLiteral("Beglichen"), this);
@@ -111,7 +113,9 @@ void PayTab::initialize()
 	customerLayout->setSpacing(3);
 	customerLayout->addWidget(nameSelect);
 	customerLayout->addWidget(btnAddPerson);
+	customerLayout->addWidget(btnExport);
 	btnAddPerson->setFixedWidth(30);
+	btnExport->setFixedWidth(40);
 
 	auto* summaryBox = new QGroupBox(QStringLiteral("Übersicht"), this);
 	auto* summaryLayout = new QFormLayout(summaryBox);
@@ -236,6 +240,11 @@ void PayTab::initialize()
 	connect(btnAddPerson, &QPushButton::clicked, this, [&]()
 		{
 			addPerson();
+		});
+
+	connect(btnExport, &QPushButton::clicked, this, [&]()
+		{
+			exportData();
 		});
 
 	connect(fullPaymentCheckBox, &QCheckBox::checkStateChanged, this, [&](Qt::CheckState state)
@@ -524,4 +533,9 @@ void PayTab::refreshTable(int64_t personEntryID)
 	}
 
 	tblConsumption->resizeColumnsToContents();
+}
+
+void PayTab::exportData() const
+{
+	// TBD
 }
