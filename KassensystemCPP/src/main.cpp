@@ -112,7 +112,6 @@ int main(int argc, char* argv[])
 *	- remove consumption earnings from earnings table, display them in seperate section with more information
 *	- BalanceTabDialog: option for adding any number of people with custom amounts (e.g. for coverage of entry fees for multiple people; currently, multiple entries necessary)
 * - PayTab:
-*	- functionality to add new person
 *	- make drop down editable for faster finding
 *	- add buttons: "Redeem All Credits", "Export Debts (CSV/CopyToClipboard/URL)"
 * - Add "Unknown Date" and "Initialization" date option to consumptions (maybe also debt, sharesettlement, etc.)

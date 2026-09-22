@@ -29,9 +29,11 @@ private:
 	void nameChanged();
 	void redeemCredit();
 	void addCredit();
+	void addPerson();
 	void refreshTable(int64_t personEntryID);
 
 	QComboBox*		nameSelect			= nullptr;
+	QPushButton*	btnAddPerson		= nullptr;
 	QLabel*			totalNumLabel		= nullptr;
 	QLabel*			settledNumLabel		= nullptr;
 	QLabel*			dueNumLabel			= nullptr;

@@ -1,6 +1,7 @@
 #include "PayTab.h"
 #include "qtutils/QtConversions.h"
 #include "PayTabAddCreditDialog.h"
+#include "PayTabAddPersonDialog.h"
 #include <QButtonGroup>
 #include <QCheckBox>
 #include <QComboBox>
@@ -17,6 +18,7 @@
 #include <QVBoxLayout>
 #include <QColor>
 #include <QInputDialog>
+#include <QMessageBox>
 #include <algorithm>
 
 PayTab::PayTab(const LowerButtonBundle& lowerButtons, PaymentService& paymentService, PersonRepository* personRepo, ConsumptionRepository* consumptionRepo, DebtRepository* debtRepo, CreditRepository* creditRepo, QWidget* parent) 
@@ -24,9 +26,12 @@ PayTab::PayTab(const LowerButtonBundle& lowerButtons, PaymentService& paymentSer
 
 void PayTab::initialize()
 {
+	// name selection
 	nameSelect = new QComboBox(this);
 	nameSelect->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
 	nameSelect->setEditable(false);
+
+	btnAddPerson = new QPushButton(QStringLiteral("+"), this);
 
 	// overview
 	auto* totalTextLabel	= new QLabel(QStringLiteral("Gesamt"), this);
@@ -89,9 +94,12 @@ void PayTab::initialize()
 	leftLayout->setSpacing(14);
 
 	auto* customerBox = new QGroupBox(QStringLiteral("Person"), this);
-	auto* customerLayout = new QVBoxLayout(customerBox);
+	auto* customerLayout = new QHBoxLayout(customerBox);
 	customerLayout->setContentsMargins(12, 14, 12, 12);
+	customerLayout->setSpacing(3);
 	customerLayout->addWidget(nameSelect);
+	customerLayout->addWidget(btnAddPerson);
+	btnAddPerson->setFixedWidth(30);
 
 	auto* summaryBox = new QGroupBox(QStringLiteral("Übersicht"), this);
 	auto* summaryLayout = new QFormLayout(summaryBox);
@@ -168,6 +176,11 @@ void PayTab::initialize()
 	connect(btnAddCredit, &QPushButton::clicked, this, [&]()
 		{
 			addCredit();
+		});
+
+	connect(btnAddPerson, &QPushButton::clicked, this, [&]()
+		{
+			addPerson();
 		});
 
 	connect(fullPaymentCheckBox, &QCheckBox::checkStateChanged, this, [&](Qt::CheckState state)
@@ -304,6 +317,42 @@ void PayTab::addCredit()
 	else { return; } // cancel pressed
 
 	paymentService.addCredit(personEntryID, inputs.amount, inputs.date, inputs.description);
+
+	refresh();
+}
+
+void PayTab::addPerson()
+{
+	PayTabAddPersonDialog::inputs inputs;
+
+	auto* inputDialog = new PayTabAddPersonDialog(this);
+	if (inputDialog->exec() == QDialog::Accepted)
+	{
+		// inputs given and OK pressed
+		inputs = inputDialog->getInputs();
+		qInfo() << inputs.firstName;
+		qInfo() << inputs.lastName;
+		qInfo() << inputs.nickName;
+		qInfo() << inputs.info;
+	}
+	else { return; } // cancel pressed
+
+	if (inputs.firstName.empty())
+	{
+		auto* errorDlg = new QMessageBox(QMessageBox::Warning, QStringLiteral("Fehler"), "Vor-/Gruppenname nicht angegeben!");
+		errorDlg->exec();
+		return;
+	}
+
+	personRepo->addPersonEntry(
+		entry::Person{
+			.personEntryID = 0,
+			.firstName = inputs.firstName,
+			.lastName = inputs.lastName,
+			.nickName = inputs.nickName,
+			.info = inputs.info
+		}
+	);
 
 	refresh();
 }
