@@ -113,7 +113,7 @@ int main(int argc, char* argv[])
 *	- BalanceTabDialog: option for adding any number of people with custom amounts (e.g. for coverage of entry fees for multiple people; currently, multiple entries necessary)
 * - PayTab:
 *	- make drop down editable for faster finding
-*	- add buttons: "Redeem All Credits", "Export Debts (CSV/CopyToClipboard/URL)"
+*	- "Export Debts (CSV/CopyToClipboard/URL)"
 * - Add "Unknown Date" and "Initialization" date option to consumptions (maybe also debt, sharesettlement, etc.)
 * - add new tab for manual database changes (dropDown for which repository + QTableView) with live SQL statement support for filtering / changing
 * - web-API: get debt per person

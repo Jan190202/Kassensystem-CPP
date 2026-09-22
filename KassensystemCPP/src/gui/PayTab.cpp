@@ -55,14 +55,18 @@ void PayTab::initialize()
 	configureAmountLabel(dueNumLabel);
 	configureAmountLabel(creditNumLabel);
 
-	QFont dueFont = dueNumLabel->font();
-	dueFont.setBold(true);
-	dueNumLabel->setFont(dueFont);
+	QFont boldFont = dueNumLabel->font();
+	boldFont.setBold(true);
+
+	dueNumLabel		->setFont(boldFont);
+	creditNumLabel	->setFont(boldFont);
 
 	btnUseCredit = new QPushButton(QStringLiteral("Anwenden"), this);
 	btnUseCredit->setEnabled(false);
 
 	btnAddCredit = new QPushButton(QStringLiteral("+"), this);
+
+	btnAllUseCredit = new QPushButton(QStringLiteral("Alle Anwenden"), this);
 
 	// payment
 	paymentSpinBox = new QDoubleSpinBox(this);
@@ -111,16 +115,15 @@ void PayTab::initialize()
 	summaryLayout->addRow(totalTextLabel, totalNumLabel);
 	summaryLayout->addRow(paidTextLabel, settledNumLabel);
 	summaryLayout->addRow(dueTextLabel, dueNumLabel);
+	summaryLayout->addRow(creditTextLabel, creditNumLabel);
 
-	auto* creditLayout = new QHBoxLayout();
-	creditLayout->setContentsMargins(0, 0, 0, 0);
-	creditLayout->setSpacing(3);
-	creditLayout->addWidget(creditNumLabel, 1);
-	creditLayout->addWidget(btnUseCredit);
-	creditLayout->addWidget(btnAddCredit);
-	btnAddCredit->setFixedWidth(30);
-
-	summaryLayout->addRow(creditTextLabel, creditLayout);
+	//auto* creditLayout = new QHBoxLayout();
+	//creditLayout->setContentsMargins(0, 0, 0, 0);
+	//creditLayout->setSpacing(3);
+	//creditLayout->addWidget(creditNumLabel, 1);
+	//creditLayout->addWidget(btnUseCredit);
+	//creditLayout->addWidget(btnAddCredit);
+	//summaryLayout->addRow(creditTextLabel, creditLayout);
 
 	auto* paymentBox = new QGroupBox(QStringLiteral("Zahlung erfassen"), this);
 	auto* paymentLayout = new QVBoxLayout(paymentBox);
@@ -143,10 +146,34 @@ void PayTab::initialize()
 	surplusLayout->addWidget(btnSurplusToTip);
 	surplusLayout->addStretch();
 
+	auto* creditBox = new QGroupBox(QStringLiteral("Guthaben verwalten"), this);
+	auto* creditLayout = new QGridLayout(creditBox);
+	creditLayout->setContentsMargins(12, 14, 12, 12);
+	creditLayout->setHorizontalSpacing(12);
+	creditLayout->setVerticalSpacing(10);
+	creditLayout->setColumnStretch(0, 0);
+	creditLayout->setColumnStretch(1, 1);
+	creditLayout->setColumnStretch(2, 0);
+
+	auto* personLabel = new QLabel(QStringLiteral("Person:"), this);
+	auto* globalLabel = new QLabel(QStringLiteral("Global:"), this);
+	auto* line = new QFrame(this);
+	line->setFrameShape(QFrame::HLine);
+	line->setFrameShadow(QFrame::Sunken);
+	btnAddCredit->setFixedWidth(30);
+
+	creditLayout->addWidget(personLabel,		0, 0);
+	creditLayout->addWidget(btnUseCredit,		0, 1);
+	creditLayout->addWidget(btnAddCredit,		0, 2);
+	creditLayout->addWidget(line,				1, 0, 1, 3);
+	creditLayout->addWidget(globalLabel,		2, 0);
+	creditLayout->addWidget(btnAllUseCredit,	2, 1, 1, 2);
+
 	leftLayout->addWidget(customerBox);
 	leftLayout->addWidget(summaryBox);
 	leftLayout->addWidget(paymentBox);
 	leftLayout->addWidget(surplusBox);
+	leftLayout->addWidget(creditBox);
 	leftLayout->addStretch();
 
 	auto* vLine = new QFrame(this);
@@ -170,7 +197,13 @@ void PayTab::initialize()
 
 	connect(btnUseCredit, &QPushButton::clicked, this, [&]()
 		{
-			redeemCredit();
+			redeemCredit(nameSelect->currentData().toLongLong());
+			refresh(); // moved refresh out of redemmCredit so allRedeemCredit doesn't refresh after every person
+		});
+
+	connect(btnAllUseCredit, &QPushButton::clicked, this, [&]()
+		{
+			allRedeemCredit();
 		});
 
 	connect(btnAddCredit, &QPushButton::clicked, this, [&]()
@@ -273,11 +306,12 @@ void PayTab::apply()
 	refresh();
 }
 
-void PayTab::redeemCredit()
+void PayTab::redeemCredit(int64_t personEntryID)
 {
-	int64_t personEntryID = nameSelect->currentData().toLongLong();
+	double personDue = debtRepo->getPersonsDue(personEntryID);
+	double personCredit = creditRepo->getPersonsCredit(personEntryID);
 
-	double redemptionAmount = std::min(credit, due);
+	double redemptionAmount = std::min(personCredit, personDue);
 	if (redemptionAmount == 0) return;
 
 	creditRepo->addCreditEntry(
@@ -296,7 +330,13 @@ void PayTab::redeemCredit()
 		.amount = redemptionAmount,
 		.overpaymentType = OverpaymentDisposition::Credit
 		});
+}
 
+void PayTab::allRedeemCredit()
+{
+	std::vector<entry::Person> personVec = personRepo->getAllPersonEntries();
+	for (const auto& entry : personVec)
+		redeemCredit(entry.personEntryID);
 	refresh();
 }
 

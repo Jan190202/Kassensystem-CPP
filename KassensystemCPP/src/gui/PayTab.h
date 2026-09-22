@@ -27,7 +27,8 @@ public:
 
 private:
 	void nameChanged();
-	void redeemCredit();
+	void redeemCredit(int64_t personEntryID);
+	void allRedeemCredit();
 	void addCredit();
 	void addPerson();
 	void refreshTable(int64_t personEntryID);
@@ -39,6 +40,7 @@ private:
 	QLabel*			dueNumLabel			= nullptr;
 	QLabel*			creditNumLabel		= nullptr;
 	QPushButton*	btnUseCredit		= nullptr;
+	QPushButton*	btnAllUseCredit		= nullptr;
 	QPushButton*	btnAddCredit		= nullptr;
 	QDoubleSpinBox* paymentSpinBox		= nullptr;
 	QCheckBox*		fullPaymentCheckBox = nullptr;
