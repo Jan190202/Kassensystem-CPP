@@ -80,6 +80,16 @@ std::expected< PersonStringSpecifiers, validityError::Name > ConsumptionService:
 
 	std::string trimmedRequest = std::regex_replace(nameRequest, std::regex(R"(^\s+|\s+$)"), "");
 	
+	// check for deliberately marked special names, like groups or names with yet unknown full name
+	// syntax "nameString"; nameString will be saved as firstName
+	std::regex specialPattern(R"regex("(.+)")regex");
+	std::smatch specialMatch;
+	if (std::regex_match(trimmedRequest, specialMatch, specialPattern))
+	{ 
+		result.firstName = specialMatch[1].str();
+		return result;
+	}
+
 	// separate mandatory name part from the optional parentheses part
 	// matches anything up to an optional "(" followed by optional content inside ()
 	std::regex basePattern(R"(^([^\(]+)(?:\((.*)\))?$)"); // R"(...)" --> raw string literal

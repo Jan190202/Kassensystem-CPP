@@ -130,7 +130,4 @@ int main(int argc, char* argv[])
 *		-> https://www.mytischtennis.de/click-tt/ByTTV/26--27/verein/102084/SV_Untereuerheim/meldungendetails/E/vr
 *		-> https://www.mytischtennis.de/click-tt/ByTTV/26--27/verein/102084/SV_Untereuerheim/meldungendetails/MJ19/vr
 * - add optional "commit" message at saving for easier change tracking (new database)
-* Bugs:
-* - AddTab 
-*	-> add scroll bar instead of increasing height of window with too many entries
 */ 

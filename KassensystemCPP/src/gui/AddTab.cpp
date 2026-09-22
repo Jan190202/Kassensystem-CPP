@@ -246,7 +246,7 @@ void AddTab::handleInputValidityError(const validityError::Code& errorCode) cons
 			break;
 		}
 		}
-		errorQStr += QStringLiteral("\nSyntax: Vorname Nachname ([\"Spitzname\"], [Info])");
+		errorQStr += QStringLiteral("\n--------------------\nUnterstützte Syntax:\n  Vorname Nachname ([\"Spitzname\"], [Info])\n  ODER\n  \"Spezieller Bezeichner\"");
 	}
 	else if (std::holds_alternative<Date>(errorCode))
 	{

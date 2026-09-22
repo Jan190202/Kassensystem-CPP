@@ -14,7 +14,13 @@ std::string Person::getLastName() const
 
 std::string Person::getFullName() const
 {
-	return firstName + " " + lastName;
+	bool isFirst = !firstName.empty();
+	bool isLast = !lastName.empty();
+
+	if (isFirst && isLast) return firstName + " " + lastName;
+	else if (isFirst) return firstName;
+	else if (isLast) return lastName;
+	else return "NAME UNSPECIFIED";
 }
 
 std::string Person::getNickName() const
@@ -31,12 +37,14 @@ std::string Person::getFullSpecifier() const
 {
 	std::string additionalString;
 
-	bool isNickName = nickName.size() > 0;
-	bool isInfo = info.size() > 0;
+	bool isNickName = !nickName.empty();
+	bool isInfo = !info.empty();
 
 	if (isNickName && isInfo) additionalString = " (\"" + nickName + "\"," + info + ")";
 	else if (isNickName) additionalString = "(\"" + nickName + "\")";
 	else if (isInfo) additionalString = "(" + info + ")";
 
-	return getFullName() + " " + additionalString;
+	if (!additionalString.empty()) additionalString = " " + additionalString;
+
+	return getFullName() + additionalString;
 }

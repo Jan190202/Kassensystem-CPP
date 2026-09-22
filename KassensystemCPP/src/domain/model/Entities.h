@@ -1,14 +1,12 @@
 #pragma once
-
 #include "DomainTypes.h"
-
-#include <string>
-#include <QDate>
-#include <ostream>
-#include <cstdint>
-#include <sstream>
+#include "common/Utils.h"
 #include <QDebug>
 #include <QString>
+#include <QDate>
+#include <string>
+#include <ostream>
+#include <cstdint>
 
 namespace entry
 {
@@ -30,6 +28,7 @@ namespace entry
 				<< "personEntryID: " << person.personEntryID;
 			return out;
 		}
+		
 		friend QDebug operator<<(QDebug out, const Person& person)
 		{
 			std::ostringstream ss;
