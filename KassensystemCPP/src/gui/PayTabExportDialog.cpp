@@ -42,6 +42,7 @@ PayTabExportDialog::PayTabExportDialog(QWidget* parent) : QDialog(parent)
 	auto* sortLayout = new QVBoxLayout();
 	sortLayout->addWidget(rBtnName);
 	sortLayout->addWidget(rBtnDebt);
+	sortLayout->addStretch();
 
 	auto* sortBox = new QGroupBox();
 	sortBox->setTitle("Sortierung");
@@ -70,6 +71,9 @@ PayTabExportDialog::PayTabExportDialog(QWidget* parent) : QDialog(parent)
 
 	connect(rBtnName, &QPushButton::clicked, this, [&]() {inputs.var = SortingVariable::name; });
 	connect(rBtnDebt, &QPushButton::clicked, this, [&]() {inputs.var = SortingVariable::debt; });
+
+	setMinimumWidth(300);
+	adjustSize();
 }
 
 PayTabExportDialog::Inputs PayTabExportDialog::getInputs() const
