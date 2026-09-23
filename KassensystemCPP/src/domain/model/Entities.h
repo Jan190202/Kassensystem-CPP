@@ -288,6 +288,15 @@ namespace entry
 	};
 }
 
+namespace exportType
+{
+	struct personDebt
+	{
+		std::string name;
+		double debt;
+	};
+}
+
 namespace registerFinancials
 {
 	struct State

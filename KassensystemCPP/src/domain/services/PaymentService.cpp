@@ -95,3 +95,21 @@ int64_t PaymentService::addTip(int64_t personEntryID, double amount, const QDate
 		.personEntryID = personEntryID 
 		});
 }
+
+std::vector<exportType::personDebt> PaymentService::getDebtsAll() const
+{
+	auto personVec = personRepo->getAllPersonEntries();
+	
+	std::vector<exportType::personDebt> debtEntries;
+	debtEntries.reserve(personVec.size());
+
+	for (const auto& entry : personVec)
+	{
+		debtEntries.emplace_back(exportType::personDebt{
+			.name = entry.getFullName(),
+			.debt = debtRepo->getPersonsDue(entry.personEntryID)
+			});
+	}
+
+	return debtEntries;
+}

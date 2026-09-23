@@ -3,6 +3,7 @@
 #include "PayTabAddCreditDialog.h"
 #include "PayTabAddPersonDialog.h"
 #include "PayTabExportDialog.h"
+#include "export/Exporter.h"
 #include <QButtonGroup>
 #include <QCheckBox>
 #include <QComboBox>
@@ -541,34 +542,34 @@ void PayTab::exportData()
 	else { return; } // cancel pressed
 
 	// get values
-	// TBD
+	std::vector<exportType::personDebt> entries = paymentService.getDebtsAll();
 
 	// sort values
 	switch (inputs.var)
 	{
 	case PayTabExportDialog::SortingVariable::name:
-		// TBD
+		std::ranges::sort(entries, {}, &exportType::personDebt::name);
 		break;
 	case PayTabExportDialog::SortingVariable::debt:
-		// TBD
+		std::ranges::sort(entries, std::ranges::greater{}, &exportType::personDebt::debt);
 		break;
 	}
 
-	// return values
+	// export values
 	switch (inputs.option)
 	{
 	case PayTabExportDialog::ExportOption::clipboard:
-		// TBD
+		exporter::toClipboard(entries);
 		break;
 	case PayTabExportDialog::ExportOption::csv:
 		if (inputs.savePath.has_value()) 
 		{ 
 			std::string savePath = inputs.savePath.value(); 
-			// TBD
+			exporter::toCSV(entries, savePath);
 		}
 		break;
 	case PayTabExportDialog::ExportOption::web:
-		// TBD
+		exporter::toWeb(entries);
 		break;
 	}
 }
