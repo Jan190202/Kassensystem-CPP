@@ -22,6 +22,8 @@
 
 BalanceTabDialog::BalanceTabDialog(BtnIndex mode, std::vector<entry::Person>& personVec, QWidget* parent) : QDialog(parent)
 {
+	setWindowTitle("Eintrag hinzufügen");
+	
 	switch (mode)
 	{
 	case BtnIndex::AddEarning:

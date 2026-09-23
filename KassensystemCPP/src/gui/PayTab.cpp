@@ -2,6 +2,7 @@
 #include "qtutils/QtConversions.h"
 #include "PayTabAddCreditDialog.h"
 #include "PayTabAddPersonDialog.h"
+#include "PayTabExportDialog.h"
 #include <QButtonGroup>
 #include <QCheckBox>
 #include <QComboBox>
@@ -129,14 +130,6 @@ void PayTab::initialize()
 	summaryLayout->addRow(dueTextLabel, dueNumLabel);
 	summaryLayout->addRow(creditTextLabel, creditNumLabel);
 
-	//auto* creditLayout = new QHBoxLayout();
-	//creditLayout->setContentsMargins(0, 0, 0, 0);
-	//creditLayout->setSpacing(3);
-	//creditLayout->addWidget(creditNumLabel, 1);
-	//creditLayout->addWidget(btnUseCredit);
-	//creditLayout->addWidget(btnAddCredit);
-	//summaryLayout->addRow(creditTextLabel, creditLayout);
-
 	auto* paymentBox = new QGroupBox(QStringLiteral("Zahlung erfassen"), this);
 	auto* paymentLayout = new QVBoxLayout(paymentBox);
 	paymentLayout->setContentsMargins(12, 14, 12, 12);
@@ -150,7 +143,7 @@ void PayTab::initialize()
 	paymentLayout->addLayout(amountLayout);
 	paymentLayout->addWidget(fullPaymentCheckBox);
 
-	auto* surplusBox = new QGroupBox(QStringLiteral("Überschuss behandeln"), this);
+	auto* surplusBox = new QGroupBox(QStringLiteral("Zahlungsüberschuss behandeln"), this);
 	auto* surplusLayout = new QHBoxLayout(surplusBox);
 	surplusLayout->setContentsMargins(12, 14, 12, 12);
 	surplusLayout->setSpacing(18);
@@ -535,7 +528,47 @@ void PayTab::refreshTable(int64_t personEntryID)
 	tblConsumption->resizeColumnsToContents();
 }
 
-void PayTab::exportData() const
+void PayTab::exportData()
 {
+	PayTabExportDialog::Inputs inputs;
+
+	auto* dlg = new PayTabExportDialog(this);
+	if (dlg->exec() == QDialog::Accepted)
+	{
+		// inputs given and OK pressed
+		inputs = dlg->getInputs();
+	}
+	else { return; } // cancel pressed
+
+	// get values
 	// TBD
+
+	// sort values
+	switch (inputs.var)
+	{
+	case PayTabExportDialog::SortingVariable::name:
+		// TBD
+		break;
+	case PayTabExportDialog::SortingVariable::debt:
+		// TBD
+		break;
+	}
+
+	// return values
+	switch (inputs.option)
+	{
+	case PayTabExportDialog::ExportOption::clipboard:
+		// TBD
+		break;
+	case PayTabExportDialog::ExportOption::csv:
+		if (inputs.savePath.has_value()) 
+		{ 
+			std::string savePath = inputs.savePath.value(); 
+			// TBD
+		}
+		break;
+	case PayTabExportDialog::ExportOption::web:
+		// TBD
+		break;
+	}
 }

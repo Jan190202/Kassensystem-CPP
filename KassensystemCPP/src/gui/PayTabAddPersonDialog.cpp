@@ -14,6 +14,8 @@
 
 PayTabAddPersonDialog::PayTabAddPersonDialog(QWidget* parent) : QDialog(parent)
 {
+	setWindowTitle("Eintrag hinzufügen");
+	
 	QFont boldFont = font();
 	boldFont.setBold(true);
 

@@ -32,7 +32,7 @@ private:
 	void addCredit();
 	void addPerson();
 	void refreshTable(int64_t personEntryID);
-	void exportData() const;
+	void exportData();
 
 	QComboBox*		nameSelect			= nullptr;
 	QPushButton*	btnAddPerson		= nullptr;

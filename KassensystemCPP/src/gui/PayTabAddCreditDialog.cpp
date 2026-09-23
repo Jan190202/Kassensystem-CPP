@@ -19,9 +19,10 @@
 
 PayTabAddCreditDialog::PayTabAddCreditDialog(QWidget* parent) : QDialog(parent)
 {
+	setWindowTitle("Guthaben hinzufügen");
+
 	QFont boldFont = font();
 	boldFont.setBold(true);
-
 
 	edtAmount = new QDoubleSpinBox();
 	edtAmount->setRange(0.0, 1'000'000.0);
