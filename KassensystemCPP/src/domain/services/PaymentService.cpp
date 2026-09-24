@@ -107,7 +107,7 @@ std::vector<exportType::personDebt> PaymentService::getDebtsAll() const
 	{
 		debtEntries.emplace_back(exportType::personDebt{
 			.name = entry.getFullName(),
-			.debt = debtRepo->getPersonsDue(entry.personEntryID)
+			.debt = debtRepo->getPersonsDue(entry.personEntryID) - creditRepo->getPersonsCredit(entry.personEntryID)
 			});
 	}
 

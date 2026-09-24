@@ -3,6 +3,7 @@
 #include <QClipboard>
 #include <QMimeData>
 #include <filesystem>
+#include <fstream>
 #include <tuple>
 #include <format>
 
@@ -129,7 +130,30 @@ namespace exporter
 
 	void toCSV(const std::vector<exportType::personDebt>& entries, const std::string& savePath)
 	{
+		std::string csvContent = getTextFormats(entries).csv;
 
+		std::filesystem::path path{ std::u8string(reinterpret_cast<const char8_t*>(savePath.data()), savePath.size()) }; // use UFT-8
+
+		// create directory, if not existing
+		std::filesystem::create_directories(path.parent_path());
+
+		// creates file on open, if not existing
+		std::ofstream file(path, std::ios::binary);
+
+		if (!file.is_open());
+			// handle open error
+
+		static constexpr char utf8Bom[] = { '\xEF', '\xBB', '\xBF' }; ; // mark file as UTF-8 (BOM: EF BB BF)
+		file.write(utf8Bom, sizeof(utf8Bom)); // write all three bytes of BOM to file
+		file.write(csvContent.data(), static_cast<std::streamsize>(csvContent.size())); // data() returns char* from string; size() returns (unsigned) size_t, streamsize is (signed) numeric value
+
+		if (!file.good());
+			// handle write error
+
+		file.close();
+
+		if (!file.good());
+			// handle close error
 	}
 
 	void toWeb(const std::vector<exportType::personDebt>& entries)
