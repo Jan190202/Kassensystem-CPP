@@ -1,7 +1,10 @@
 #include "Exporter.h"
+#include "qtutils/QtConversions.h"
 #include <QApplication>
 #include <QClipboard>
 #include <QMimeData>
+#include <QImage>
+#include <QPainter>
 #include <filesystem>
 #include <fstream>
 #include <tuple>
@@ -16,6 +19,11 @@ namespace exporter
 		struct Formats
 		{
 			std::string html, csv, tsv;
+		};
+
+		enum class Theme
+		{
+			dark, bright
 		};
 
 		// csv field: wrap in quotes if it contains a comma, quote, or newline; double any internal quotes.
@@ -114,16 +122,68 @@ namespace exporter
 
 			return formats;
 		}
+	
+		QImage renderCellsAsImage(const std::vector<exportType::personDebt>& entries, Theme theme)
+		{		
+			int scale = 3;
+
+			constexpr int rowHeight = 28;
+			constexpr int colWidths[] = { 150, 100 };
+			constexpr int totalWidth = colWidths[0] + colWidths[1];
+			const int totalHeight = rowHeight * (static_cast<int>(entries.size()) + 1);
+
+			QImage image(QSize(totalWidth, totalHeight) * scale, QImage::Format_ARGB32);
+			image.setDevicePixelRatio(scale);
+			image.fill(theme == Theme::bright ? Qt::white : Qt::black);
+
+			QPainter painter(&image);
+			painter.setRenderHint(QPainter::Antialiasing);
+			painter.setRenderHint(QPainter::TextAntialiasing);
+
+			painter.setPen(theme == Theme::bright ? Qt::black : Qt::white);
+			QFont font = painter.font();
+			font.setPointSize(10);
+			painter.setFont(font);
+
+			auto drawRow = [&](int rowIndex, const QString& col1, const QString& col2, bool bold)
+				{
+					QFont f = painter.font();
+					f.setBold(bold);
+					painter.setFont(f);
+
+					const int y = rowIndex * rowHeight;
+					QRect cell1(0, y, colWidths[0], rowHeight);
+					QRect cell2(colWidths[0], y, colWidths[1], rowHeight);
+
+					painter.drawRect(cell1);
+					painter.drawRect(cell2);
+					painter.drawText(cell1.adjusted(6, 0, -6, 0), Qt::AlignVCenter | Qt::AlignLeft, col1);
+					painter.drawText(cell2.adjusted(6, 0, -6, 0), Qt::AlignVCenter | Qt::AlignRight, col2);
+				};
+
+			drawRow(0, "Name", "Ausstand ("+ QtUtils::eurSymbol() + ")", true);
+
+			int row = 1;
+			for (const auto& entry : entries)
+			{
+				drawRow(row++, QString::fromStdString(entry.name), QString::fromLatin1(formatDebt(entry.debt)), false);
+			}
+
+			painter.end();
+			return image;
+		}
 	}
 
 	void toClipboard(const std::vector<exportType::personDebt>& entries)
 	{
 		Formats formats = getTextFormats(entries);
+		QImage image = renderCellsAsImage(entries, Theme::dark);
 
 		auto* data = new QMimeData();
 		data->setText(QString::fromStdString(formats.tsv));
 		data->setHtml(QString::fromStdString(formats.html));
 		data->setData("text/csv", QByteArray::fromStdString(formats.csv));
+		data->setImageData(image);
 
 		QApplication::clipboard()->setMimeData(data);
 	}
