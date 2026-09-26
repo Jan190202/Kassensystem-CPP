@@ -7,6 +7,7 @@
 #include <string>
 #include <ostream>
 #include <cstdint>
+#include <variant>
 
 namespace entry
 {
@@ -362,4 +363,26 @@ struct PriceList
 		out.nospace() << QString::fromStdString(oss.str());
 		return out;
 	}
+};
+
+class RegisterDate
+{
+public:
+	enum class SpecialDate
+	{
+		Unknown, Previous, Subsequent
+	};
+
+	RegisterDate() = delete;
+	RegisterDate(QDate date);
+	RegisterDate(SpecialDate date);
+
+	bool isSpecial() const;
+
+	friend std::ostream& operator<<(std::ostream&, const RegisterDate& date);
+
+	friend QDebug operator<<(QDebug out, const RegisterDate& date);
+
+private:
+	std::variant<QDate, SpecialDate> date;
 };
