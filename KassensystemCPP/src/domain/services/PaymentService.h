@@ -9,11 +9,11 @@ class PaymentService
 public:
 	PaymentService(const RepositoryBundle& repoBundle);
 	void addPayment(const request::Payment& request);
-	int64_t addCredit(int64_t personEntryID, double amount, const QDate& date, const std::string& description);
+	int64_t addCredit(int64_t personEntryID, double amount, const RegisterDate& date, const std::string& description);
 	std::vector<exportType::personDebt> getDebtsAll() const;
 private:
 	double addPaymentAllocation(int64_t paymentEntryID, int64_t personEntryID, double amount);
-	int64_t addTip(int64_t personEntryID, double amount, const QDate& date);
+	int64_t addTip(int64_t personEntryID, double amount, const RegisterDate& date);
 	
 	PaymentRepository* paymentRepo;
 	CreditRepository* creditRepo;

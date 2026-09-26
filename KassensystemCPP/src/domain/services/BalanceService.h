@@ -23,7 +23,7 @@ public:
 	registerFinancials::Report getReport() const;
 		
 private:
-	int64_t addCredit(int64_t personEntryID, double amount, const QDate& date, const std::string& description);
+	int64_t addCredit(int64_t personEntryID, double amount, const RegisterDate& date, const std::string& description);
 	double addShareSettlementAllocation(int64_t settlementEntryID, double amount);
 
 	BalanceRepository* balanceRepo;

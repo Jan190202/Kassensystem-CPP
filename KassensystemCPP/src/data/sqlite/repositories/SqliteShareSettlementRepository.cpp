@@ -15,7 +15,7 @@ int64_t SqliteShareSettlementRepository::addShareSettlementEntry(const entry::Sh
 		"VALUES (:date, :amount) "
 		"RETURNING ID "
 	);
-	query.bindValue(":date", entry.date.toString(Qt::ISODate));
+	query.bindValue(":date", entry.dateBooked.date().toString(Qt::ISODate));
 	query.bindValue(":amount", entry.amount);
 
 	if (query.exec())

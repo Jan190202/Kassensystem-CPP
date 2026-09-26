@@ -16,7 +16,7 @@ int64_t SqliteCreditRepository::addCreditEntry(const entry::Credit& entry)
 		"RETURNING ID"
 	);
 	query.bindValue(":personID", entry.personEntryID);
-	query.bindValue(":date", entry.date.toString(Qt::ISODate));
+	query.bindValue(":date", entry.dateBooked.date().toString(Qt::ISODate));
 	query.bindValue(":amount", entry.amount);
 	query.bindValue(":description", QString::fromStdString(entry.description));
 

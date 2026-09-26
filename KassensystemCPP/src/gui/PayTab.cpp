@@ -334,7 +334,7 @@ void PayTab::apply()
 {
 	request::Payment request{
 		.personEntryID = nameSelect->currentData().toLongLong(),
-		.date = QDate::currentDate(),
+		.dateBooked = QDate::currentDate(),
 		.amount = paymentSpinBox->value(),
 		.overpaymentType = btnSurplusToCredit->isChecked() ? OverpaymentDisposition::Credit : OverpaymentDisposition::Tip
 	};
@@ -356,7 +356,7 @@ void PayTab::redeemCredit(int64_t personEntryID)
 		entry::Credit{
 			.creditEntryID = 0,
 			.personEntryID = personEntryID,
-			.date = QDate::currentDate(),
+			.dateBooked = QDate::currentDate(),
 			.amount = -redemptionAmount,
 			.description = "Einlösung von bestehendem Guthaben"
 		});
@@ -364,7 +364,7 @@ void PayTab::redeemCredit(int64_t personEntryID)
 	paymentService.addPayment(
 		request::Payment{
 		.personEntryID = personEntryID,
-		.date = QDate::currentDate(),
+		.dateBooked = QDate::currentDate(),
 		.amount = redemptionAmount,
 		.overpaymentType = OverpaymentDisposition::Credit
 		});
@@ -445,7 +445,7 @@ void PayTab::refreshTable(int64_t personEntryID)
 	// sort by date
 	std::sort(drEntries.begin(), drEntries.end(), [](const entry::Outstanding& a, const entry::Outstanding& b)
 		{
-			return a.date > b.date;
+			return a.dateBooked > b.dateBooked;
 		});
 
 	// create items and add them to table
@@ -479,7 +479,13 @@ void PayTab::refreshTable(int64_t personEntryID)
 			}
 		}
 
-		QTableWidgetItem* dateItem = new QTableWidgetItem(QtUtils::extractMonth(drEntry.date) + " " + drEntry.date.toString("yy"));
+		QString dateString;
+		if (!drEntry.dateBooked.isSpecial())
+			dateString = QtUtils::extractMonth(drEntry.dateBooked.date()) + " " + drEntry.dateBooked.date().toString("yy");
+		else
+			dateString = drEntry.dateBooked.toQString();
+
+		QTableWidgetItem* dateItem = new QTableWidgetItem(dateString);
 		QTableWidgetItem* infoItem = new QTableWidgetItem(QString::number(drEntry.amount-drEntry.remaining, 'f', 2) + QString::fromStdString(" / ") + QString::number(drEntry.amount, 'f', 2));
 
 		QTableWidgetItem* beer05Item;

@@ -15,7 +15,7 @@ int64_t SqliteDebtRepository::addDebtEntry(const entry::Debt& entry)
 		"RETURNING ID"
 	);
 	query.bindValue(":personID", entry.personEntryID);
-	query.bindValue(":date", entry.date.toString(Qt::ISODate));
+	query.bindValue(":date", entry.dateBooked.date().toString(Qt::ISODate));
 	query.bindValue(":amount", entry.amount);
 	query.bindValue(":foreignShare", entry.foreignShare);
 	
@@ -223,7 +223,7 @@ entry::Outstanding SqliteDebtRepository::getOutstandingEntryFromQuery(const QSql
 {
 	return entry::Outstanding{
 		.debtEntryID = query.value("ID").toLongLong(),
-		.date = query.value("date").toDate(),
+		.dateBooked = query.value("date").toDate(),
 		.amount = query.value("amount").toDouble(),
 		.remaining = query.value("remaining").toDouble()
 	};

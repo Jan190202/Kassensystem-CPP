@@ -1,12 +1,11 @@
 #pragma once
-
 #include <QPushButton>
 #include <string>
 #include <variant>
 
 enum class BtnIndex
 {
-	AddEarning, AddSpending
+	AddEarning, AddSpending // TBD: to lower
 };
 
 struct LowerButtonBundle

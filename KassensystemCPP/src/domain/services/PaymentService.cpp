@@ -12,7 +12,7 @@ void PaymentService::addPayment(const request::Payment& request)
 	entry::Payment entry{
 		.paymentEntryID = 0,
 		.personEntryID = request.personEntryID,
-		.date = request.date,
+		.dateBooked = request.dateBooked,
 		.amount = request.amount,
 		.overpaymentType = request.overpaymentType
 	};
@@ -25,10 +25,10 @@ void PaymentService::addPayment(const request::Payment& request)
 		switch (entry.overpaymentType)
 		{
 		case OverpaymentDisposition::Credit:
-			addCredit(entry.personEntryID, overpaymentAmount, entry.date, "Guthaben durch Einzahlung/Überbezahlung");
+			addCredit(entry.personEntryID, overpaymentAmount, entry.dateBooked, "Guthaben durch Einzahlung/Überbezahlung");
 			break;
 		case OverpaymentDisposition::Tip:
-			addTip(entry.personEntryID, overpaymentAmount, entry.date);
+			addTip(entry.personEntryID, overpaymentAmount, entry.dateBooked);
 			break;
 		}
 	}
@@ -41,7 +41,7 @@ double PaymentService::addPaymentAllocation(int64_t paymentEntryID, int64_t pers
 	// sort be reverse date so older outstanding debts are paid first
 	std::sort(remainingDebtEntries.begin(), remainingDebtEntries.end(), [](const entry::Outstanding& a, const entry::Outstanding& b)
 		{
-			return a.date < b.date;
+			return a.dateBooked < b.dateBooked;
 		});
 
 	double amountLeft = amount;
@@ -65,7 +65,7 @@ double PaymentService::addPaymentAllocation(int64_t paymentEntryID, int64_t pers
 	return amountLeft;
 }
 
-int64_t PaymentService::addCredit(int64_t personEntryID, double amount, const QDate& date, const std::string& description)
+int64_t PaymentService::addCredit(int64_t personEntryID, double amount, const RegisterDate& date, const std::string& description)
 {
 	// potential validity check here
 	
@@ -73,13 +73,14 @@ int64_t PaymentService::addCredit(int64_t personEntryID, double amount, const QD
 		entry::Credit{ 
 			.creditEntryID = 0, 
 			.personEntryID = personEntryID, 
-			.date = date, 
+			.dateBooked = date, 
+			.dateAdded = QDate::currentDate(),
 			.amount = amount, 
 			.description = description
 		});
 }
 
-int64_t PaymentService::addTip(int64_t personEntryID, double amount, const QDate& date)
+int64_t PaymentService::addTip(int64_t personEntryID, double amount, const RegisterDate& date)
 {
 	// potential validity check here
 	

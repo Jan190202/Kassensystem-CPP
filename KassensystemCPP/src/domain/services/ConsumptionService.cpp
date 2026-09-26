@@ -53,7 +53,7 @@ void ConsumptionService::addConsumption(const request::Consumption& request)
 	}
 
 	// add debt and consumption entry
-	entry::Debt dEntry{ .debtEntryID = 0, .personEntryID = personEntryID, .date = request.date, .amount = amount};
+	entry::Debt dEntry{ .debtEntryID = 0, .personEntryID = personEntryID, .dateBooked = request.dateBooked, .dateAdded = QDate::currentDate(), .amount = amount};
 	int64_t dEntryID = debtRepo->addDebtEntry(dEntry);
 
 	entry::Consumption cEntry{ .consumptionEntryID = 0, .debtEntryID = dEntryID, .nBeer05 = request.nBeer05 , .nBeer04 = request.nBeer04, .nSoftdrinks = request.nSoftdrinks, .nWater = request.nWater, .otherExpense = request.otherExpense };
@@ -194,7 +194,7 @@ std::expected<void, validityError::Code> ConsumptionService::isRequestValid(cons
 		return std::unexpected(Consumption::EmptyConsumptionEntries);
 
 	// check date <= today
-	if (request.date > QDate::currentDate()) 
+	if (request.dateBooked > QDate::currentDate()) 
 		return std::unexpected(Date::DateLaterThanCurrentDate);
 
 	// check name format

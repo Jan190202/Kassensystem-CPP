@@ -16,7 +16,7 @@ int64_t SqlitePaymentRepository::addPaymentEntry(const entry::Payment& entry)
 		"RETURNING ID "
 	);
 	query.bindValue(":personID", entry.personEntryID);
-	query.bindValue(":date", entry.date.toString(Qt::ISODate));
+	query.bindValue(":date", entry.dateBooked.date().toString(Qt::ISODate));
 	query.bindValue(":amount", entry.amount);
 	query.bindValue(":overpaymentType", static_cast<int>(entry.overpaymentType));
 	

@@ -9,6 +9,38 @@
 #include <cstdint>
 #include <variant>
 
+class RegisterDate
+{
+public:
+	enum class Special
+	{
+		unknown, previous, subsequent
+	};
+
+	RegisterDate() = delete;
+	RegisterDate(QDate date);
+	RegisterDate(Special date);
+
+	bool isSpecial() const;
+	Special special() const;
+	QDate date() const;
+
+	std::string toString() const;
+	QString toQString() const;
+
+	bool operator<(const RegisterDate& regDate) const;
+	bool operator<=(const RegisterDate& regDate) const;
+	bool operator>(const RegisterDate& regDate) const;
+	bool operator>=(const RegisterDate& regDate) const;
+
+	friend std::ostream& operator<<(std::ostream&, const RegisterDate& regDate);
+
+	friend QDebug operator<<(QDebug out, const RegisterDate& regDate);
+
+private:
+	std::variant<QDate, Special> data;
+};
+
 namespace entry
 {
 	struct Person
@@ -45,7 +77,7 @@ namespace entry
 		BalanceType type;
 		std::string description;
 		double amount;
-		QDate dateBooked;
+		RegisterDate dateBooked;
 		QDate dateAdded;
 		std::string comment;
 		std::optional<int64_t> personEntryID;
@@ -56,7 +88,7 @@ namespace entry
 				<< "type: " << static_cast<int>(entry.type) << ", "
 				<< "description: " << entry.description << ", "
 				<< "amount: " << entry.amount << ", "
-				<< "dateBooked: " << entry.dateBooked.toString("dd.MM.yyyy").toStdString() << ", "
+				<< "dateBooked: " << entry.dateBooked << ", "
 				<< "dateAdded: " << entry.dateAdded.toString("dd.MM.yyyy").toStdString() << ", "
 				<< "comment: " << entry.comment << ", "
 				<< "personEntryID: " << (entry.personEntryID.has_value() ? std::to_string(entry.personEntryID.value()) : "NULL");
@@ -106,7 +138,8 @@ namespace entry
 	{
 		int64_t debtEntryID;
 		int64_t personEntryID;
-		QDate date;
+		RegisterDate dateBooked;
+		QDate dateAdded;
 		double amount;
 		double foreignShare = 0.85;
 
@@ -114,7 +147,8 @@ namespace entry
 		{
 			out << "debtEntryID: " << entry.debtEntryID << ", "
 				<< "personEntryID: " << entry.personEntryID << ", "
-				<< "date: " << entry.date.toString("dd.MM.yyyy").toStdString() << ", "
+				<< "dateBooked: " << entry.dateBooked << ", "
+				<< "dateAdded: " << entry.dateAdded.toString("dd.MM.yyyy").toStdString() << ", "
 				<< "amount: " << entry.amount << ", "
 				<< "foreignShare: " << entry.foreignShare;
 
@@ -133,14 +167,14 @@ namespace entry
 	struct Outstanding
 	{
 		int64_t debtEntryID;
-		QDate date;
+		RegisterDate dateBooked;
 		double amount;
 		double remaining;
 
 		friend std::ostream& operator<<(std::ostream& out, const Outstanding& entry)
 		{
 			out << "debtEntryID: " << entry.debtEntryID << ", "
-				<< "date: " << entry.date.toString("dd.MM.yyyy").toStdString() << ", "
+				<< "dateBooked: " << entry.dateBooked << ", "
 				<< "amount: " << entry.amount << ", "
 				<< "remaining: " << entry.remaining;
 
@@ -160,7 +194,8 @@ namespace entry
 	{
 		int64_t paymentEntryID;
 		int64_t personEntryID;
-		QDate date;
+		RegisterDate dateBooked;
+		QDate dateAdded;
 		double amount;
 		OverpaymentDisposition overpaymentType;
 
@@ -168,7 +203,8 @@ namespace entry
 		{
 			out << "paymentEntryID: " << entry.paymentEntryID << ", "
 				<< "personEntryID: " << entry.personEntryID << ", "
-				<< "date: " << entry.date.toString("dd.MM.yyyy").toStdString() << ", "
+				<< "dateBooked: " << entry.dateBooked << ", "
+				<< "dateAdded: " << entry.dateAdded.toString("dd.MM.yyyy").toStdString() << ", "
 				<< "amount: " << entry.amount << ", "
 				<< "overpaymentType: " << static_cast<int>(entry.overpaymentType);
 
@@ -214,7 +250,8 @@ namespace entry
 	{
 		int64_t creditEntryID;
 		int64_t personEntryID;
-		QDate date;
+		RegisterDate dateBooked;
+		QDate dateAdded;
 		double amount;
 		std::string description;
 
@@ -222,7 +259,8 @@ namespace entry
 		{
 			out << "creditEntryID: " << entry.creditEntryID << ", "
 				<< "personEntryID: " << entry.personEntryID << ", "
-				<< "date: " << entry.date.toString("dd.MM.yyyy").toStdString() << ", "
+				<< "dateBooked: " << entry.dateBooked << ", "
+				<< "dateAdded: " << entry.dateAdded.toString("dd.MM.yyyy").toStdString() << ", "
 				<< "amount: " << entry.amount << ", "
 				<< "description: " << entry.description;
 
@@ -241,13 +279,15 @@ namespace entry
 	struct ShareSettlement
 	{
 		int64_t shareSettlementEntryID;
-		QDate date;
+		RegisterDate dateBooked;
+		QDate dateAdded;
 		double amount;
 
 		friend std::ostream& operator<<(std::ostream& out, const ShareSettlement& entry)
 		{
 			out << "settlementEntryID: " << entry.shareSettlementEntryID << ", "
-				<< "date: " << entry.date.toString("dd.MM.yyyy").toStdString() << ", "
+				<< "dateBooked: " << entry.dateBooked << ", "
+				<< "dateAdded: " << entry.dateAdded.toString("dd.MM.yyyy").toStdString() << ", "
 				<< "amount: " << entry.amount;
 
 			return out;
@@ -363,26 +403,4 @@ struct PriceList
 		out.nospace() << QString::fromStdString(oss.str());
 		return out;
 	}
-};
-
-class RegisterDate
-{
-public:
-	enum class SpecialDate
-	{
-		Unknown, Previous, Subsequent
-	};
-
-	RegisterDate() = delete;
-	RegisterDate(QDate date);
-	RegisterDate(SpecialDate date);
-
-	bool isSpecial() const;
-
-	friend std::ostream& operator<<(std::ostream&, const RegisterDate& date);
-
-	friend QDebug operator<<(QDebug out, const RegisterDate& date);
-
-private:
-	std::variant<QDate, SpecialDate> date;
 };

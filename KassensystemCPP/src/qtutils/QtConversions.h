@@ -7,7 +7,7 @@
 #include <QObject>
 #include <QDate>
 
-namespace QtUtils
+namespace QtUtils // TBD: to lower
 {
 	QList<QString> strVecToQStrList(const std::vector<std::string>& vec);
 

@@ -11,7 +11,7 @@ int64_t BalanceService::addBalanceItem(const request::Balance& request)
 		.type = request.type,
 		.description = request.description,
 		.amount = request.amount,
-		.dateBooked = request.date,
+		.dateBooked = request.dateBooked,
 		.dateAdded = QDate::currentDate(),
 		.comment = request.comment,
 		.personEntryID = request.coveringpersonEntryID
@@ -25,7 +25,7 @@ int64_t BalanceService::addBalanceItem(const request::Balance& request)
 	return balanceRepo->addBalanceEntry(entry);
 }
 
-int64_t BalanceService::addCredit(int64_t personEntryID, double amount, const QDate& date, const std::string& description)
+int64_t BalanceService::addCredit(int64_t personEntryID, double amount, const RegisterDate& date, const std::string& description)
 {
 	// potential validity check here
 	
@@ -33,7 +33,8 @@ int64_t BalanceService::addCredit(int64_t personEntryID, double amount, const QD
 		entry::Credit{ 
 			.creditEntryID = 0, 
 			.personEntryID = personEntryID, 
-			.date = date, 
+			.dateBooked = date, 
+			.dateAdded = QDate::currentDate(),
 			.amount = amount, 
 			.description = description 
 		});
@@ -143,7 +144,8 @@ AddSettlementException BalanceService::addShareSettlement(request::ShareSettleme
 
 	entry::ShareSettlement entry{
 		.shareSettlementEntryID = 0,
-		.date = QDate::currentDate(),
+		.dateBooked = QDate::currentDate(), // TBD: get booked date in GUI optionally
+		.dateAdded = QDate::currentDate(),
 		.amount = request.amount,
 	};
 

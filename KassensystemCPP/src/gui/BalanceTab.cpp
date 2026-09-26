@@ -189,7 +189,7 @@ void BalanceTab::addEntry(BtnIndex mode)
 			.type = mode==BtnIndex::AddEarning ? BalanceType::Earning : BalanceType::Spending,
 			.description = inputs.description,
 			.amount = inputs.amount,
-			.date = inputs.date,
+			.dateBooked = inputs.date,
 			.comment = inputs.comment,
 			.coveringpersonEntryID = inputs.coveringpersonEntryID
 		});
@@ -242,7 +242,7 @@ void BalanceTab::refreshTables(const registerFinancials::Report& report) const
 
 			QTableWidgetItem* descriptionItem = new QTableWidgetItem(QString::fromStdString(bEntry.description));
 			QTableWidgetItem* amountItem = new QTableWidgetItem(QString::number(bEntry.amount, 'f', 2));
-			QTableWidgetItem* dateItem = new QTableWidgetItem(bEntry.dateBooked.toString("dd.MM.yyyy"));
+			QTableWidgetItem* dateItem = new QTableWidgetItem(bEntry.dateBooked.toQString());
 
 			//descriptionItem->setTextAlignment(Qt::AlignHCenter | Qt::AlignVCenter);
 			//amountItem->setTextAlignment(Qt::AlignHCenter | Qt::AlignVCenter);

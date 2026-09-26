@@ -1,6 +1,8 @@
 #pragma once
 #include <cstdint>
 
+// TBD: to lower of all enum fields
+
 enum class BalanceType : uint8_t
 {
 	None = 0,			// 0000.0000
