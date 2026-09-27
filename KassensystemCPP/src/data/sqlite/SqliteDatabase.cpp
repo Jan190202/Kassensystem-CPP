@@ -14,14 +14,14 @@ namespace sqliteDatabase
 		{
 			/*
 			* Setup tables for blank database:
-			*	- Balance					(ID, balanceType, description, amount, dateBooked, dateAdded, comment personID)
+			*	- Balance					(ID, balanceType, description, amount, dateBooked, dateBookedSpecial, dateAdded, comment personID)
 			*	- Consumption				(ID, debtID, nBeer05, nBeer04, nSoftdrinks, nWater, otherExpense)
-			*	- Credit					(ID, personID, date, amount, description)
-			*	- Debt						(ID, personID, date, amount, foreignShare)
-			*	- Payment					(ID, personID, date, amount, overpaymentType)
+			*	- Credit					(ID, personID, dateBooked, dateBookedSpecial, dateAdded, amount, description)
+			*	- Debt						(ID, personID, dateBooked, dateBookedSpecial, dateAdded, amount, foreignShare)
+			*	- Payment					(ID, personID, dateBooked, dateBookedSpecial, dateAdded, amount, overpaymentType)
 			*	- PaymentAllocation			(ID, debtID, paymentID, amount)
 			*	- Person					(ID, firstName, lastName, nickName, info)
-			*	- ShareSettlement			(ID, date, amount)
+			*	- ShareSettlement			(ID, dateBooked, dateBookedSpecial, dateAdded, amount)
 			*	- ShareSettlementAllocation (ID, debtID, shareSettlementID, amount)
 			*/
 
@@ -45,7 +45,8 @@ namespace sqliteDatabase
 				"type			INTEGER NOT NULL,"
 				"description	TEXT,"
 				"amount			REAL NOT NULL,"
-				"dateBooked		TEXT NOT NULL,"
+				"dateBooked		TEXT,"
+				"dateBookedSpecial		INTEGER,"
 				"dateAdded		TEXT NOT NULL,"
 				"comment		TEXT,"
 				"personID		INTEGER REFERENCES Person(ID)"
@@ -56,7 +57,9 @@ namespace sqliteDatabase
 				"CREATE TABLE Debt ("
 				"ID				INTEGER PRIMARY KEY,"
 				"personID		INTEGER NOT NULL REFERENCES Person(ID),"
-				"date			TEXT NOT NULL,"
+				"dateBooked		TEXT,"
+				"dateBookedSpecial		INTEGER,"
+				"dateAdded		TEXT NOT NULL,"
 				"amount			REAL NOT NULL,"
 				"foreignShare	REAL"
 				") STRICT"
@@ -78,7 +81,9 @@ namespace sqliteDatabase
 				"CREATE TABLE Credit ("
 				"ID				INTEGER PRIMARY KEY,"
 				"personID		INTEGER NOT NULL REFERENCES Person(ID),"
-				"date			TEXT NOT NULL,"
+				"dateBooked		TEXT,"
+				"dateBookedSpecial		INTEGER,"
+				"dateAdded		TEXT NOT NULL,"
 				"amount			REAL NOT NULL,"
 				"description	TEXT"
 				") STRICT"
@@ -88,7 +93,9 @@ namespace sqliteDatabase
 				"CREATE TABLE Payment ("
 				"ID					INTEGER PRIMARY KEY,"
 				"personID			INTEGER NOT NULL REFERENCES Person(ID),"
-				"date				TEXT NOT NULL,"
+				"dateBooked		TEXT,"
+				"dateBookedSpecial		INTEGER,"
+				"dateAdded		TEXT NOT NULL,"
 				"amount				REAL NOT NULL,"
 				"overpaymentType	INTEGER NOT NULL"
 				") STRICT"
@@ -105,9 +112,11 @@ namespace sqliteDatabase
 
 			creationQueries.emplace_back(
 				"CREATE TABLE ShareSettlement ("
-				"ID		INTEGER PRIMARY KEY,"
-				"date	TEXT NOT NULL,"
-				"amount	REAL NOT NULL"
+				"ID				INTEGER PRIMARY KEY,"
+				"dateBooked		TEXT,"
+				"dateBookedSpecial		INTEGER,"
+				"dateAdded		TEXT NOT NULL,"
+				"amount			REAL NOT NULL"
 				") STRICT"
 			);
 

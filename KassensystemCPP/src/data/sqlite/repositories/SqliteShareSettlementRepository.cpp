@@ -8,14 +8,22 @@
 
 int64_t SqliteShareSettlementRepository::addShareSettlementEntry(const entry::ShareSettlement& entry)
 {
+	bool isBookedSpecial = entry.dateBooked.isSpecial();
+	
 	QSqlQuery query;
 	query.prepare(
 		"INSERT INTO ShareSettlement "
-		"(date, amount) "
-		"VALUES (:date, :amount) "
+		"(" + QString(isBookedSpecial ? "dateBookedSpecial" : "dateBooked") + ", dateAdded, amount) "
+		"VALUES (:dateBookedVar, :dateAdded, :amount) "
 		"RETURNING ID "
 	);
-	query.bindValue(":date", entry.dateBooked.date().toString(Qt::ISODate));
+
+	if (isBookedSpecial)
+		query.bindValue(":dateBookeVar", static_cast<int>(entry.dateBooked.special()));
+	else
+		query.bindValue(":dateBookeVar", entry.dateBooked.date().toString(Qt::ISODate));
+
+	query.bindValue(":dateAdded", entry.dateAdded.toString(Qt::ISODate));
 	query.bindValue(":amount", entry.amount);
 
 	if (query.exec())
