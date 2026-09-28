@@ -22,7 +22,7 @@ public:
 	{
 		std::string description;
 		double amount;
-		QDate date;
+		RegisterDate date;
 		std::string comment;
 		std::optional<int64_t> coveringpersonEntryID;
 	};
@@ -35,6 +35,8 @@ private:
 	QLineEdit*		edtDescription;
 	QDoubleSpinBox*	edtCost;
 	QDateEdit*		edtDate;
+	QCheckBox*		edtIsSpecial;
+	QComboBox*		edtSpecial;
 	QPlainTextEdit* edtComment;
 	QCheckBox*		edtIsCovered;
 	QComboBox*		edtCoveringPerson;

@@ -98,7 +98,6 @@ int main(int argc, char* argv[])
 
 /*
 * Ideas:
-* - Add "Unknown Date" and "Initialization" date option to consumptions (maybe also debt, sharesettlement, etc.)
 * - clear up date handling: use dateBooked in requests, add dateAdded (today) in entry, clean up initialization (GUI <-> Services)
 * - add new tab for manual database changes (dropDown for which repository + QTableView) with live SQL statement support for filtering / changing
 * - general architecture:

@@ -485,6 +485,11 @@ void PayTab::refreshTable(int64_t personEntryID)
 		else
 			dateString = drEntry.dateBooked.toQString();
 
+		qDebug() << "dateString:" << dateString;
+		qDebug() << "dateString:" << drEntry.dateBooked.toQString();
+		qDebug() << "dateString:" << drEntry.dateBooked.toString();
+		qDebug() << "isSpecial:" << drEntry.dateBooked.isSpecial();
+
 		QTableWidgetItem* dateItem = new QTableWidgetItem(dateString);
 		QTableWidgetItem* infoItem = new QTableWidgetItem(QString::number(drEntry.amount-drEntry.remaining, 'f', 2) + QString::fromStdString(" / ") + QString::number(drEntry.amount, 'f', 2));
 

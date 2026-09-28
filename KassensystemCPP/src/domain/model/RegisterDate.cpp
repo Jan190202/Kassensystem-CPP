@@ -17,11 +17,13 @@ bool RegisterDate::isSpecial() const
 
 RegisterDate::Special RegisterDate::special() const
 {
+	Q_ASSERT(isSpecial());
 	return std::get<Special>(this->data);
 }
 
 QDate RegisterDate::date() const
 {
+	Q_ASSERT(!isSpecial());
 	return std::get<QDate>(this->data);
 }
 

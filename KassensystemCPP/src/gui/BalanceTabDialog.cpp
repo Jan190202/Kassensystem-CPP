@@ -51,6 +51,34 @@ BalanceTabDialog::BalanceTabDialog(BtnIndex mode, std::vector<entry::Person>& pe
 	edtDate->setDisplayFormat(QStringLiteral("dd MMMM yy"));
 	edtDate->setCalendarPopup(true);
 
+	auto* vLine = new QFrame(this);
+	vLine->setFrameShape(QFrame::VLine);
+	vLine->setFrameShadow(QFrame::Sunken);
+
+	edtIsSpecial = new QCheckBox("Sonstiger Zeitraum:", this);
+	edtIsSpecial->setChecked(false);
+
+	std::map<QString, RegisterDate::Special> specialMap =
+	{
+		{"Vergangenheit", RegisterDate::Special::previous},
+		{"Unbekannt", RegisterDate::Special::unknown},
+		{"Zukunft", RegisterDate::Special::subsequent}
+	};
+	edtSpecial = new QComboBox(this);
+	for (const auto& [specialStr, specialData] : specialMap)
+	{
+		edtSpecial->insertItem(0, specialStr, QVariant(static_cast<int>(specialData)));
+	}
+	edtSpecial->setCurrentIndex(edtSpecial->findText("Unbekannt"));
+	edtSpecial->setEnabled(false);
+
+	auto* dateLayout = new QHBoxLayout();
+	dateLayout->addWidget(edtDate, 3);
+	dateLayout->addWidget(vLine);
+	dateLayout->addWidget(edtIsSpecial, 1, Qt::AlignRight);
+	dateLayout->addWidget(edtSpecial, 1);
+
+
 	edtComment = new QPlainTextEdit();
 	edtComment->setPlaceholderText(QStringLiteral("optional"));
 	edtComment->setFixedHeight(70);
@@ -73,7 +101,7 @@ BalanceTabDialog::BalanceTabDialog(BtnIndex mode, std::vector<entry::Person>& pe
 
 	form->addRow(lblDescription, edtDescription);
 	form->addRow(lblCost, edtCost);
-	form->addRow(lblDate, edtDate);
+	form->addRow(lblDate, dateLayout);
 	form->addRow(lblComment, edtComment);
 
 
@@ -140,6 +168,19 @@ BalanceTabDialog::BalanceTabDialog(BtnIndex mode, std::vector<entry::Person>& pe
 
 	connect(btnOK, &QPushButton::clicked, this, &QDialog::accept);
 	connect(btnCancel, &QPushButton::clicked, this, &QDialog::reject);
+	connect(edtIsSpecial, &QCheckBox::checkStateChanged, this, [&](Qt::CheckState state) {
+		switch (state)
+		{
+		case Qt::Checked:
+			edtDate->setEnabled(false);
+			edtSpecial->setEnabled(true);
+			break;
+		case Qt::Unchecked:
+			edtDate->setEnabled(true);
+			edtSpecial->setEnabled(false);
+			break;
+		}
+		});
 
 	setMinimumWidth(520);
 	adjustSize();
@@ -150,7 +191,9 @@ BalanceTabDialog::inputs BalanceTabDialog::getInputs() const
 	return BalanceTabDialog::inputs{
 		.description = edtDescription->text().toStdString(),
 		.amount = edtCost->value(),
-		.date = edtDate->date(),
+		.date = edtIsSpecial->isChecked() ? 
+			RegisterDate{static_cast<RegisterDate::Special>(edtSpecial->currentData().toInt())} :
+			RegisterDate{edtDate->date()},
 		.comment = edtComment->toPlainText().toStdString(),
 		.coveringpersonEntryID = edtIsCovered->isChecked() ? 
 			std::optional<int64_t>(edtCoveringPerson->currentData().toLongLong()) : 
