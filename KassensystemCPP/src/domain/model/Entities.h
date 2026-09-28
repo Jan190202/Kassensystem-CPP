@@ -20,7 +20,7 @@ public:
 	// needed for SQL clause construction as long as static reflections aren't possible
 	static constexpr std::array<Special, 3> allSpecials{ Special::previous, Special::unknown, Special::subsequent };
 
-	RegisterDate() = delete;
+	RegisterDate() = default;
 	RegisterDate(QDate date);
 	RegisterDate(Special date);
 

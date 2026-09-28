@@ -11,6 +11,8 @@ class AddTabEntry;
 class QDateEdit;
 class QGridLayout;
 class QPushButton;
+class QComboBox;
+class QCheckBox;
 class QVBoxLayout;
 
 class AddTab : public BaseTab
@@ -26,6 +28,8 @@ private slots:
 
 private:
 	QDateEdit* monthSelection = nullptr;
+	QCheckBox* specialDateCheck = nullptr;
+	QComboBox* specialDateSelection = nullptr;
 	std::vector<AddTabEntry*> entries;
 
 	QPushButton* btnAddEntry = nullptr;

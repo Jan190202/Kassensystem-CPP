@@ -4,6 +4,8 @@
 #include "qtutils/QtConversions.h"
 #include <QDate>
 #include <QDateEdit>
+#include <QCheckBox>
+#include <QComboBox>
 #include <QGridLayout>
 #include <QHBoxLayout>
 #include <QLabel>
@@ -19,6 +21,8 @@
 #include <QTimer>
 #include <algorithm>
 #include <string>
+#include <map>
+#include <ranges>
 
 AddTab::AddTab(const LowerButtonBundle& lowerButtons, ConsumptionService& consumptionService, PersonRepository* personRepo, QWidget* parent) : lowerButtons(lowerButtons), consumptionService(consumptionService), personRepo(personRepo), BaseTab(parent) {}
 
@@ -28,6 +32,23 @@ void AddTab::initialize()
 	monthSelection->setDisplayFormat(QStringLiteral("MMMM yy"));
 	monthSelection->setCalendarPopup(false);
 	monthSelection->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
+
+	specialDateCheck = new QCheckBox("Spezielles Datum:", this);
+	specialDateCheck->setChecked(false);
+
+	std::map<QString, RegisterDate::Special> specialMap = 
+	{
+		{"Vergangenheit", RegisterDate::Special::previous},
+		{"Unbekannt", RegisterDate::Special::unknown},
+		{"Zukunft", RegisterDate::Special::subsequent}
+	};
+	specialDateSelection = new QComboBox(this);
+	for (const auto& [specialStr, specialData] : specialMap)
+	{
+		specialDateSelection->insertItem(0, specialStr, QVariant(static_cast<int>(specialData)));
+	}
+	specialDateSelection->setCurrentIndex(specialDateSelection->findText("Unbekannt"));
+	specialDateSelection->setEnabled(false);
 
 	btnAddEntry = new QPushButton(QStringLiteral("+ Eintrag hinzufügen"), this);
 	btnAddEntry->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
@@ -82,7 +103,9 @@ void AddTab::initialize()
 	monthLayout->setContentsMargins(0, 0, 0, 0);
 	monthLayout->setSpacing(10);
 	monthLayout->addWidget(new QLabel(QStringLiteral("Abrechnungsmonat"), this));
-	monthLayout->addWidget(monthSelection, 1);
+	monthLayout->addWidget(monthSelection, 4);
+	monthLayout->addWidget(specialDateCheck, 1);
+	monthLayout->addWidget(specialDateSelection, 1);
 
 	auto* entriesContainer = new QWidget(); // for scroll area
 	auto* containerLayout = new QVBoxLayout(entriesContainer);
@@ -109,6 +132,19 @@ void AddTab::initialize()
 
 	connect(btnAddEntry, &QPushButton::clicked, this, &AddTab::addEntry);
 	connect(lowerButtons.btnApply, &QPushButton::clicked, this, &AddTab::apply);
+	connect(specialDateCheck, &QCheckBox::checkStateChanged, this, [&](Qt::CheckState state) {
+			switch (state)
+			{
+			case Qt::Checked:
+				monthSelection->setEnabled(false);
+				specialDateSelection->setEnabled(true);
+				break;
+			case Qt::Unchecked:
+				monthSelection->setEnabled(true);
+				specialDateSelection->setEnabled(false);
+				break;
+			}
+		});
 }
 
 void AddTab::refresh()
@@ -183,14 +219,23 @@ void AddTab::apply()
 	{
 		ConsumptionInputs inputs = entry->getEntryInputs();
 
-		QDate setDate = monthSelection->date();
-		int nDays = setDate.daysInMonth();
-		int setDays = setDate.day();
-		QDate dateAtMonthEnd = setDate.addDays(nDays - setDays);
+		RegisterDate date;
+		if (!specialDateCheck->isEnabled())
+		{
+			QDate setDate = monthSelection->date();
+			int nDays = setDate.daysInMonth();
+			int setDays = setDate.day();
+			QDate dateAtMonthEnd = setDate.addDays(nDays - setDays);
+			date = dateAtMonthEnd;
+		}
+		else
+		{
+			date = static_cast<RegisterDate::Special>(specialDateSelection->currentData().toInt());
+		}
 
 		request::Consumption request{
 			.personInput = inputs.personInput,
-			.dateBooked = dateAtMonthEnd,
+			.dateBooked = date,
 			.nBeer05 = inputs.nBeer05,
 			.nBeer04 = inputs.nBeer04,
 			.nSoftdrinks = inputs.nSoftdrinks,
