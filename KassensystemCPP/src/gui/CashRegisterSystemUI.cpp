@@ -28,7 +28,12 @@ void CashRegisterSystemUI::initUi(const ServiceBundle& serviceBundle, const Repo
 	QHBoxLayout* buttonBar = new QHBoxLayout();
 	lowerButtons.btnCancel = new QPushButton("Cancel", this);
 	lowerButtons.btnApply = new QPushButton("Apply", this);
-	lowerButtons.btnSave = new QPushButton("Save", this);
+	lowerButtons.btnSave = new QPushButton("Save", this); 
+	
+	
+	lowerButtons.btnSave->setEnabled(false); // only for precaution, delete before deployment
+	
+	
 	buttonBar->addWidget(lowerButtons.btnCancel);
 	buttonBar->addWidget(lowerButtons.btnApply);
 	buttonBar->addWidget(lowerButtons.btnSave);
