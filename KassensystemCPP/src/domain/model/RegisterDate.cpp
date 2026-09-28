@@ -46,6 +46,40 @@ QString RegisterDate::toQString() const
 	return QString::fromStdString(toString());
 }
 
+QVariant RegisterDate::toSqlDateValue() const 
+{
+	return isSpecial() ? QVariant() : QVariant(date().toString(Qt::ISODate));
+}
+
+QVariant RegisterDate::toSqlSpecialValue() const 
+{
+	return isSpecial() ? QVariant(static_cast<int>(special())) : QVariant();
+}
+
+int RegisterDate::sortRank(const RegisterDate& regDate)
+{
+	// rule: previous (1) -> unknown (2) -> any date (3) -> subsequent (4)
+	
+	if (!regDate.isSpecial())
+		return 3;
+	else
+	{
+		switch (regDate.special())
+		{
+		case RegisterDate::Special::previous: return 1;
+		case RegisterDate::Special::unknown: return 2;
+		case RegisterDate::Special::subsequent: return 4;
+		}
+	}
+
+	std::unreachable();
+}
+
+int RegisterDate::sortRank() const
+{
+	return sortRank(*this);
+}
+
 std::ostream& operator<<(std::ostream& out, const RegisterDate& regDate)
 {
 	if (std::holds_alternative<QDate>(regDate.data))
@@ -80,82 +114,19 @@ QDebug operator<<(QDebug out, const RegisterDate& regDate)
 }
 
 bool RegisterDate::operator<(const RegisterDate& regDate) const
-{
-	// rule: previous -> unknown -> any date -> subsequent
-	
-	using enum RegisterDate::Special;
-	bool isSpecialL = this->isSpecial();
-	bool isSpecialR = regDate.isSpecial();
-
-	if (!isSpecialL && !isSpecialR)
-	{
+{	
+	if (!this->isSpecial() && !regDate.isSpecial())
 		return this->date() < regDate.date();
-	}
-	else if (isSpecialL && !isSpecialR)
-	{
-		switch (this->special())
-		{
-		case previous: return true;
-		case unknown: return true;
-		case subsequent: return false;
-		}
-	}
-	else if (!isSpecialL && isSpecialR)
-	{
-		switch (regDate.special())
-		{
-		case previous: return false;
-		case unknown: return false;
-		case subsequent: return true;
-		}
-	}
-
-	auto specialL = this->special();
-	auto specialR = regDate.special();
-	
-	switch (specialL)
-	{
-	case previous:
-		switch (specialR)
-		{
-		case previous:   return false;
-		case unknown:    return true;
-		case subsequent: return true;
-		}
-	case unknown:
-		switch (specialR)
-		{
-		case previous:   return false;
-		case unknown:    return false;
-		case subsequent: return true;
-		}
-	case subsequent:
-		switch (specialR)
-		{
-		case previous:   return false;
-		case unknown:    return false;
-		case subsequent: return false;
-		}
-	}
-
-	std::unreachable();
+	else
+		return this->sortRank() < regDate.sortRank();
 }
 
 bool RegisterDate::operator<=(const RegisterDate& regDate) const
 {
-	using enum RegisterDate::Special;
-	bool isSpecialL = this->isSpecial();
-	bool isSpecialR = regDate.isSpecial();
-
-	if (!isSpecialL && !isSpecialR)
-		if (this->date() == regDate.date())
-			return true;
-
-	if (isSpecialL && isSpecialR)
-		if (this->special() == regDate.special())
-			return true;
-
-	return operator<(regDate);
+	if (!this->isSpecial() && !regDate.isSpecial())
+		return this->date() <= regDate.date();
+	else
+		return this->sortRank() <= regDate.sortRank();
 }
 
 bool RegisterDate::operator>(const RegisterDate& regDate) const

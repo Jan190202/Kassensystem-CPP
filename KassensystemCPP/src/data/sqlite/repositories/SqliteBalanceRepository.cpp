@@ -1,4 +1,5 @@
 #include "SqliteBalanceRepository.h"
+#include "data/sqlite/sqliteutils/SqliteUtils.h"
 #include <QSqlDatabase>
 #include <QFile>
 #include <QSqlError>
@@ -10,14 +11,15 @@ int64_t SqliteBalanceRepository::addBalanceEntry(const entry::Balance& entry)
 	QSqlQuery query;
 	query.prepare(
 		"INSERT INTO Balance"
-		"(type, description, amount, dateBooked, dateAdded, comment, personID)"
-		"VALUES (:balanceType, :description, :amount, :dateBooked, :dateAdded, :comment, :personID)"
+		"(type, description, amount, dateBooked, dateBookedSpecial, dateAdded, comment, personID)"
+		"VALUES (:balanceType, :description, :amount, :dateBooked, :dateBookedSpecial, :dateAdded, :comment, :personID)"
 		"RETURNING ID"
 	);
 	query.bindValue(":balanceType", static_cast<int>(entry.type));
 	query.bindValue(":description", QString::fromStdString(entry.description));
 	query.bindValue(":amount", entry.amount);
-	query.bindValue(":dateBooked", entry.dateBooked.date().toString(Qt::ISODate));
+	query.bindValue(":dateBooked", entry.dateBooked.toSqlDateValue());
+	query.bindValue(":dateBookedSpecial", entry.dateBooked.toSqlSpecialValue());
 	query.bindValue(":dateAdded", entry.dateAdded.toString(Qt::ISODate));
 	query.bindValue(":comment", QString::fromStdString(entry.comment));
 
@@ -63,14 +65,22 @@ std::vector<entry::Balance> SqliteBalanceRepository::getBalanceEntries(BalanceTy
 {
 	bool isTypeSpecific = hasFlag(type, BalanceType::Earning) ^ hasFlag(type, BalanceType::Spending); // either Earning or Spending, but not both
 	
+
+	QString compClause = sqliteUtils::registerDateCompareClause(
+		sqliteUtils::Op::largerOrEq,
+		RegisterDate{ minDate },
+		"Balance.dateBooked",
+		"Balance.dateBookedSpecial",
+		":minDate");
+
 	QString sqlStatement =
 		"SELECT * "
 		"FROM Balance "
-		"WHERE Balance.dateBooked >= :minDate";
+		"WHERE " + compClause + " ";
 
 	if (isTypeSpecific)
 	{
-		sqlStatement += " AND Balance.type = :type";
+		sqlStatement += "AND Balance.type = :type ";
 	}
 
 	QSqlQuery query;
@@ -104,7 +114,10 @@ entry::Balance SqliteBalanceRepository::getEntryFromQuery(const QSqlQuery& query
 		.type = static_cast<BalanceType>(query.value("type").toUInt()),
 		.description = query.value("description").toString().toStdString(),
 		.amount = query.value("amount").toDouble(),
-		.dateBooked = query.value("dateBooked").toDate(),
+		.dateBooked =
+			query.value("dateBooked").isValid() ?
+				RegisterDate{query.value("dateBooked").toDate()} :
+				RegisterDate{static_cast<RegisterDate::Special>(query.value("dateBookedSpecial").toInt())},
 		.dateAdded = query.value("dateAdded").toDate(),
 		.comment = query.value("comment").toString().toStdString(),
 		.personEntryID = query.value("personID").toLongLong()

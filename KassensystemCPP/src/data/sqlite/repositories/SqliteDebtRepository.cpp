@@ -1,4 +1,5 @@
 #include "SqliteDebtRepository.h"
+#include "data/sqlite/sqliteutils/SqliteUtils.h"
 #include <QSqlDatabase>
 #include <QFile>
 #include <QSqlError>
@@ -10,12 +11,14 @@ int64_t SqliteDebtRepository::addDebtEntry(const entry::Debt& entry)
 	QSqlQuery query;
 	query.prepare(
 		"INSERT INTO Debt"
-		"(personID, date, amount, foreignShare)"
-		"VALUES (:personID, :date, :amount, :foreignShare)"
+		"(personID, dateBooked, dateBookedSpecial, dateAdded, amount, foreignShare)"
+		"VALUES (:personID, :dateBooked, :dateBookedSpecial, :dateAdded, :amount, :foreignShare)"
 		"RETURNING ID"
 	);
 	query.bindValue(":personID", entry.personEntryID);
-	query.bindValue(":date", entry.dateBooked.date().toString(Qt::ISODate));
+	query.bindValue(":dateBooked", entry.dateBooked.toSqlDateValue());
+	query.bindValue(":dateBookedSpecial", entry.dateBooked.toSqlSpecialValue());
+	query.bindValue(":dateAdded", entry.dateAdded.toString(Qt::ISODate));
 	query.bindValue(":amount", entry.amount);
 	query.bindValue(":foreignShare", entry.foreignShare);
 	
@@ -106,14 +109,21 @@ double SqliteDebtRepository::getTotalShare(FinancialShare share, const QDate& mi
 		shareString = "Debt.foreignShare";
 		break;
 	}
+
+	QString compClause = sqliteUtils::registerDateCompareClause(
+		sqliteUtils::Op::largerOrEq,
+		RegisterDate{ minDate },
+		"Debt.dateBooked",
+		"Debt.dateBookedSpecial",
+		":minDate");
 	
 	QSqlQuery query;
 	query.prepare(
 		"SELECT SUM(Debt.amount * " + shareString + ") AS share "
 		"FROM Debt "
-		"WHERE Debt.date >= :date "
+		"WHERE " + compClause + " "
 	);
-	query.bindValue(":date", minDate.toString(Qt::ISODate));
+	query.bindValue(":minDate", minDate.toString(Qt::ISODate));
 
 	if (query.exec())
 		
@@ -159,7 +169,7 @@ std::vector<entry::Outstanding> SqliteDebtRepository::getPersonsOutstandingEntri
 			"FROM PaymentAllocation "
 			"GROUP BY PaymentAllocation.debtID "
 		") "
-		"SELECT Debt.ID, Debt.date, Debt.amount, Debt.amount - COALESCE(GroupedPayments.paid,0) AS remaining "
+		"SELECT Debt.ID, Debt.dateBooked, Debt.dateBookedSpecial, Debt.amount, Debt.amount - COALESCE(GroupedPayments.paid,0) AS remaining "
 		"FROM Debt "
 		"LEFT OUTER JOIN GroupedPayments ON Debt.ID = GroupedPayments.debtID "
 		"WHERE Debt.personID = :personEntryID" + sqlString
@@ -196,7 +206,7 @@ std::vector<entry::Outstanding> SqliteDebtRepository::getForeignShareOutstanding
 		"FROM ShareSettlementAllocation "
 		"GROUP BY ShareSettlementAllocation.debtID "
 		") "
-		"SELECT Debt.ID, Debt.date, Debt.amount, Debt.amount - COALESCE(GroupedShareSettlements.settled,0) AS remaining "
+		"SELECT Debt.ID, Debt.dateBooked, Debt.dateBookedSpecial, Debt.amount, Debt.amount - COALESCE(GroupedShareSettlements.settled,0) AS remaining "
 		"FROM Debt "
 		"LEFT OUTER JOIN GroupedShareSettlements ON Debt.ID = GroupedShareSettlements.debtID "
 		+ sqlString
@@ -223,7 +233,10 @@ entry::Outstanding SqliteDebtRepository::getOutstandingEntryFromQuery(const QSql
 {
 	return entry::Outstanding{
 		.debtEntryID = query.value("ID").toLongLong(),
-		.dateBooked = query.value("date").toDate(),
+		.dateBooked = 
+			query.value("dateBooked").isValid() ? 
+				RegisterDate{query.value("dateBooked").toDate()} : 
+				RegisterDate{static_cast<RegisterDate::Special>(query.value("dateBookedSpecial").toInt())},
 		.amount = query.value("amount").toDouble(),
 		.remaining = query.value("remaining").toDouble()
 	};

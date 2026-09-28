@@ -17,6 +17,9 @@ public:
 		unknown, previous, subsequent
 	};
 
+	// needed for SQL clause construction as long as static reflections aren't possible
+	static constexpr std::array<Special, 3> allSpecials{ Special::previous, Special::unknown, Special::subsequent };
+
 	RegisterDate() = delete;
 	RegisterDate(QDate date);
 	RegisterDate(Special date);
@@ -27,6 +30,12 @@ public:
 
 	std::string toString() const;
 	QString toQString() const;
+	
+	QVariant toSqlDateValue() const;
+	QVariant toSqlSpecialValue() const;
+
+	int sortRank() const;
+	static int sortRank(const RegisterDate& regDate);
 
 	bool operator<(const RegisterDate& regDate) const;
 	bool operator<=(const RegisterDate& regDate) const;
