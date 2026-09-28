@@ -33,7 +33,11 @@ void AddTab::initialize()
 	monthSelection->setCalendarPopup(false);
 	monthSelection->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
 
-	specialDateCheck = new QCheckBox("Spezielles Datum:", this);
+	auto* vLine = new QFrame(this);
+	vLine->setFrameShape(QFrame::VLine);
+	vLine->setFrameShadow(QFrame::Sunken);
+
+	specialDateCheck = new QCheckBox("Sonstiger Zeitraum:", this);
 	specialDateCheck->setChecked(false);
 
 	std::map<QString, RegisterDate::Special> specialMap = 
@@ -101,10 +105,11 @@ void AddTab::initialize()
 
 	auto* monthLayout = new QHBoxLayout();
 	monthLayout->setContentsMargins(0, 0, 0, 0);
-	monthLayout->setSpacing(10);
+	monthLayout->setSpacing(3);
 	monthLayout->addWidget(new QLabel(QStringLiteral("Abrechnungsmonat"), this));
 	monthLayout->addWidget(monthSelection, 4);
-	monthLayout->addWidget(specialDateCheck, 1);
+	monthLayout->addWidget(vLine);
+	monthLayout->addWidget(specialDateCheck, 1, Qt::AlignRight);
 	monthLayout->addWidget(specialDateSelection, 1);
 
 	auto* entriesContainer = new QWidget(); // for scroll area
