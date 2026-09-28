@@ -210,11 +210,6 @@ void PayTab::initialize()
 			}
 		});
 
-	connect(lowerButtons.btnApply, &QPushButton::clicked, this, [&]()
-		{
-			apply();
-		});
-
 	connect(btnUseCredit, &QPushButton::clicked, this, [&]()
 		{
 			redeemCredit(nameSelect->currentData().toLongLong());
@@ -489,6 +484,8 @@ void PayTab::refreshTable(int64_t personEntryID)
 		qDebug() << "dateString:" << drEntry.dateBooked.toQString();
 		qDebug() << "dateString:" << drEntry.dateBooked.toString();
 		qDebug() << "isSpecial:" << drEntry.dateBooked.isSpecial();
+
+		qDebug() << drEntry.dateBooked.sortRank();
 
 		QTableWidgetItem* dateItem = new QTableWidgetItem(dateString);
 		QTableWidgetItem* infoItem = new QTableWidgetItem(QString::number(drEntry.amount-drEntry.remaining, 'f', 2) + QString::fromStdString(" / ") + QString::number(drEntry.amount, 'f', 2));

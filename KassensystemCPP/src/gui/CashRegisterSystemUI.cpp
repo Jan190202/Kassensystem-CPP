@@ -90,4 +90,11 @@ void CashRegisterSystemUI::changeTab(TabIndex activeTab)
 		tabs.at(activeTabNum)->initialize();
 		loadedTabs.at(activeTabNum) = true;
 	}
+
+	// apply button only controls the active tab
+	lowerButtons.btnApply->disconnect();
+	connect(lowerButtons.btnApply, &QPushButton::clicked, this, [=]()
+		{
+			tabs.at(activeTabNum)->apply();
+		});
 }

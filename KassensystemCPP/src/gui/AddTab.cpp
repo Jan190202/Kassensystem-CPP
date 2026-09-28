@@ -136,7 +136,6 @@ void AddTab::initialize()
 	btnAddEntry->setFocus(Qt::TabFocusReason);
 
 	connect(btnAddEntry, &QPushButton::clicked, this, &AddTab::addEntry);
-	connect(lowerButtons.btnApply, &QPushButton::clicked, this, &AddTab::apply);
 	connect(specialDateCheck, &QCheckBox::checkStateChanged, this, [&](Qt::CheckState state) {
 			switch (state)
 			{
