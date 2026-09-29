@@ -49,11 +49,11 @@ void CashRegisterSystemUI::initUi(const ServiceBundle& serviceBundle, const Repo
 		new AddTab(lowerButtons, serviceBundle.consumptionService, repoBundle.personRepo), 
 		new BalanceTab(lowerButtons, serviceBundle.balanceService, repoBundle.personRepo) };
 
-	tabSelector->addTab(tabs.at(static_cast<int>(TabIndex::Pay)), QStringLiteral("Schulden begleichen"));
-	tabSelector->addTab(tabs.at(static_cast<int>(TabIndex::Add)), QStringLiteral("Einträge hinzufügen"));
-	tabSelector->addTab(tabs.at(static_cast<int>(TabIndex::Balance)), QStringLiteral("Abteilungsbilanz bearbeiten"));
+	tabSelector->addTab(tabs.at(static_cast<int>(TabIndex::pay)), QStringLiteral("Schulden begleichen"));
+	tabSelector->addTab(tabs.at(static_cast<int>(TabIndex::add)), QStringLiteral("Einträge hinzufügen"));
+	tabSelector->addTab(tabs.at(static_cast<int>(TabIndex::balance)), QStringLiteral("Abteilungsbilanz bearbeiten"));
 	
-	TabIndex initialTab = TabIndex::Pay; // initialize first tab
+	TabIndex initialTab = TabIndex::pay; // initialize first tab
 	changeTab(initialTab);
 	tabSelector->setCurrentIndex(static_cast<int>(initialTab));
 

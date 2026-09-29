@@ -14,7 +14,7 @@ class QDoubleSpinBox;
 class QCheckBox;
 class QComboBox;
 
-class BalanceTabDialog : public QDialog
+class BalanceTabAddEntryDialog : public QDialog
 {
 	Q_OBJECT
 public:
@@ -27,9 +27,9 @@ public:
 		std::optional<int64_t> coveringpersonEntryID;
 	};
 
-	BalanceTabDialog(BtnIndex mode, std::vector<entry::Person>& personVec, QWidget* parent);
+	BalanceTabAddEntryDialog(BtnIndex mode, std::vector<entry::Person>& personVec, QWidget* parent);
 
-	BalanceTabDialog::inputs getInputs() const;
+	BalanceTabAddEntryDialog::inputs getInputs() const;
 
 private:
 	QLineEdit*		edtDescription;

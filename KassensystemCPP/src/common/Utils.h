@@ -2,7 +2,7 @@
 
 #include <string>
 
-namespace Utils
+namespace utils
 {
 	std::string eurSymbol();
 	void toUpper(std::string& s);

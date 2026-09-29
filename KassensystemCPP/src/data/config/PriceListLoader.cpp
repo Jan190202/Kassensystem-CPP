@@ -24,13 +24,13 @@ namespace priceListLoader
 		if (!result.has_value())
 			switch (result.error())
 			{
-			case jsonReader::Exception::MissingJsonObject:
+			case jsonReader::Exception::missingJsonObject:
 				qDebug() << fileName << ": " << "No JSON object found";
 				break;
-			case jsonReader::Exception::OpeningFileFailed:
+			case jsonReader::Exception::openingFileFailed:
 				qDebug() << fileName << ": " << "Failed opening file";
 				break;
-			case jsonReader::Exception::ParsingJsonFailed:
+			case jsonReader::Exception::parsingJsonFailed:
 				qDebug() << fileName << ": " << "Failed parsing JSON document";
 				break;
 

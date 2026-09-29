@@ -45,13 +45,13 @@
 //
 //		switch (share)
 //		{
-//		case FinancialShare::All:
+//		case FinancialShare::all:
 //			currentShare = 1;
 //			break;
-//		case FinancialShare::Foreign:
+//		case FinancialShare::foreign:
 //			currentShare = entry.foreignShare;
 //			break;
-//		case FinancialShare::Own:
+//		case FinancialShare::own:
 //			currentShare = 1 - entry.foreignShare;
 //			break;
 //		}
@@ -65,7 +65,7 @@
 //double DebtRepoInMem::getPersonsDue(int64_t personEntryID) const
 //{
 //	double due{};
-//	for (const auto& entry : getPersonsOutstandingEntries(personEntryID, FilterType::OmitFullyPaid))
+//	for (const auto& entry : getPersonsOutstandingEntries(personEntryID, FilterType::omitFullyPaid))
 //		due+=entry.remaining;
 //	return due;
 //}
@@ -73,7 +73,7 @@
 //double DebtRepoInMem::getForeignDue() const
 //{
 //	double due{};
-//	for (const auto& entry : getForeignShareOutstandingEntries(FilterType::OmitFullyPaid))
+//	for (const auto& entry : getForeignShareOutstandingEntries(FilterType::omitFullyPaid))
 //		due += entry.remaining;
 //	return due;
 //}
@@ -81,7 +81,7 @@
 //double DebtRepoInMem::getPersonsPaid(int64_t personEntryID) const
 //{
 //	double settled{};
-//	for (auto& entry : getPersonsOutstandingEntries(personEntryID, FilterType::IncludeFullyPaid))
+//	for (auto& entry : getPersonsOutstandingEntries(personEntryID, FilterType::includeFullyPaid))
 //		settled += entry.amount - entry.remaining;
 //	return settled;
 //}
@@ -96,7 +96,7 @@
 //		{
 //			double remaining = entry.amount - getAllocatedPayments(entry.debtEntryID);
 //
-//			if (filter == FilterType::OmitFullyPaid && remaining < 1e-9) continue;
+//			if (filter == FilterType::omitFullyPaid && remaining < 1e-9) continue;
 //
 //			entry::Outstanding entryOut;
 //			entryOut.debtEntryID = entry.debtEntryID;
@@ -119,7 +119,7 @@
 //	{
 //		double remaining = entry.foreignShare * entry.amount -  getAllocatedShareSettlements(entry.debtEntryID);
 //
-//		if (filter == FilterType::OmitFullyPaid && remaining < 1e-9) continue;
+//		if (filter == FilterType::omitFullyPaid && remaining < 1e-9) continue;
 //
 //		entry::Outstanding entryOut;
 //		entryOut.debtEntryID = entry.debtEntryID;

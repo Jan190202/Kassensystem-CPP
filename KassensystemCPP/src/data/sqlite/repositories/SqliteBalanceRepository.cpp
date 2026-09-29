@@ -54,7 +54,7 @@ std::expected<entry::Balance, GetEntryException> SqliteBalanceRepository::getBal
 	{
 		while (query.next())
 		{
-			if (foundEntry.has_value()) return std::unexpected(GetEntryException::MultipleEntriesFound);
+			if (foundEntry.has_value()) return std::unexpected(GetEntryException::multipleEntriesFound);
 
 			foundEntry = getEntryFromQuery(query);
 		}
@@ -62,14 +62,14 @@ std::expected<entry::Balance, GetEntryException> SqliteBalanceRepository::getBal
 	
 	if (foundEntry.has_value()) return foundEntry.value();
 
-	return std::unexpected(GetEntryException::EntryNotFound);
+	return std::unexpected(GetEntryException::entryNotFound);
 }
 
 std::vector<entry::Balance> SqliteBalanceRepository::getBalanceEntries(BalanceType type, const QDate& minDate) const
 {
 	qDebug() << "-> getBalanceEntries";
 
-	bool isTypeSpecific = hasFlag(type, BalanceType::Earning) ^ hasFlag(type, BalanceType::Spending); // either Earning or Spending, but not both
+	bool isTypeSpecific = hasFlag(type, BalanceType::earning) ^ hasFlag(type, BalanceType::spending); // either Earning or Spending, but not both
 	
 	QString compClause = sqliteUtils::registerDateCompareClause(
 		sqliteUtils::Op::largerOrEq,
@@ -95,7 +95,7 @@ std::vector<entry::Balance> SqliteBalanceRepository::getBalanceEntries(BalanceTy
 	if (isTypeSpecific)
 	{
 		query.bindValue(":type", 
-			static_cast<uint8_t>(type & (BalanceType::Earning | BalanceType::Spending))); // only flag bits for Earning or Spending are left
+			static_cast<uint8_t>(type & (BalanceType::earning | BalanceType::spending))); // only flag bits for Earning or Spending are left
 	}
 	
 	std::vector<entry::Balance> entries;

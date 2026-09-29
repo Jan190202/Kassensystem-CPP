@@ -17,7 +17,7 @@ namespace jsonReader
 
 		QFile file(filePath);
 		if (!file.open(QIODevice::ReadOnly | QIODevice::Text))
-			return std::unexpected(Exception::OpeningFileFailed);
+			return std::unexpected(Exception::openingFileFailed);
 
 		QByteArray fileContent = file.readAll();
 		file.close();
@@ -26,10 +26,10 @@ namespace jsonReader
 		QJsonDocument jsonDoc = QJsonDocument::fromJson(fileContent, &parseError);
 
 		if (parseError.error != QJsonParseError::NoError)
-			return std::unexpected(Exception::ParsingJsonFailed);
+			return std::unexpected(Exception::parsingJsonFailed);
 
 		if (!jsonDoc.isObject())
-			return std::unexpected(Exception::MissingJsonObject);
+			return std::unexpected(Exception::missingJsonObject);
 
 		return jsonDoc.object();
 	}

@@ -7,7 +7,7 @@
 
 enum class AddSettlementException
 {
-	None, AmountNegative, AmountZero, AmountGreaterThanTotalForeignShare
+	none, amountNegative, amountZero, amountGreaterThanTotalForeignShare
 };
 
 class BalanceService

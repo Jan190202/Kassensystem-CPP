@@ -19,7 +19,7 @@ BalanceTabSettlementDialog::BalanceTabSettlementDialog(QWidget* parent) : QDialo
 	edtAmount = new QDoubleSpinBox();
 	edtAmount->setRange(0.0, 1'000'000.0);
 	edtAmount->setDecimals(2);
-	edtAmount->setSuffix(QStringLiteral(" ") + QtUtils::eurSymbol());
+	edtAmount->setSuffix(QStringLiteral(" ") + qtUtils::eurSymbol());
 	edtAmount->setSingleStep(1.0);
 	edtAmount->setAlignment(Qt::AlignLeft | Qt::AlignVCenter);
 

@@ -1,35 +1,33 @@
 #pragma once
 #include <cstdint>
 
-// TBD: to lower of all enum fields
-
 enum class BalanceType : uint8_t
 {
-	None = 0,			// 0000.0000
-	Earning = 1 << 0,	// 0000.0001
-	Spending = 1 << 1,	// 0000.0010
-	Supplement = 1 << 2 // 0000.0100
+	none = 0,			// 0000.0000
+	earning = 1 << 0,	// 0000.0001
+	spending = 1 << 1,	// 0000.0010
+	supplement = 1 << 2 // 0000.0100
 	// supplements: drink sales, rounding error at payForeignShare()
 };
 
 enum class OverpaymentDisposition
 {
-	Credit, Tip
+	credit, tip
 };
 
 enum class FilterType
 {
-	IncludeFullyPaid, OmitFullyPaid
+	includeFullyPaid, omitFullyPaid
 };
 
 enum class GetEntryException
 {
-	EntryNotFound, MultipleEntriesFound
+	entryNotFound, multipleEntriesFound
 };
 
 enum class FinancialShare
 {
-	All, Foreign, Own
+	all, foreign, own
 };
 
 constexpr BalanceType operator|(BalanceType a, BalanceType b)

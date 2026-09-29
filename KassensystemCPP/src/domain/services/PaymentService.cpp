@@ -25,10 +25,10 @@ void PaymentService::addPayment(const request::Payment& request)
 	{
 		switch (entry.overpaymentType)
 		{
-		case OverpaymentDisposition::Credit:
+		case OverpaymentDisposition::credit:
 			addCredit(entry.personEntryID, overpaymentAmount, entry.dateAdded, "Guthaben durch Einzahlung/Überbezahlung");
 			break;
-		case OverpaymentDisposition::Tip:
+		case OverpaymentDisposition::tip:
 			addTip(entry.personEntryID, overpaymentAmount, entry.dateAdded);
 			break;
 		}
@@ -37,7 +37,7 @@ void PaymentService::addPayment(const request::Payment& request)
 
 double PaymentService::addPaymentAllocation(int64_t paymentEntryID, int64_t personEntryID, double amount)
 {
-	std::vector<entry::Outstanding> remainingDebtEntries = debtRepo->getPersonsOutstandingEntries(personEntryID, FilterType::OmitFullyPaid);
+	std::vector<entry::Outstanding> remainingDebtEntries = debtRepo->getPersonsOutstandingEntries(personEntryID, FilterType::omitFullyPaid);
 	
 	// sort be reverse date so older outstanding debts are paid first
 	std::sort(remainingDebtEntries.begin(), remainingDebtEntries.end(), [](const entry::Outstanding& a, const entry::Outstanding& b)
@@ -88,7 +88,7 @@ int64_t PaymentService::addTip(int64_t personEntryID, double amount, const Regis
 	return balanceRepo->addBalanceEntry(
 		entry::Balance{ 
 		.balanceEntryID = 0, 
-		.type = BalanceType::Earning, 
+		.type = BalanceType::earning, 
 		.description = "Trinkgeld bei Schuldenbegleichung",
 		.amount = amount, 
 		.dateBooked = date, 

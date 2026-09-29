@@ -161,7 +161,7 @@ namespace exporter
 					painter.drawText(cell2.adjusted(6, 0, -6, 0), Qt::AlignVCenter | Qt::AlignRight, col2);
 				};
 
-			drawRow(0, "Name", "Ausstand ("+ QtUtils::eurSymbol() + ")", true);
+			drawRow(0, "Name", "Ausstand ("+ qtUtils::eurSymbol() + ")", true);
 
 			int row = 1;
 			for (const auto& entry : entries)

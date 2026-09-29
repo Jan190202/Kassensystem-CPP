@@ -18,14 +18,14 @@
 //
 //std::vector<entry::Balance> BalanceRepoInMem::getBalanceEntries(BalanceType type, const QDate& minDate) const
 //{
-//	if (type == BalanceType::EarningAndSupplement) type = BalanceType::Earning;
+//	if (type == BalanceType::earningAndSupplement) type = BalanceType::earning;
 //
 //	std::vector<entry::Balance> filteredEntries;
 //	
 //	for (const auto& entry : entries)
 //	{
 //		if (entry.dateBooked < minDate) continue;
-//		if (type == BalanceType::EarningAndSpending || entry.type == type) filteredEntries.push_back(entry);
+//		if (type == BalanceType::earningAndSpending || entry.type == type) filteredEntries.push_back(entry);
 //	}
 //
 //	return filteredEntries;
@@ -39,12 +39,12 @@
 //	{
 //		if (entry.description == description)
 //		{
-//			if (foundEntry) return std::unexpected(GetEntryException::MultipleEntriesFound);
+//			if (foundEntry) return std::unexpected(GetEntryException::multipleEntriesFound);
 //
 //			foundEntry = &entry;
 //		}
 //	}
 //
 //	if (foundEntry) return std::ref(*foundEntry);
-//	else return std::unexpected(GetEntryException::EntryNotFound);
+//	else return std::unexpected(GetEntryException::entryNotFound);
 //}

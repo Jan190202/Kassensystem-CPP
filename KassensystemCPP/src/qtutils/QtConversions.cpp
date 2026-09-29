@@ -2,7 +2,7 @@
 #include <algorithm>
 #include <QDebug>
 
-namespace QtUtils
+namespace qtUtils
 {
 	QList<QString> strVecToQStrList(const std::vector<std::string>& vec)
 	{

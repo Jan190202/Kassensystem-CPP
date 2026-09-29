@@ -1,4 +1,4 @@
-#include "BalanceTabDialog.h"
+#include "BalanceTabAddEntryDialog.h"
 #include "qtutils/QtConversions.h"
 #include <QDialog>
 #include <QWidget>
@@ -20,16 +20,16 @@
 #include <string>
 #include <algorithm>
 
-BalanceTabDialog::BalanceTabDialog(BtnIndex mode, std::vector<entry::Person>& personVec, QWidget* parent) : QDialog(parent)
+BalanceTabAddEntryDialog::BalanceTabAddEntryDialog(BtnIndex mode, std::vector<entry::Person>& personVec, QWidget* parent) : QDialog(parent)
 {
 	setWindowTitle("Eintrag hinzufügen");
 	
 	switch (mode)
 	{
-	case BtnIndex::AddEarning:
+	case BtnIndex::addEarning:
 		setWindowTitle(QStringLiteral("Einnahme hinzufügen"));
 		break;
-	case BtnIndex::AddSpending:
+	case BtnIndex::addSpending:
 		setWindowTitle(QStringLiteral("Ausgabe hinzufügen"));
 		break;
 	}
@@ -43,7 +43,7 @@ BalanceTabDialog::BalanceTabDialog(BtnIndex mode, std::vector<entry::Person>& pe
 	edtCost = new QDoubleSpinBox();
 	edtCost->setRange(0.0, 1'000'000.0);
 	edtCost->setDecimals(2);
-	edtCost->setSuffix(QStringLiteral(" ") + QtUtils::eurSymbol());
+	edtCost->setSuffix(QStringLiteral(" ") + qtUtils::eurSymbol());
 	edtCost->setSingleStep(1.0);
 	edtCost->setAlignment(Qt::AlignLeft | Qt::AlignVCenter);
 
@@ -114,7 +114,7 @@ BalanceTabDialog::BalanceTabDialog(BtnIndex mode, std::vector<entry::Person>& pe
 		{
 			return a.getFullSpecifier() > b.getFullSpecifier();
 		});
-	QList<QString> nameList = QtUtils::personVecToQStrList(personVec, &entry::Person::getFullName);
+	QList<QString> nameList = qtUtils::personVecToQStrList(personVec, &entry::Person::getFullName);
 	for (size_t i = personVec.size(); i-- > 0; )
 		edtCoveringPerson->addItem(
 			nameList.at(i),
@@ -154,7 +154,7 @@ BalanceTabDialog::BalanceTabDialog(BtnIndex mode, std::vector<entry::Person>& pe
 
 	mainLayout->addLayout(form);
 	mainLayout->addSpacing(8);
-	if (mode == BtnIndex::AddSpending)
+	if (mode == BtnIndex::addSpending)
 	{
 		mainLayout->addWidget(topSeparator);
 		mainLayout->addWidget(sectionLabel);
@@ -186,9 +186,9 @@ BalanceTabDialog::BalanceTabDialog(BtnIndex mode, std::vector<entry::Person>& pe
 	adjustSize();
 }
 
-BalanceTabDialog::inputs BalanceTabDialog::getInputs() const
+BalanceTabAddEntryDialog::inputs BalanceTabAddEntryDialog::getInputs() const
 {
-	return BalanceTabDialog::inputs{
+	return BalanceTabAddEntryDialog::inputs{
 		.description = edtDescription->text().toStdString(),
 		.amount = edtCost->value(),
 		.date = edtIsSpecial->isChecked() ? 

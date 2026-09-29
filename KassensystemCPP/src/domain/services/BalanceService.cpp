@@ -17,7 +17,7 @@ int64_t BalanceService::addBalanceItem(const request::Balance& request)
 		.personEntryID = request.coveringpersonEntryID
 	};
 
-	if (request.coveringpersonEntryID.has_value() && hasFlag(entry.type, BalanceType::Spending))
+	if (request.coveringpersonEntryID.has_value() && hasFlag(entry.type, BalanceType::spending))
 	{
 		addCredit(entry.personEntryID.value(), entry.amount, entry.dateBooked, "Abteilungsausgabe übernommen");
 	}
@@ -44,19 +44,19 @@ std::vector<entry::Balance> BalanceService::getBalanceEntries(BalanceType type, 
 {
 	auto entries = balanceRepo->getBalanceEntries(type, minDate);
 
-	if (hasFlag(type, BalanceType::Supplement))
+	if (hasFlag(type, BalanceType::supplement))
 	{
 		entries.push_back(
 			entry::Balance{
-				.type = BalanceType::Earning | BalanceType::Supplement,
+				.type = BalanceType::earning | BalanceType::supplement,
 				.description = "Einnahmen durch Getränkeverkäufe",
-				.amount = debtRepo->getTotalShare(FinancialShare::Own, minDate),
+				.amount = debtRepo->getTotalShare(FinancialShare::own, minDate),
 				.dateBooked = QDate::currentDate()
 			});
 
 		//entries.push_back(
 		//	entry::Balance{
-		//		.type = BalanceType::Earning | BalanceType::Supplement,
+		//		.type = BalanceType::earning | BalanceType::supplement,
 		//		.description = "Rundungsfehler bei Abrechnung (kum.)",
 		//		.amount = 0, //settlementRepo->getTotalRounding(),
 		//		.dateBooked = QDate::currentDate()
@@ -74,9 +74,9 @@ registerFinancials::Report BalanceService::getReport() const
 	double departmentSpendings{};
 	double consumptionOwnShare{};
 	
-	for (const auto& entry : getBalanceEntries(BalanceType::Earning, stateBefore.date)) departmentEarnings += entry.amount;
-	for (const auto& entry : getBalanceEntries(BalanceType::Spending, stateBefore.date)) departmentSpendings += entry.amount;
-	consumptionOwnShare = debtRepo->getTotalShare(FinancialShare::Own, stateBefore.date);
+	for (const auto& entry : getBalanceEntries(BalanceType::earning, stateBefore.date)) departmentEarnings += entry.amount;
+	for (const auto& entry : getBalanceEntries(BalanceType::spending, stateBefore.date)) departmentSpendings += entry.amount;
+	consumptionOwnShare = debtRepo->getTotalShare(FinancialShare::own, stateBefore.date);
 
 	double savingsDiff = departmentEarnings - departmentSpendings + consumptionOwnShare;
 
@@ -136,11 +136,11 @@ registerFinancials::Report BalanceService::getReport() const
 AddSettlementException BalanceService::addShareSettlement(request::ShareSettlement request)
 {
 	if (request.amount < 0) 
-		return AddSettlementException::AmountNegative;
+		return AddSettlementException::amountNegative;
 	if (request.amount < 1e-9) 
-		return AddSettlementException::AmountZero;
+		return AddSettlementException::amountZero;
 	if (request.amount - debtRepo->getForeignDue() > 1e-9)
-		return AddSettlementException::AmountGreaterThanTotalForeignShare;
+		return AddSettlementException::amountGreaterThanTotalForeignShare;
 
 	entry::ShareSettlement entry{
 		.shareSettlementEntryID = 0,
@@ -159,14 +159,14 @@ AddSettlementException BalanceService::addShareSettlement(request::ShareSettleme
 		// if settlement in advance (or up-rounding) intended later, implement here
 	}
 
-	debtRepo->getForeignShareOutstandingEntries(FilterType::OmitFullyPaid);
+	debtRepo->getForeignShareOutstandingEntries(FilterType::omitFullyPaid);
 
-	return AddSettlementException::None;
+	return AddSettlementException::none;
 }
 
 double BalanceService::addShareSettlementAllocation(int64_t settlementEntryID, double amount)
 {
-	std::vector<entry::Outstanding> remainingDebtEntries = debtRepo->getForeignShareOutstandingEntries(FilterType::OmitFullyPaid);
+	std::vector<entry::Outstanding> remainingDebtEntries = debtRepo->getForeignShareOutstandingEntries(FilterType::omitFullyPaid);
 
 	double amountLeft = amount;
 	for (const auto& entryRem : remainingDebtEntries)

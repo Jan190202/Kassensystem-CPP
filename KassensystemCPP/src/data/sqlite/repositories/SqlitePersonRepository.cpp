@@ -44,13 +44,13 @@ std::expected<entry::Person, GetEntryException> SqlitePersonRepository::findPers
 	{
 		if (query.next())
 		{
-			if (foundPerson.has_value()) return std::unexpected(GetEntryException::MultipleEntriesFound);
+			if (foundPerson.has_value()) return std::unexpected(GetEntryException::multipleEntriesFound);
 
 			foundPerson = getEntryFromQuery(query);
 		}
 	}
 
-	if (!foundPerson.has_value()) return std::unexpected(GetEntryException::EntryNotFound);
+	if (!foundPerson.has_value()) return std::unexpected(GetEntryException::entryNotFound);
 
 	return foundPerson.value();
 }

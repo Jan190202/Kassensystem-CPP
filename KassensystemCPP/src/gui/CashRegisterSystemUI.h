@@ -15,10 +15,14 @@ class CashRegisterSystemUI : public QMainWindow
 public:
 	CashRegisterSystemUI(const ServiceBundle& serviceBundle, const RepositoryBundle& repoBundle, const SessionController& controller, QWidget* parent = nullptr);
 private:
+	enum class TabIndex
+	{
+		pay = 0, add, balance
+	};
+
 	std::array<BaseTab*, 3> tabs;
 	LowerButtonBundle lowerButtons;
 
-	enum class TabIndex { Pay=0, Add, Balance }; // TBD: to lower
 	int activeTab = 0;
 	std::array<bool, 3> loadedTabs = {false};
 

@@ -21,7 +21,7 @@ AddTabEntry::AddTabEntry(std::vector<entry::Person>& personVec, QWidget* parent)
 		{
 			return a.getFullSpecifier() > b.getFullSpecifier();
 		});
-	QList<QString> nameList = QtUtils::personVecToQStrList(personVec, &entry::Person::getFullSpecifier);
+	QList<QString> nameList = qtUtils::personVecToQStrList(personVec, &entry::Person::getFullSpecifier);
 	for (size_t i = personVec.size(); i-- > 0; ) // loop backward to insert in inverse-alphabetical order
 		nameSelect->addItem(
 			nameList.at(i), 
@@ -58,9 +58,9 @@ AddTabEntry::AddTabEntry(std::vector<entry::Person>& personVec, QWidget* parent)
 	spinboxCustom->setMaximum(999.99);
 	spinboxCustom->setDecimals(2);
 	spinboxCustom->setSingleStep(0.5);
-	spinboxCustom->setSuffix(QStringLiteral(" ") + QtUtils::eurSymbol());
+	spinboxCustom->setSuffix(QStringLiteral(" ") + qtUtils::eurSymbol());
 
-	lCost = new QLabel(QtUtils::toCurrencyFormat(entryCost), parent);
+	lCost = new QLabel(qtUtils::toCurrencyFormat(entryCost), parent);
 	lCost->setAlignment(Qt::AlignCenter);
 	lCost->setMinimumWidth(70);
 
@@ -102,7 +102,7 @@ AddTabEntry::AddTabEntry(std::vector<entry::Person>& personVec, QWidget* parent)
 		{
 			ConsumptionInputs inputs = getEntryInputs();
 			emit calcEntryCost(inputs, entryCost); // entryCost passed by reference for result retrieval
-			lCost->setText(QtUtils::toCurrencyFormat(entryCost));
+			lCost->setText(qtUtils::toCurrencyFormat(entryCost));
 		};
 
 	connect(spinboxBeer05, &QSpinBox::valueChanged, this, consumptionInputChanged);

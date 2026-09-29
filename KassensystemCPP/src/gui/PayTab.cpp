@@ -52,10 +52,10 @@ void PayTab::initialize()
 	auto* dueTextLabel		= new QLabel(QStringLiteral("Ausstehend"), this);
 	auto* creditTextLabel	= new QLabel(QStringLiteral("Guthaben"), this);
 
-	totalNumLabel	= new QLabel(QtUtils::toCurrencyFormat(0.0), this);
-	settledNumLabel	= new QLabel(QtUtils::toCurrencyFormat(0.0), this);
-	dueNumLabel		= new QLabel(QtUtils::toCurrencyFormat(0.0), this);
-	creditNumLabel	= new QLabel(QtUtils::toCurrencyFormat(0.0), this);
+	totalNumLabel	= new QLabel(qtUtils::toCurrencyFormat(0.0), this);
+	settledNumLabel	= new QLabel(qtUtils::toCurrencyFormat(0.0), this);
+	dueNumLabel		= new QLabel(qtUtils::toCurrencyFormat(0.0), this);
+	creditNumLabel	= new QLabel(qtUtils::toCurrencyFormat(0.0), this);
 
 	const auto configureAmountLabel = [](QLabel* label)
 		{
@@ -86,7 +86,7 @@ void PayTab::initialize()
 	paymentSpinBox->setDecimals(2);
 	paymentSpinBox->setMinimum(0.0);
 	paymentSpinBox->setMaximum(999999.99);
-	paymentSpinBox->setSuffix(QStringLiteral(" ") + QtUtils::eurSymbol());
+	paymentSpinBox->setSuffix(QStringLiteral(" ") + qtUtils::eurSymbol());
 	paymentSpinBox->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
 
 	fullPaymentCheckBox = new QCheckBox(QStringLiteral("Ausstand übernehmen"), this);
@@ -268,10 +268,10 @@ void PayTab::nameChanged()
 	refreshTable(personEntryID);
 
 	// refresh labels
-	totalNumLabel->setText(QtUtils::toCurrencyFormat(total));
-	settledNumLabel->setText(QtUtils::toCurrencyFormat(settled));
-	dueNumLabel->setText(QtUtils::toCurrencyFormat(due));
-	creditNumLabel->setText(QtUtils::toCurrencyFormat(credit));
+	totalNumLabel->setText(qtUtils::toCurrencyFormat(total));
+	settledNumLabel->setText(qtUtils::toCurrencyFormat(settled));
+	dueNumLabel->setText(qtUtils::toCurrencyFormat(due));
+	creditNumLabel->setText(qtUtils::toCurrencyFormat(credit));
 
 	// reinit checkboxes, buttons, spinbox
 	credit > 1e-9 ? btnUseCredit->setEnabled(true) : btnUseCredit->setEnabled(false);
@@ -301,7 +301,7 @@ void PayTab::refresh()
 		{
 			return a.getFullSpecifier() > b.getFullSpecifier(); 
 		});
-	QList<QString> nameList = QtUtils::personVecToQStrList(personVec, &entry::Person::getFullSpecifier);
+	QList<QString> nameList = qtUtils::personVecToQStrList(personVec, &entry::Person::getFullSpecifier);
 	
 	std::optional<size_t> indexForOldID;
 	for (size_t i = personVec.size(); i-- > 0; ) // loop backward to insert in inverse-alphabetical order (i = size()-1 ... 0)
@@ -331,7 +331,7 @@ void PayTab::apply()
 		.personEntryID = nameSelect->currentData().toLongLong(),
 		.amount = paymentSpinBox->value(),
 		.comment = "", // TBD: temporary, retrieve through GUI later
-		.overpaymentType = btnSurplusToCredit->isChecked() ? OverpaymentDisposition::Credit : OverpaymentDisposition::Tip
+		.overpaymentType = btnSurplusToCredit->isChecked() ? OverpaymentDisposition::credit : OverpaymentDisposition::tip
 	};
 
 	paymentService.addPayment(request);
@@ -351,7 +351,8 @@ void PayTab::redeemCredit(int64_t personEntryID)
 		entry::Credit{
 			.creditEntryID = 0,
 			.personEntryID = personEntryID,
-			.dateBooked = QDate::currentDate(), // TBD: add custom date selection option if needed
+			.dateBooked = QDate::currentDate(),
+			.dateAdded = QDate::currentDate(),
 			.amount = -redemptionAmount,
 			.description = "Einlösung von bestehendem Guthaben"
 		});
@@ -360,7 +361,7 @@ void PayTab::redeemCredit(int64_t personEntryID)
 		request::Payment{
 		.personEntryID = personEntryID,
 		.amount = redemptionAmount,
-		.overpaymentType = OverpaymentDisposition::Credit
+		.overpaymentType = OverpaymentDisposition::credit
 		});
 }
 
@@ -427,7 +428,7 @@ void PayTab::refreshTable(int64_t personEntryID)
 	tblConsumption->clearContents();
 	
 	std::vector<entry::Consumption> cEntries = consumptionRepo->getConsumptionEntries(personEntryID);
-	std::vector<entry::Outstanding> drEntries = debtRepo->getPersonsOutstandingEntries(personEntryID, FilterType::IncludeFullyPaid);
+	std::vector<entry::Outstanding> drEntries = debtRepo->getPersonsOutstandingEntries(personEntryID, FilterType::includeFullyPaid);
 
 	// sort by date
 	std::sort(drEntries.begin(), drEntries.end(), [](const entry::Outstanding& a, const entry::Outstanding& b)
@@ -441,7 +442,7 @@ void PayTab::refreshTable(int64_t personEntryID)
 
 	tblConsumption->setRowCount(rowCount);
 	tblConsumption->setColumnCount(columnCount);
-	tblConsumption->setHorizontalHeaderLabels(QtUtils::strVecToQStrList({ "Zeitraum", "Bezahlt / Gesamt (" + Utils::eurSymbol() + ")", "Bier (0.5l)", "Bier (0.4l)", "Wasser", "Softdrinks", "Sonstiges (" + Utils::eurSymbol() + ")"}));
+	tblConsumption->setHorizontalHeaderLabels(qtUtils::strVecToQStrList({ "Zeitraum", "Bezahlt / Gesamt (" + utils::eurSymbol() + ")", "Bier (0.5l)", "Bier (0.4l)", "Wasser", "Softdrinks", "Sonstiges (" + utils::eurSymbol() + ")"}));
 
 	QColor rowColor;
 	for (size_t row = 0; row < drEntries.size(); row++)
@@ -468,7 +469,7 @@ void PayTab::refreshTable(int64_t personEntryID)
 
 		QString dateString;
 		if (!drEntry.dateBooked.isSpecial())
-			dateString = QtUtils::extractMonth(drEntry.dateBooked.date()) + " " + drEntry.dateBooked.date().toString("yy");
+			dateString = qtUtils::extractMonth(drEntry.dateBooked.date()) + " " + drEntry.dateBooked.date().toString("yy");
 		else
 			dateString = drEntry.dateBooked.toQString();
 

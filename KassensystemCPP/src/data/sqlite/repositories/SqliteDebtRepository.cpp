@@ -110,13 +110,13 @@ double SqliteDebtRepository::getTotalShare(FinancialShare share, const QDate& mi
 	QString shareString;
 	switch (share)
 	{
-	case FinancialShare::All:
+	case FinancialShare::all:
 		shareString = "1";
 		break;
-	case FinancialShare::Own:
+	case FinancialShare::own:
 		shareString = "(1-Debt.foreignShare)";
 		break;
-	case FinancialShare::Foreign:
+	case FinancialShare::foreign:
 		shareString = "Debt.foreignShare";
 		break;
 	}
@@ -173,7 +173,7 @@ std::vector<entry::Outstanding> SqliteDebtRepository::getPersonsOutstandingEntri
 	qDebug() << "-> getPersonsOutstandingEntries";
 
 	QString sqlString;
-	if (type == FilterType::OmitFullyPaid) sqlString = " AND (Debt.amount - COALESCE(GroupedPayments.paid,0)) > 0";
+	if (type == FilterType::omitFullyPaid) sqlString = " AND (Debt.amount - COALESCE(GroupedPayments.paid,0)) > 0";
 	
 	QSqlQuery query;
 	query.prepare(
@@ -202,7 +202,7 @@ std::vector<entry::Outstanding> SqliteDebtRepository::getForeignShareOutstanding
 	qDebug() << "-> getForeignShareOutstandingEntries";
 
 	QString filter;
-	if (type == FilterType::OmitFullyPaid)
+	if (type == FilterType::omitFullyPaid)
 		filter = " AND ROUND(Debt.amount * Debt.foreignShare - COALESCE(GroupedShareSettlements.settled, 0), 2) > 0";
 
 	QSqlQuery query;

@@ -1,5 +1,5 @@
 #include "BalanceTab.h"
-#include "BalanceTabDialog.h"
+#include "BalanceTabAddEntryDialog.h"
 #include "BalanceTabSettlementDialog.h"
 #include "GuiTypes.h"
 #include "qtutils/QtConversions.h"
@@ -34,19 +34,19 @@ void BalanceTab::initialize()
 	tblSpendings->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
 
 	// labels
-	lCashBefore			= new QLabel(QtUtils::toCurrencyFormat(0.0), this);
-	lCashDifference		= new QLabel(QtUtils::toCurrencyFormat(0.0), this);
-	lCashAfter			= new QLabel(QtUtils::toCurrencyFormat(0.0), this);
+	lCashBefore			= new QLabel(qtUtils::toCurrencyFormat(0.0), this);
+	lCashDifference		= new QLabel(qtUtils::toCurrencyFormat(0.0), this);
+	lCashAfter			= new QLabel(qtUtils::toCurrencyFormat(0.0), this);
 
-	lSavingsBefore		= new QLabel(QtUtils::toCurrencyFormat(0.0,3), this);
-	lSavingsDifference	= new QLabel(QtUtils::toCurrencyFormat(0.0,3), this);
-	lSavingsAfter		= new QLabel(QtUtils::toCurrencyFormat(0.0,3), this);
+	lSavingsBefore		= new QLabel(qtUtils::toCurrencyFormat(0.0,3), this);
+	lSavingsDifference	= new QLabel(qtUtils::toCurrencyFormat(0.0,3), this);
+	lSavingsAfter		= new QLabel(qtUtils::toCurrencyFormat(0.0,3), this);
 
-	lForeignBefore		= new QLabel(QtUtils::toCurrencyFormat(0.0,3), this);
-	lForeignAfter		= new QLabel(QtUtils::toCurrencyFormat(0.0,3), this);
+	lForeignBefore		= new QLabel(qtUtils::toCurrencyFormat(0.0,3), this);
+	lForeignAfter		= new QLabel(qtUtils::toCurrencyFormat(0.0,3), this);
 
-	lEarnings			= new QLabel(QtUtils::toCurrencyFormat(0.0,3), this);
-	lSpendings			= new QLabel(QtUtils::toCurrencyFormat(0.0), this);
+	lEarnings			= new QLabel(qtUtils::toCurrencyFormat(0.0,3), this);
+	lSpendings			= new QLabel(qtUtils::toCurrencyFormat(0.0), this);
 
 	const auto configureAmount = [](QLabel* label)
 		{
@@ -160,17 +160,17 @@ void BalanceTab::initialize()
 
 	refresh();
 
-	connect(btnAddEarning,  &QPushButton::clicked, this, [=]() {BalanceTab::addEntry(BtnIndex::AddEarning); });
-	connect(btnAddSpending, &QPushButton::clicked, this, [=]() {BalanceTab::addEntry(BtnIndex::AddSpending); });
+	connect(btnAddEarning,  &QPushButton::clicked, this, [=]() {BalanceTab::addEntry(BtnIndex::addEarning); });
+	connect(btnAddSpending, &QPushButton::clicked, this, [=]() {BalanceTab::addEntry(BtnIndex::addSpending); });
 	connect(btnSettleForeign, &QPushButton::clicked, this, [=]() {BalanceTab::addSettlement(); });
 }
 
 void BalanceTab::addEntry(BtnIndex mode)
 {
-	BalanceTabDialog::inputs inputs; // TBD: rename to BalanceTabAddEntryDialog
+	BalanceTabAddEntryDialog::inputs inputs;
 
 	std::vector<entry::Person> personVec = personRepo->getAllPersonEntries();
-	auto* inputDialog = new BalanceTabDialog(mode, personVec, this);
+	auto* inputDialog = new BalanceTabAddEntryDialog(mode, personVec, this);
 	if (inputDialog->exec() == QDialog::Accepted)
 	{
 		// inputs given and OK pressed
@@ -180,7 +180,7 @@ void BalanceTab::addEntry(BtnIndex mode)
 
 	balanceService.addBalanceItem(
 		request::Balance{
-			.type = mode==BtnIndex::AddEarning ? BalanceType::Earning : BalanceType::Spending,
+			.type = mode==BtnIndex::addEarning ? BalanceType::earning : BalanceType::spending,
 			.description = inputs.description,
 			.amount = inputs.amount,
 			.dateBooked = inputs.date,
@@ -205,8 +205,8 @@ void BalanceTab::refreshTables(const registerFinancials::Report& report) const
 	std::vector<TableAllocation> allocVec;
 	allocVec.reserve(2);
 
-	allocVec.emplace_back(tblEarnings, BalanceType::Earning | BalanceType::Supplement );
-	allocVec.emplace_back(tblSpendings, BalanceType::Spending );
+	allocVec.emplace_back(tblEarnings, BalanceType::earning | BalanceType::supplement );
+	allocVec.emplace_back(tblSpendings, BalanceType::spending );
 	
 	
 	// populate both tables with entries saved in balanceRepo
@@ -228,7 +228,7 @@ void BalanceTab::refreshTables(const registerFinancials::Report& report) const
 
 		table->setRowCount(rowCount);
 		table->setColumnCount(colCount);
-		table->setHorizontalHeaderLabels(QtUtils::strVecToQStrList({ "Beschreibung", "Betrag (" + Utils::eurSymbol() + ")", "Datum"}));
+		table->setHorizontalHeaderLabels(qtUtils::strVecToQStrList({ "Beschreibung", "Betrag (" + utils::eurSymbol() + ")", "Datum"}));
 
 		for (size_t row = 0; row < bEntries.size(); row++)
 		{
@@ -257,7 +257,7 @@ void BalanceTab::refreshLables(const registerFinancials::Report& report) const
 		{
 			QString color = addsPositively ? "#2e8b57" : "#c0392b"; // green / red
 			QString pre = addsPositively ? "+" : "-";
-			QString val = num >= 0 ? QtUtils::toCurrencyFormat(num) : ("(" + QtUtils::toCurrencyFormat(num) + ")");
+			QString val = num >= 0 ? qtUtils::toCurrencyFormat(num) : ("(" + qtUtils::toCurrencyFormat(num) + ")");
 
 			return QString(
 				"<tr>"
@@ -279,22 +279,22 @@ void BalanceTab::refreshLables(const registerFinancials::Report& report) const
 		row(true, d.depositedCredit, "Guthaben", true) +
 		"</table>";
 
-	lEarnings->setText(QtUtils::toCurrencyFormat(report.totalEarnings, 3));
-	lSpendings->setText(QtUtils::toCurrencyFormat(report.totalSpendings));
+	lEarnings->setText(qtUtils::toCurrencyFormat(report.totalEarnings, 3));
+	lSpendings->setText(qtUtils::toCurrencyFormat(report.totalSpendings));
 
 	beforeBox->setTitle(formatHeader(report.stateBefore.date));
-	lCashBefore->setText(QtUtils::toCurrencyFormat(report.stateBefore.cash));
-	lSavingsBefore->setText(QtUtils::toCurrencyFormat(report.stateBefore.savings, 3));
-	lForeignBefore->setText(QtUtils::toCurrencyFormat(report.stateBefore.foreignCash, 3));
+	lCashBefore->setText(qtUtils::toCurrencyFormat(report.stateBefore.cash));
+	lSavingsBefore->setText(qtUtils::toCurrencyFormat(report.stateBefore.savings, 3));
+	lForeignBefore->setText(qtUtils::toCurrencyFormat(report.stateBefore.foreignCash, 3));
 
-	lSavingsDifference->setText(QtUtils::toCurrencyFormat(report.savingsDiff, 3));
-	lCashDifference->setText(QtUtils::toCurrencyFormat(report.cashDiff));
+	lSavingsDifference->setText(qtUtils::toCurrencyFormat(report.savingsDiff, 3));
+	lCashDifference->setText(qtUtils::toCurrencyFormat(report.cashDiff));
 	lCashDifference->setToolTip(cashExplanation);
 
 	afterBox->setTitle(formatHeader(report.stateAfter.date));
-	lSavingsAfter->setText(QtUtils::toCurrencyFormat(report.stateAfter.savings, 3));
-	lCashAfter->setText(QtUtils::toCurrencyFormat(report.stateAfter.cash));
-	lForeignAfter->setText(QtUtils::toCurrencyFormat(report.stateAfter.foreignCash, 3));
+	lSavingsAfter->setText(qtUtils::toCurrencyFormat(report.stateAfter.savings, 3));
+	lCashAfter->setText(qtUtils::toCurrencyFormat(report.stateAfter.cash));
+	lForeignAfter->setText(qtUtils::toCurrencyFormat(report.stateAfter.foreignCash, 3));
 }
 
 void BalanceTab::apply()
@@ -331,10 +331,10 @@ void BalanceTab::addSettlement()
 
 	switch (returnMsg) // currently not needed; can be used for error presentation like an error dialog if needed
 	{
-	case AddSettlementException::None: break;
-	case AddSettlementException::AmountZero: break;
-	case AddSettlementException::AmountNegative: break;
-	case AddSettlementException::AmountGreaterThanTotalForeignShare: break;
+	case AddSettlementException::none: break;
+	case AddSettlementException::amountZero: break;
+	case AddSettlementException::amountNegative: break;
+	case AddSettlementException::amountGreaterThanTotalForeignShare: break;
 	}
 
 	refresh();

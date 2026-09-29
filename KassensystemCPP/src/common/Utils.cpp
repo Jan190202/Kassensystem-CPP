@@ -1,7 +1,7 @@
 #include "Utils.h"
 #include <algorithm>
 
-namespace Utils
+namespace utils
 {
 	std::string eurSymbol()
 	{

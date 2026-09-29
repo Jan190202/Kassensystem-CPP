@@ -5,7 +5,7 @@
 
 enum class BtnIndex
 {
-	AddEarning, AddSpending // TBD: to lower
+	addEarning, addSpending
 };
 
 struct LowerButtonBundle
