@@ -23,36 +23,36 @@ BalanceTabSettlementDialog::BalanceTabSettlementDialog(QWidget* parent) : QDialo
 	edtAmount->setSingleStep(1.0);
 	edtAmount->setAlignment(Qt::AlignLeft | Qt::AlignVCenter);
 
-	edtDate = new QDateEdit(QDate::currentDate());
-	edtDate->setDisplayFormat(QStringLiteral("dd MMMM yy"));
-	edtDate->setCalendarPopup(true);
+	//edtDate = new QDateEdit(QDate::currentDate());
+	//edtDate->setDisplayFormat(QStringLiteral("dd MMMM yy"));
+	//edtDate->setCalendarPopup(true);
 
-	auto* vLine = new QFrame(this);
-	vLine->setFrameShape(QFrame::VLine);
-	vLine->setFrameShadow(QFrame::Sunken);
+	//auto* vLine = new QFrame(this);
+	//vLine->setFrameShape(QFrame::VLine);
+	//vLine->setFrameShadow(QFrame::Sunken);
 
-	edtIsSpecial = new QCheckBox("Sonstiger Zeitraum:", this);
-	edtIsSpecial->setChecked(false);
+	//edtIsSpecial = new QCheckBox("Sonstiger Zeitraum:", this);
+	//edtIsSpecial->setChecked(false);
 
-	std::map<QString, RegisterDate::Special> specialMap =
-	{
-		{"Vergangenheit", RegisterDate::Special::previous},
-		{"Unbekannt", RegisterDate::Special::unknown},
-		{"Zukunft", RegisterDate::Special::subsequent}
-	};
-	edtSpecial = new QComboBox(this);
-	for (const auto& [specialStr, specialData] : specialMap)
-	{
-		edtSpecial->insertItem(0, specialStr, QVariant(static_cast<int>(specialData)));
-	}
-	edtSpecial->setCurrentIndex(edtSpecial->findText("Unbekannt"));
-	edtSpecial->setEnabled(false);
+	//std::map<QString, RegisterDate::Special> specialMap =
+	//{
+	//	{"Vergangenheit", RegisterDate::Special::previous},
+	//	{"Unbekannt", RegisterDate::Special::unknown},
+	//	{"Zukunft", RegisterDate::Special::subsequent}
+	//};
+	//edtSpecial = new QComboBox(this);
+	//for (const auto& [specialStr, specialData] : specialMap)
+	//{
+	//	edtSpecial->insertItem(0, specialStr, QVariant(static_cast<int>(specialData)));
+	//}
+	//edtSpecial->setCurrentIndex(edtSpecial->findText("Unbekannt"));
+	//edtSpecial->setEnabled(false);
 
-	auto* dateLayout = new QHBoxLayout();
-	dateLayout->addWidget(edtDate, 3);
-	dateLayout->addWidget(vLine);
-	dateLayout->addWidget(edtIsSpecial, 1, Qt::AlignRight);
-	dateLayout->addWidget(edtSpecial, 1);
+	//auto* dateLayout = new QHBoxLayout();
+	//dateLayout->addWidget(edtDate, 3);
+	//dateLayout->addWidget(vLine);
+	//dateLayout->addWidget(edtIsSpecial, 1, Qt::AlignRight);
+	//dateLayout->addWidget(edtSpecial, 1);
 
 
 	edtComment = new QPlainTextEdit();
@@ -61,8 +61,8 @@ BalanceTabSettlementDialog::BalanceTabSettlementDialog(QWidget* parent) : QDialo
 
 	auto* lblAmount = new QLabel(QStringLiteral("Betrag:"));
 	lblAmount->setFont(boldFont);
-	auto* lblDate = new QLabel(QStringLiteral("Datum:"));
-	lblDate->setFont(boldFont);
+	//auto* lblDate = new QLabel(QStringLiteral("Datum:"));
+	//lblDate->setFont(boldFont);
 	auto* lblComment = new QLabel(QStringLiteral("Kommentar:"));
 	lblComment->setFont(boldFont);
 
@@ -74,7 +74,7 @@ BalanceTabSettlementDialog::BalanceTabSettlementDialog(QWidget* parent) : QDialo
 	form->setRowWrapPolicy(QFormLayout::WrapAllRows);
 
 	form->addRow(lblAmount, edtAmount);
-	form->addRow(lblDate, dateLayout);
+	//form->addRow(lblDate, dateLayout);
 	form->addRow(lblComment, edtComment);
 
 	auto* bottomSeparator = new QFrame;
@@ -104,19 +104,19 @@ BalanceTabSettlementDialog::BalanceTabSettlementDialog(QWidget* parent) : QDialo
 
 	connect(btnOK, &QPushButton::clicked, this, &QDialog::accept);
 	connect(btnCancel, &QPushButton::clicked, this, &QDialog::reject);
-	connect(edtIsSpecial, &QCheckBox::checkStateChanged, this, [&](Qt::CheckState state) {
-		switch (state)
-		{
-		case Qt::Checked:
-			edtDate->setEnabled(false);
-			edtSpecial->setEnabled(true);
-			break;
-		case Qt::Unchecked:
-			edtDate->setEnabled(true);
-			edtSpecial->setEnabled(false);
-			break;
-		}
-		});
+	//connect(edtIsSpecial, &QCheckBox::checkStateChanged, this, [&](Qt::CheckState state) {
+	//	switch (state)
+	//	{
+	//	case Qt::Checked:
+	//		edtDate->setEnabled(false);
+	//		edtSpecial->setEnabled(true);
+	//		break;
+	//	case Qt::Unchecked:
+	//		edtDate->setEnabled(true);
+	//		edtSpecial->setEnabled(false);
+	//		break;
+	//	}
+	//	});
 
 	setMinimumWidth(520);
 	adjustSize();
@@ -126,9 +126,6 @@ BalanceTabSettlementDialog::inputs BalanceTabSettlementDialog::getInputs() const
 {
 	return BalanceTabSettlementDialog::inputs{
 		.amount = edtAmount->value(),
-		.date = edtIsSpecial->isChecked() ?
-			RegisterDate{static_cast<RegisterDate::Special>(edtSpecial->currentData().toInt())} :
-			RegisterDate{edtDate->date()},
 		.comment = edtComment->toPlainText().toStdString()
 	};
 }

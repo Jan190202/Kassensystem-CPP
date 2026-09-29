@@ -80,12 +80,12 @@ namespace testing
 		request::Balance bReq10{ .type = BalanceType::Earning, .description = "Eintrag 10", .amount = 10, .dateBooked = QDate(2026,1,2), .comment = "Kommentar 10", .coveringpersonEntryID = std::nullopt };
 
 		// p1ID --> total: 15, toCredit: 5, toTip: 10, >=2026: 8
-		request::Payment pEntry1{ .personEntryID = p1ID, .dateBooked = QDate::currentDate(), .amount = 1, .overpaymentType = OverpaymentDisposition::Credit };
-		request::Payment pEntry2{ .personEntryID = p1ID, .dateBooked = QDate(2026,1,1), .amount = 1, .overpaymentType = OverpaymentDisposition::Credit };
-		request::Payment pEntry3{ .personEntryID = p1ID, .dateBooked = QDate(2026,1,2), .amount = 1, .overpaymentType = OverpaymentDisposition::Credit };
-		request::Payment pEntry4{ .personEntryID = p1ID, .dateBooked = QDate(2025,12,12), .amount = 2, .overpaymentType = OverpaymentDisposition::Credit };
-		request::Payment pEntry5{ .personEntryID = p1ID, .dateBooked = QDate(2026,2,2), .amount = 5, .overpaymentType = OverpaymentDisposition::Tip };
-		request::Payment pEntry6{ .personEntryID = p1ID, .dateBooked = QDate(2025,8,8), .amount = 5, .overpaymentType = OverpaymentDisposition::Tip };
+		request::Payment pEntry1{ .personEntryID = p1ID, .amount = 1, .overpaymentType = OverpaymentDisposition::Credit };
+		request::Payment pEntry2{ .personEntryID = p1ID, .amount = 1, .overpaymentType = OverpaymentDisposition::Credit };
+		request::Payment pEntry3{ .personEntryID = p1ID, .amount = 1, .overpaymentType = OverpaymentDisposition::Credit };
+		request::Payment pEntry4{ .personEntryID = p1ID, .amount = 2, .overpaymentType = OverpaymentDisposition::Credit };
+		request::Payment pEntry5{ .personEntryID = p1ID, .amount = 5, .overpaymentType = OverpaymentDisposition::Tip };
+		request::Payment pEntry6{ .personEntryID = p1ID, .amount = 5, .overpaymentType = OverpaymentDisposition::Tip };
 
 		// total: 30
 		request::ShareSettlement sEntry1{ .amount = 10 };

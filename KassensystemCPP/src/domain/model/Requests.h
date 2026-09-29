@@ -25,18 +25,17 @@ namespace request
 		std::optional<int64_t> coveringpersonEntryID;
 	};
 
-	struct Payment
+	struct Payment // specifically no date, as allocation only ever done using the current debt entries, aren't changed afterwards in an earlier payment comes in
 	{
 		int64_t personEntryID;
-		QDate dateBooked;
 		double amount;
+		std::string comment;
 		OverpaymentDisposition overpaymentType;
 	};
 
-	struct ShareSettlement
+	struct ShareSettlement // specifically no date, as allocation only ever done using the current debt entries, aren't changed afterwards in an earlier settlement comes in
 	{
 		double amount;
-		RegisterDate dateBooked;
 		std::string comment;
 	};
 }

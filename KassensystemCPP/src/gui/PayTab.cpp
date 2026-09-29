@@ -329,8 +329,8 @@ void PayTab::apply()
 {
 	request::Payment request{
 		.personEntryID = nameSelect->currentData().toLongLong(),
-		.dateBooked = QDate::currentDate(), // TBD: add custom date selection option if needed
 		.amount = paymentSpinBox->value(),
+		.comment = "", // TBD: temporary, retrieve through GUI later
 		.overpaymentType = btnSurplusToCredit->isChecked() ? OverpaymentDisposition::Credit : OverpaymentDisposition::Tip
 	};
 
@@ -359,7 +359,6 @@ void PayTab::redeemCredit(int64_t personEntryID)
 	paymentService.addPayment(
 		request::Payment{
 		.personEntryID = personEntryID,
-		.dateBooked = QDate::currentDate(), // TBD: add custom date selection option if needed
 		.amount = redemptionAmount,
 		.overpaymentType = OverpaymentDisposition::Credit
 		});

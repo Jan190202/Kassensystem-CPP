@@ -10,19 +10,14 @@
 int64_t SqliteShareSettlementRepository::addShareSettlementEntry(const entry::ShareSettlement& entry)
 {
 	qDebug() << "-> addShareSettlementEntry";
-	
-	bool isBookedSpecial = entry.dateBooked.isSpecial();
-	
+
 	QSqlQuery query;
 	query.prepare(
 		"INSERT INTO ShareSettlement "
-		"(dateBooked, dateBookedSpecial, dateAdded, amount, comment) "
-		"VALUES (:dateBooked, :dateBookedSpecial, :dateAdded, :amount, :comment) "
+		"(dateAdded, amount, comment) "
+		"VALUES (:dateAdded, :amount, :comment) "
 		"RETURNING ID "
 	);
-
-	query.bindValue(":dateBooked", entry.dateBooked.toSqlDateValue());
-	query.bindValue(":dateBookedSpecial", entry.dateBooked.toSqlSpecialValue());
 	query.bindValue(":dateAdded", entry.dateAdded.toString(Qt::ISODate));
 	query.bindValue(":amount", entry.amount);
 	query.bindValue(":comment", QString::fromStdString(entry.comment));
@@ -90,19 +85,11 @@ double SqliteShareSettlementRepository::getTotalAllocatedShareSettlements(const 
 	qDebug() << "-> getTotalAllocatedShareSettlements";
 
 	QSqlQuery query;
-	
-	QString compClause = sqliteUtils::registerDateCompareClause(
-		sqliteUtils::Op::largerOrEq, 
-		RegisterDate{ minDate }, 
-		"ShareSettlement.dateBooked", 
-		"ShareSettlement.dateBookedSpecial", 
-		":minDate");
-
-	query.prepare(
+		query.prepare(
 		"SELECT COALESCE(SUM(ShareSettlementAllocation.amount),0) AS total "
 		"FROM ShareSettlementAllocation "
 		"JOIN ShareSettlement ON ShareSettlementAllocation.shareSettlementID = ShareSettlement.ID "
-		"WHERE " + compClause + " "
+		"WHERE ShareSettlement.dateAdded >= :minDate "
 	);
 	query.bindValue(":minDate", minDate.toString(Qt::ISODate));
 

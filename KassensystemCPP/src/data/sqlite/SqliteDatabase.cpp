@@ -40,14 +40,14 @@ namespace sqliteDatabase
 					"amount REAL NOT NULL, description TEXT" },
 				{ "Payment",
 					"ID INTEGER PRIMARY KEY, personID INTEGER NOT NULL REFERENCES Person(ID), "
-					"dateBooked TEXT, dateBookedSpecial INTEGER, dateAdded TEXT NOT NULL, "
-					"amount REAL NOT NULL, overpaymentType INTEGER NOT NULL" },
+					"dateAdded TEXT NOT NULL, amount REAL NOT NULL, overpaymentType INTEGER NOT NULL, "
+					"comment TEXT" },
 				{ "PaymentAllocation",
 					"ID INTEGER PRIMARY KEY, debtID INTEGER NOT NULL REFERENCES Debt(ID), "
 					"paymentID INTEGER NOT NULL REFERENCES Payment(ID), amount REAL NOT NULL" },
 				{ "ShareSettlement",
-					"ID INTEGER PRIMARY KEY, dateBooked TEXT, dateBookedSpecial INTEGER, "
-					"dateAdded TEXT NOT NULL, amount REAL NOT NULL, comment TEXT" },
+					"ID INTEGER PRIMARY KEY, dateAdded TEXT NOT NULL, amount REAL NOT NULL, "
+					"comment TEXT" },
 				{ "ShareSettlementAllocation",
 					"ID INTEGER PRIMARY KEY, debtID INTEGER NOT NULL REFERENCES Debt(ID), "
 					"shareSettlementID INTEGER NOT NULL REFERENCES ShareSettlement(ID), amount REAL NOT NULL" },
@@ -193,7 +193,10 @@ namespace sqliteDatabase
 
 		////////////////// FROM HERE: MIGRATION, DELETE FUNCTIONS AFTER ONE TIME USE ///////////
 
-		const QStringList kDatedTables{ "Balance", "Debt", "Credit", "Payment", "ShareSettlement" };
+		const QStringList kDatedTables{ "Balance", "Debt", "Credit" };
+		const QStringList kAddedOnlyTables{ "Payment", "ShareSettlement" };
+		const QStringList kCommentTables{ "Payment", "ShareSettlement" };
+
 		const QString kFallbackDate = "'2026-09-28'"; 
 
 		QStringList columnsOf(QSqlDatabase& db, const QString& table)
@@ -213,7 +216,12 @@ namespace sqliteDatabase
 				&& (!cols.contains("dateAdded") || !cols.contains("dateBookedSpecial")))
 				return true;
 
-			if (table == "ShareSettlement" && !cols.contains("comment"))
+			if (kAddedOnlyTables.contains(table)
+				&& (!cols.contains("dateAdded")
+					|| cols.contains("dateBooked") || cols.contains("dateBookedSpecial")))
+				return true;
+
+			if (kCommentTables.contains(table) && !cols.contains("comment"))
 				return true;
 
 			return false;

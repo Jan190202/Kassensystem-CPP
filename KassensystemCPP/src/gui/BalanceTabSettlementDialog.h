@@ -17,7 +17,6 @@ public:
 	struct inputs
 	{
 		double amount;
-		RegisterDate date;
 		std::string comment;
 	};
 
@@ -27,8 +26,5 @@ public:
 
 private:
 	QDoubleSpinBox*		edtAmount;
-	QDateEdit*			edtDate;
-	QCheckBox*			edtIsSpecial;
-	QComboBox*			edtSpecial;
 	QPlainTextEdit*		edtComment;
 };

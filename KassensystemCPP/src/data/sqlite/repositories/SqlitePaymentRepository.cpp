@@ -14,15 +14,14 @@ int64_t SqlitePaymentRepository::addPaymentEntry(const entry::Payment& entry)
 	QSqlQuery query;
 	query.prepare(
 		"INSERT INTO Payment "
-		"(personID, dateBooked, dateBookedSpecial, dateAdded, amount, overpaymentType) "
-		"VALUES (:personID, :dateBooked, :dateBookedSpecial, :dateAdded, :amount, :overpaymentType) "
+		"(personID, dateAdded, amount, comment, overpaymentType) "
+		"VALUES (:personID, :dateAdded, :amount, :comment, :overpaymentType) "
 		"RETURNING ID "
 	);
 	query.bindValue(":personID", entry.personEntryID);
-	query.bindValue(":dateBooked", entry.dateBooked.toSqlDateValue());
-	query.bindValue(":dateBookedSpecial", entry.dateBooked.toSqlSpecialValue());
 	query.bindValue(":dateAdded", entry.dateAdded.toString(Qt::ISODate));
 	query.bindValue(":amount", entry.amount);
+	query.bindValue(":comment", QString::fromStdString(entry.comment));
 	query.bindValue(":overpaymentType", static_cast<int>(entry.overpaymentType));
 	
 	if (query.exec())
@@ -87,19 +86,12 @@ double SqlitePaymentRepository::getTotalAllocatedPayments(const QDate& minDate) 
 {
 	qDebug() << "-> getTotalAllocatedPayments";
 
-	QString compClause = sqliteUtils::registerDateCompareClause(
-		sqliteUtils::Op::largerOrEq,
-		RegisterDate{ minDate },
-		"Payment.dateBooked",
-		"Payment.dateBookedSpecial",
-		":minDate");
-
 	QSqlQuery query;
 	query.prepare(
 		"SELECT COALESCE(SUM(PaymentAllocation.amount),0) AS total "
 		"FROM PaymentAllocation "
 		"LEFT OUTER JOIN Payment ON PaymentAllocation.paymentID = Payment.ID "
-		"WHERE " + compClause + " "
+		"WHERE Payment.dateAdded >= :minDate "
 	);
 	query.bindValue(":minDate", minDate.toString(Qt::ISODate));
 

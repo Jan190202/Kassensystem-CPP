@@ -203,18 +203,18 @@ namespace entry
 	{
 		int64_t paymentEntryID;
 		int64_t personEntryID;
-		RegisterDate dateBooked;
 		QDate dateAdded;
 		double amount;
+		std::string comment;
 		OverpaymentDisposition overpaymentType;
 
 		friend std::ostream& operator<<(std::ostream& out, const Payment& entry)
 		{
 			out << "paymentEntryID: " << entry.paymentEntryID << ", "
 				<< "personEntryID: " << entry.personEntryID << ", "
-				<< "dateBooked: " << entry.dateBooked << ", "
 				<< "dateAdded: " << entry.dateAdded.toString("dd.MM.yyyy").toStdString() << ", "
 				<< "amount: " << entry.amount << ", "
+				<< "comment: " << entry.comment << ", "
 				<< "overpaymentType: " << static_cast<int>(entry.overpaymentType);
 
 			return out;
@@ -288,7 +288,6 @@ namespace entry
 	struct ShareSettlement
 	{
 		int64_t shareSettlementEntryID;
-		RegisterDate dateBooked;
 		QDate dateAdded;
 		double amount;
 		std::string comment;
@@ -296,7 +295,6 @@ namespace entry
 		friend std::ostream& operator<<(std::ostream& out, const ShareSettlement& entry)
 		{
 			out << "settlementEntryID: " << entry.shareSettlementEntryID << ", "
-				<< "dateBooked: " << entry.dateBooked << ", "
 				<< "dateAdded: " << entry.dateAdded.toString("dd.MM.yyyy").toStdString() << ", "
 				<< "amount: " << entry.amount << ", "
 				<< "comment: " << entry.comment;

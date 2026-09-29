@@ -12,8 +12,9 @@ void PaymentService::addPayment(const request::Payment& request)
 	entry::Payment entry{
 		.paymentEntryID = 0,
 		.personEntryID = request.personEntryID,
-		.dateBooked = request.dateBooked,
+		.dateAdded= QDate::currentDate(),
 		.amount = request.amount,
+		.comment = request.comment,
 		.overpaymentType = request.overpaymentType
 	};
 
@@ -25,10 +26,10 @@ void PaymentService::addPayment(const request::Payment& request)
 		switch (entry.overpaymentType)
 		{
 		case OverpaymentDisposition::Credit:
-			addCredit(entry.personEntryID, overpaymentAmount, entry.dateBooked, "Guthaben durch Einzahlung/Überbezahlung");
+			addCredit(entry.personEntryID, overpaymentAmount, entry.dateAdded, "Guthaben durch Einzahlung/Überbezahlung");
 			break;
 		case OverpaymentDisposition::Tip:
-			addTip(entry.personEntryID, overpaymentAmount, entry.dateBooked);
+			addTip(entry.personEntryID, overpaymentAmount, entry.dateAdded);
 			break;
 		}
 	}

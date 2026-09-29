@@ -167,7 +167,7 @@ void BalanceTab::initialize()
 
 void BalanceTab::addEntry(BtnIndex mode)
 {
-	BalanceTabDialog::inputs inputs;
+	BalanceTabDialog::inputs inputs; // TBD: rename to BalanceTabAddEntryDialog
 
 	std::vector<entry::Person> personVec = personRepo->getAllPersonEntries();
 	auto* inputDialog = new BalanceTabDialog(mode, personVec, this);
@@ -326,7 +326,6 @@ void BalanceTab::addSettlement()
 	auto returnMsg = balanceService.addShareSettlement(
 		request::ShareSettlement{
 			.amount = inputs.amount,
-			.dateBooked = inputs.date,
 			.comment = inputs.comment 
 		});
 
