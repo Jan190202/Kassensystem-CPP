@@ -235,7 +235,7 @@ void BalanceTab::refreshTables(const registerFinancials::Report& report) const
 			const entry::Balance& bEntry = bEntries.at(row);
 
 			QTableWidgetItem* descriptionItem = new QTableWidgetItem(QString::fromStdString(bEntry.description));
-			QTableWidgetItem* amountItem = new QTableWidgetItem(QString::number(bEntry.amount, 'f', 2));
+			QTableWidgetItem* amountItem = new QTableWidgetItem(QString::number(bEntry.amount, 'f', (hasFlag(bEntry.type, BalanceType::supplement) ? 3 : 2)));
 			QTableWidgetItem* dateItem = new QTableWidgetItem(bEntry.dateBooked.toQString());
 
 			//descriptionItem->setTextAlignment(Qt::AlignHCenter | Qt::AlignVCenter);
