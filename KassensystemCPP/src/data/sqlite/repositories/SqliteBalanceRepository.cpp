@@ -115,7 +115,7 @@ entry::Balance SqliteBalanceRepository::getEntryFromQuery(const QSqlQuery& query
 		.description = query.value("description").toString().toStdString(),
 		.amount = query.value("amount").toDouble(),
 		.dateBooked =
-			query.value("dateBooked").isValid() ?
+			!query.value("dateBooked").isNull() ?
 				RegisterDate{query.value("dateBooked").toDate()} :
 				RegisterDate{static_cast<RegisterDate::Special>(query.value("dateBookedSpecial").toInt())},
 		.dateAdded = query.value("dateAdded").toDate(),

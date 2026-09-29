@@ -33,7 +33,7 @@ double SqliteDebtRepository::getPersonsTotal(int64_t personEntryID) const
 {
 	QSqlQuery query;
 	query.prepare(
-		"SELECT SUM(amount) AS total "
+		"SELECT COALESCE(SUM(amount), 0) AS total "
 		"FROM Debt "
 		"WHERE Debt.personID = :personEntryID "
 	);
@@ -119,7 +119,7 @@ double SqliteDebtRepository::getTotalShare(FinancialShare share, const QDate& mi
 	
 	QSqlQuery query;
 	query.prepare(
-		"SELECT SUM(Debt.amount * " + shareString + ") AS share "
+		"SELECT COALESCE(SUM(Debt.amount * " + shareString + "),0) AS share "
 		"FROM Debt "
 		"WHERE " + compClause + " "
 	);
@@ -210,7 +210,7 @@ std::vector<entry::Outstanding> SqliteDebtRepository::getForeignShareOutstanding
 		"FROM Debt "
 		"LEFT OUTER JOIN GroupedShareSettlements ON Debt.ID = GroupedShareSettlements.debtID "
 		+ sqlString
-	);
+	); // TBD: error here (possibly also in PaymentRepository)
 
 	std::vector<entry::Outstanding> entries;
 
@@ -234,7 +234,7 @@ entry::Outstanding SqliteDebtRepository::getOutstandingEntryFromQuery(const QSql
 	return entry::Outstanding{
 		.debtEntryID = query.value("ID").toLongLong(),
 		.dateBooked = 
-			query.value("dateBooked").isValid() ? 
+			!query.value("dateBooked").isNull() ? 
 				RegisterDate{query.value("dateBooked").toDate()} : 
 				RegisterDate{static_cast<RegisterDate::Special>(query.value("dateBookedSpecial").toInt())},
 		.amount = query.value("amount").toDouble(),

@@ -22,6 +22,7 @@
 #include <QInputDialog>
 #include <QMessageBox>
 #include <QCompleter>
+#include <QSignalBlocker>
 #include <algorithm>
 
 PayTab::PayTab(const LowerButtonBundle& lowerButtons, PaymentService& paymentService, PersonRepository* personRepo, ConsumptionRepository* consumptionRepo, DebtRepository* debtRepo, CreditRepository* creditRepo, QWidget* parent) 
@@ -251,10 +252,7 @@ void PayTab::initialize()
 			}
 		});
 
-	connect(nameSelect, &QComboBox::currentIndexChanged, this, [&]()
-		{
-			nameChanged();
-		});
+	connect(nameSelect, &QComboBox::currentIndexChanged, this, [&]() { nameChanged(); });
 }
 
 void PayTab::nameChanged()
@@ -284,9 +282,11 @@ void PayTab::nameChanged()
 
 void PayTab::refresh()
 {
-	// refresh name list (clear and rebuild from database), in case it was altered
+	// refresh name list (clear and rebuild from database), in case it was altered (block signal emmitting temporarily)
 	// try to keep name loaded before, or placeholder
 	// refresh tab for current name
+
+	QSignalBlocker blocker(nameSelect);
 
 	bool isPlaceholder = false;
 	if (nameSelect->currentIndex() == -1) isPlaceholder = true;
@@ -479,13 +479,6 @@ void PayTab::refreshTable(int64_t personEntryID)
 			dateString = QtUtils::extractMonth(drEntry.dateBooked.date()) + " " + drEntry.dateBooked.date().toString("yy");
 		else
 			dateString = drEntry.dateBooked.toQString();
-
-		qDebug() << "dateString:" << dateString;
-		qDebug() << "dateString:" << drEntry.dateBooked.toQString();
-		qDebug() << "dateString:" << drEntry.dateBooked.toString();
-		qDebug() << "isSpecial:" << drEntry.dateBooked.isSpecial();
-
-		qDebug() << drEntry.dateBooked.sortRank();
 
 		QTableWidgetItem* dateItem = new QTableWidgetItem(dateString);
 		QTableWidgetItem* infoItem = new QTableWidgetItem(QString::number(drEntry.amount-drEntry.remaining, 'f', 2) + QString::fromStdString(" / ") + QString::number(drEntry.amount, 'f', 2));
