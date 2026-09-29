@@ -16,8 +16,8 @@ int64_t SqliteShareSettlementRepository::addShareSettlementEntry(const entry::Sh
 	QSqlQuery query;
 	query.prepare(
 		"INSERT INTO ShareSettlement "
-		"(dateBooked, dateBookedSpecial, dateAdded, amount) "
-		"VALUES (:dateBooked, :dateBookedSpecial, :dateAdded, :amount) "
+		"(dateBooked, dateBookedSpecial, dateAdded, amount, comment) "
+		"VALUES (:dateBooked, :dateBookedSpecial, :dateAdded, :amount, :comment) "
 		"RETURNING ID "
 	);
 
@@ -25,6 +25,7 @@ int64_t SqliteShareSettlementRepository::addShareSettlementEntry(const entry::Sh
 	query.bindValue(":dateBookedSpecial", entry.dateBooked.toSqlSpecialValue());
 	query.bindValue(":dateAdded", entry.dateAdded.toString(Qt::ISODate));
 	query.bindValue(":amount", entry.amount);
+	query.bindValue(":comment", QString::fromStdString(entry.comment));
 
 	if (query.exec())
 		if (query.next())

@@ -1,5 +1,6 @@
 #include "BalanceTab.h"
 #include "BalanceTabDialog.h"
+#include "BalanceTabSettlementDialog.h"
 #include "GuiTypes.h"
 #include "qtutils/QtConversions.h"
 #include <QDate>
@@ -309,34 +310,24 @@ QString BalanceTab::formatHeader(const QDate& date) const
 
 void BalanceTab::addSettlement()
 {
-	const double minValue = 0.0;
-	const double maxValue = report.stateAfter.foreignCash;
-	const double initValue = maxValue;
-	const int decimals = 2;
+	BalanceTabSettlementDialog::inputs inputs;
 
-	QInputDialog dialog(this);
-	dialog.setWindowTitle(QStringLiteral("Fremdanteil begleichen"));
-	dialog.setLabelText(QString::fromStdString("Betrag (" + Utils::eurSymbol() + "):"));
+	auto* inputDialog = new BalanceTabSettlementDialog(this);
+	if (inputDialog->exec() == QDialog::Accepted)
+	{
+		// inputs given and OK pressed
+		inputs = inputDialog->getInputs();
+	}
+	else { return; } // cancel pressed
 
-	dialog.setDoubleRange(minValue, maxValue);
-	dialog.setDoubleDecimals(decimals);
-	dialog.setDoubleValue(initValue);
-
-	QSize size = dialog.sizeHint();
-	size.setWidth(qMax(size.width(), 200));
-	dialog.resize(size);
-
-	if (dialog.exec() != QDialog::Accepted)
-		return;
-
-	const double settledAmount = dialog.doubleValue();
-
-	if (settledAmount == 0)
+	if (inputs.amount < 1e-9)
 		return;
 
 	auto returnMsg = balanceService.addShareSettlement(
 		request::ShareSettlement{
-			.amount = settledAmount
+			.amount = inputs.amount,
+			.dateBooked = inputs.date,
+			.comment = inputs.comment 
 		});
 
 	switch (returnMsg) // currently not needed; can be used for error presentation like an error dialog if needed

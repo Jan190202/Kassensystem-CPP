@@ -36,5 +36,7 @@ namespace request
 	struct ShareSettlement
 	{
 		double amount;
+		RegisterDate dateBooked;
+		std::string comment;
 	};
 }

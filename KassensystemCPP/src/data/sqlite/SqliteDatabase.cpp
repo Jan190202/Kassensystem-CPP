@@ -47,7 +47,7 @@ namespace sqliteDatabase
 					"paymentID INTEGER NOT NULL REFERENCES Payment(ID), amount REAL NOT NULL" },
 				{ "ShareSettlement",
 					"ID INTEGER PRIMARY KEY, dateBooked TEXT, dateBookedSpecial INTEGER, "
-					"dateAdded TEXT NOT NULL, amount REAL NOT NULL" },
+					"dateAdded TEXT NOT NULL, amount REAL NOT NULL, comment TEXT" },
 				{ "ShareSettlementAllocation",
 					"ID INTEGER PRIMARY KEY, debtID INTEGER NOT NULL REFERENCES Debt(ID), "
 					"shareSettlementID INTEGER NOT NULL REFERENCES ShareSettlement(ID), amount REAL NOT NULL" },
@@ -205,9 +205,18 @@ namespace sqliteDatabase
 			return cols; 
 		}
 
-		bool needsMigration(const QStringList& cols)
+		bool needsMigration(const QString& table, const QStringList& cols)
 		{
-			return !cols.isEmpty() && (!cols.contains("dateAdded") || !cols.contains("dateBookedSpecial"));
+			if (cols.isEmpty()) return false;
+
+			if (kDatedTables.contains(table)
+				&& (!cols.contains("dateAdded") || !cols.contains("dateBookedSpecial")))
+				return true;
+
+			if (table == "ShareSettlement" && !cols.contains("comment"))
+				return true;
+
+			return false;
 		}
 
 		QString sourceExpression(const QString& col, const QStringList& oldCols)
@@ -215,7 +224,7 @@ namespace sqliteDatabase
 			if (oldCols.contains(col))                      
 				return col;                                
 
-			if (col == "dateBookedSpecial")
+			if (col == "dateBookedSpecial" || col == "comment")
 				return "NULL";
 
 			const bool hadLegacyDate = oldCols.contains("date");
@@ -257,7 +266,7 @@ namespace sqliteDatabase
 		{
 			std::vector<const TableDef*> pending;
 			for (const auto& def : tableDefinitions())
-				if (kDatedTables.contains(def.name) && needsMigration(columnsOf(db, def.name)))
+				if (needsMigration(def.name, columnsOf(db, def.name)))
 					pending.push_back(&def);
 
 			if (pending.empty()) return true;   

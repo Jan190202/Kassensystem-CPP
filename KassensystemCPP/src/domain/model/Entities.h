@@ -291,13 +291,15 @@ namespace entry
 		RegisterDate dateBooked;
 		QDate dateAdded;
 		double amount;
+		std::string comment;
 
 		friend std::ostream& operator<<(std::ostream& out, const ShareSettlement& entry)
 		{
 			out << "settlementEntryID: " << entry.shareSettlementEntryID << ", "
 				<< "dateBooked: " << entry.dateBooked << ", "
 				<< "dateAdded: " << entry.dateAdded.toString("dd.MM.yyyy").toStdString() << ", "
-				<< "amount: " << entry.amount;
+				<< "amount: " << entry.amount << ", "
+				<< "comment: " << entry.comment;
 
 			return out;
 		}

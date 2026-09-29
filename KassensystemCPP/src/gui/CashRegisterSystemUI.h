@@ -18,7 +18,7 @@ private:
 	std::array<BaseTab*, 3> tabs;
 	LowerButtonBundle lowerButtons;
 
-	enum class TabIndex { Pay=0, Add, Balance };
+	enum class TabIndex { Pay=0, Add, Balance }; // TBD: to lower
 	int activeTab = 0;
 	std::array<bool, 3> loadedTabs = {false};
 
