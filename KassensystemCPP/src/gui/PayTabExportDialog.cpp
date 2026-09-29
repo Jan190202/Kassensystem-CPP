@@ -96,7 +96,5 @@ std::string PayTabExportDialog::getPath()
 	std::string path = pathQ.toStdString();
 	if (!path.ends_with(".csv")) path += ".csv";
 
-	qDebug() << QString::fromStdString(path);
-
 	return path;
 }

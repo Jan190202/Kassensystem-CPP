@@ -9,6 +9,8 @@
 
 int64_t SqliteShareSettlementRepository::addShareSettlementEntry(const entry::ShareSettlement& entry)
 {
+	qDebug() << "-> addShareSettlementEntry";
+	
 	bool isBookedSpecial = entry.dateBooked.isSpecial();
 	
 	QSqlQuery query;
@@ -26,11 +28,16 @@ int64_t SqliteShareSettlementRepository::addShareSettlementEntry(const entry::Sh
 
 	if (query.exec())
 		if (query.next())
+		{
+			qDebug() << "--> returns " << query.value(0).toLongLong();
 			return query.value(0).toLongLong();
+		}
 }
 
 int64_t SqliteShareSettlementRepository::addShareSettlementAllocationEntry(const entry::ShareSettlementAllocation& entry)
 {
+	qDebug() << "-> addShareSettlementAllocationEntry";
+
 	QSqlQuery query;
 	query.prepare(
 		"INSERT INTO ShareSettlementAllocation "
@@ -44,11 +51,16 @@ int64_t SqliteShareSettlementRepository::addShareSettlementAllocationEntry(const
 
 	if (query.exec())
 		if (query.next())
+		{
+			qDebug() << "--> returns " << query.value(0).toLongLong();
 			return query.value(0).toLongLong();
+		}
 }
 
 std::vector<entry::ShareSettlementAllocation> SqliteShareSettlementRepository::getDebtEntrysShareSettlementAllocationEntries(int64_t debtEntryID) const
 {
+	qDebug() << "-> getDebtEntrysShareSettlementAllocationEntries";
+
 	QSqlQuery query;
 	query.prepare(
 		"SELECT ID, debtID, shareSettlementID, amount "
@@ -69,15 +81,13 @@ std::vector<entry::ShareSettlementAllocation> SqliteShareSettlementRepository::g
 				});
 		}
 
-	qDebug() << "DebtsEntryAllocationEntries: ";
-	for (auto& entry : entries)
-		qDebug() << entry;
-
 	return entries;
 }
 
 double SqliteShareSettlementRepository::getTotalAllocatedShareSettlements(const QDate& minDate) const
 {
+	qDebug() << "-> getTotalAllocatedShareSettlements";
+
 	QSqlQuery query;
 	
 	QString compClause = sqliteUtils::registerDateCompareClause(
@@ -99,7 +109,7 @@ double SqliteShareSettlementRepository::getTotalAllocatedShareSettlements(const 
 	{
 		if (query.next())
 		{
-			qDebug() << "AllocatedSettlements: " << query.value(0).toDouble();
+			qDebug() << "--> returns " << query.value(0).toDouble();
 			return query.value(0).toDouble();
 		}
 	}

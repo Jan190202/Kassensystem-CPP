@@ -8,6 +8,8 @@
 
 int64_t SqliteDebtRepository::addDebtEntry(const entry::Debt& entry)
 {
+	qDebug() << "-> addDebtEntry";
+
 	QSqlQuery query;
 	query.prepare(
 		"INSERT INTO Debt"
@@ -22,15 +24,18 @@ int64_t SqliteDebtRepository::addDebtEntry(const entry::Debt& entry)
 	query.bindValue(":amount", entry.amount);
 	query.bindValue(":foreignShare", entry.foreignShare);
 	
-	qDebug() << entry;
-
 	if (query.exec())
 		if (query.next())
+		{
+			qDebug() << "--> returns " << query.value(0).toLongLong();
 			return query.value(0).toLongLong();
+		}
 }
 
 double SqliteDebtRepository::getPersonsTotal(int64_t personEntryID) const
 {
+	qDebug() << "-> getPersonsTotal";
+
 	QSqlQuery query;
 	query.prepare(
 		"SELECT COALESCE(SUM(amount), 0) AS total "
@@ -42,13 +47,15 @@ double SqliteDebtRepository::getPersonsTotal(int64_t personEntryID) const
 	if (query.exec())
 		if (query.next())
 		{
-			qDebug() << "Total: " << query.value(0).toDouble();
+			qDebug() << "--> returns " << query.value(0).toDouble();
 			return query.value(0).toDouble();
 		}
 }
 
 double SqliteDebtRepository::getPersonsDue(int64_t personEntryID) const
 {
+	qDebug() << "-> getPersonsDue";
+
 	QSqlQuery query;
 	query.prepare(
 		"WITH TotalDebt AS ( "
@@ -70,13 +77,15 @@ double SqliteDebtRepository::getPersonsDue(int64_t personEntryID) const
 	if (query.exec())
 		if (query.next())
 		{
-			qDebug() << "Due: " << query.value(0).toDouble();
+			qDebug() << "returns " << query.value(0).toDouble();
 			return query.value(0).toDouble();
 		}
 }
 
 double SqliteDebtRepository::getPersonsPaid(int64_t personEntryID) const
 {
+	qDebug() << "-> getPersonsPaid";
+
 	QSqlQuery query;
 	query.prepare(
 		"SELECT COALESCE(SUM(PaymentAllocation.amount), 0) AS paid "
@@ -89,13 +98,15 @@ double SqliteDebtRepository::getPersonsPaid(int64_t personEntryID) const
 	if (query.exec())
 		if (query.next())
 		{
-			qDebug() << "Paid: " << query.value(0).toDouble();
+			qDebug() << "--> returns " << query.value(0).toDouble();
 			return query.value(0).toDouble();
 		}
 }
 
 double SqliteDebtRepository::getTotalShare(FinancialShare share, const QDate& minDate) const
 {
+	qDebug() << "-> getTotalShare";
+
 	QString shareString;
 	switch (share)
 	{
@@ -125,21 +136,19 @@ double SqliteDebtRepository::getTotalShare(FinancialShare share, const QDate& mi
 	);
 	query.bindValue(":minDate", minDate.toString(Qt::ISODate));
 
-	qDebug() << "in getTotalShare: " << "SELECT COALESCE(SUM(Debt.amount * " + shareString + "),0) AS share "
-		"FROM Debt "
-		"WHERE " + compClause + " ";
-
 	if (query.exec())
 		
 		if (query.next())
 		{
-			qDebug() << "Share: " << query.value(0).toDouble();
+			qDebug() << "--> returns " << query.value(0).toDouble();
 			return query.value(0).toDouble();
 		}
 }
 
 double SqliteDebtRepository::getForeignDue() const
 {
+	qDebug() << "-> getForeignDue";
+
 	QSqlQuery query;
 	query.prepare(
 		"WITH SettledShares AS ( "
@@ -154,16 +163,16 @@ double SqliteDebtRepository::getForeignDue() const
 	if (query.exec())
 		if (query.next())
 		{
-			qDebug() << "ForeignDue: " << query.value(0).toDouble();;
+			qDebug() << "--> returns " << query.value(0).toDouble();
 			return query.value(0).toDouble();
 		}
-	qWarning() << "Query failed:" << query.lastError().text();
 }
 
 std::vector<entry::Outstanding> SqliteDebtRepository::getPersonsOutstandingEntries(int64_t personEntryID, FilterType type) const
 {
-	QString sqlString;
+	qDebug() << "-> getPersonsOutstandingEntries";
 
+	QString sqlString;
 	if (type == FilterType::OmitFullyPaid) sqlString = " AND (Debt.amount - COALESCE(GroupedPayments.paid,0)) > 0";
 	
 	QSqlQuery query;
@@ -181,24 +190,17 @@ std::vector<entry::Outstanding> SqliteDebtRepository::getPersonsOutstandingEntri
 	query.bindValue(":personEntryID", personEntryID);
 
 	std::vector<entry::Outstanding> entries;
-
 	if (query.exec())
-	{
 		while (query.next())
-		{
 			entries.emplace_back(getOutstandingEntryFromQuery(query));
-		}
-	}
-
-	qDebug() << "Person Outstanding: ";
-	for (auto& entry : entries)
-		qDebug() << entry;
 
 	return entries;
 }
 
 std::vector<entry::Outstanding> SqliteDebtRepository::getForeignShareOutstandingEntries(FilterType type) const
 {
+	qDebug() << "-> getForeignShareOutstandingEntries";
+
 	QString filter;
 	if (type == FilterType::OmitFullyPaid)
 		filter = " AND ROUND(Debt.amount * Debt.foreignShare - COALESCE(GroupedShareSettlements.settled, 0), 2) > 0";
@@ -220,18 +222,9 @@ std::vector<entry::Outstanding> SqliteDebtRepository::getForeignShareOutstanding
 	);
 
 	std::vector<entry::Outstanding> entries;
-
 	if (query.exec())
-	{
 		while (query.next())
-		{
 			entries.emplace_back(getOutstandingEntryFromQuery(query));
-		}
-	}
-
-	qDebug() << "Foreign Outstanding: ";
-	for (auto& entry : entries)
-		qDebug() << entry;
 
 	return entries;
 }

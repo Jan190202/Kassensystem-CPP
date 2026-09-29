@@ -52,18 +52,20 @@ int main(int argc, char* argv[])
 	QCoreApplication::setApplicationName("KassensystemSVU");
 
 	// load read-only data
-	qDebug() << "Reading config:";
+	qDebug() << "-Reading config-";
 	const PriceList priceList = priceListLoader::read();
 	const registerFinancials::State financialStateBefore = financialStateLoader::read();
 	qDebug() << "";
 
 	// open database
+	qDebug() << "-Opening database-";
 	OneDriveSyncManager syncManager{};
 	syncManager.setup();
 	qDebug() << "Local database: " << syncManager.getLocalDatabasePath();
 	qDebug() << "Remote database: " << syncManager.getRemoteDatabasePath();
 	std::string dbPath = syncManager.getLocalDatabasePath();
 	sqliteDatabase::open(dbPath);
+	qDebug() << "";
 
 	// create session control
 	SqliteSessionController sqliteController{ syncManager };
@@ -88,10 +90,14 @@ int main(int argc, char* argv[])
 	//testing::addTestEntries(repoBundle, serviceBundle);
 
 	// start UI
-	qDebug() << "Starting UI\n";
+	qDebug() << "-Starting up GUI-";
 	CashRegisterSystemUI sysUI(serviceBundle, repoBundle, controller);
 	sysUI.show();
+	qDebug() << "";
+
+	qDebug() << "-Starting app execution-";
 	int returnValue = app.exec();
+	qDebug() << "";
 
 	return returnValue;
 }

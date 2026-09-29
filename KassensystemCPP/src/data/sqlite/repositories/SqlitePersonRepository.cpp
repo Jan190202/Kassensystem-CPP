@@ -1,6 +1,5 @@
 #include "SqlitePersonRepository.h"
 #include <QSqlDatabase>
-
 #include <QFile>
 #include <QSqlError>
 #include <QDebug>
@@ -9,6 +8,8 @@
 
 int64_t SqlitePersonRepository::addPersonEntry(const entry::Person& entry)
 {
+	qDebug() << "-> addPersonEntry";
+	
 	QSqlQuery query;
 	query.prepare(
 		"INSERT INTO Person "
@@ -28,6 +29,8 @@ int64_t SqlitePersonRepository::addPersonEntry(const entry::Person& entry)
 
 std::expected<entry::Person, GetEntryException> SqlitePersonRepository::findPersonEntry(int64_t personEntryID) const
 {
+	qDebug() << "-> findPersonEntry";
+
 	QSqlQuery query;
 	query.prepare(
 		"SELECT ID, firstName, lastName, nickName, info "
@@ -54,6 +57,8 @@ std::expected<entry::Person, GetEntryException> SqlitePersonRepository::findPers
 
 std::vector<entry::Person> SqlitePersonRepository::getAllPersonEntries() const
 {
+	qDebug() << "-> getAllPersonEntries";
+
 	QSqlQuery query;
 	query.prepare(
 		"SELECT ID, firstName, lastName, nickName, info "
@@ -62,19 +67,10 @@ std::vector<entry::Person> SqlitePersonRepository::getAllPersonEntries() const
 
 	std::vector<entry::Person> entries;
 	if (query.exec())
-	{
 		while (query.next())
-		{
 			entries.emplace_back(getEntryFromQuery(query));
-		}
-	}
-
-	qDebug() << "all person entries: ";
-	for (auto& entry : entries)
-		qDebug() << entry;
 
 	return entries;
-
 }
 
 entry::Person SqlitePersonRepository::getEntryFromQuery(const QSqlQuery& query) const

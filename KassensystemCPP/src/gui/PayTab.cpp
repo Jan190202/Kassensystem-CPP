@@ -383,9 +383,6 @@ void PayTab::addCredit()
 	{
 		// inputs given and OK pressed
 		inputs = inputDialog->getInputs();
-		qInfo() << inputs.amount;
-		qInfo() << inputs.date;
-		qInfo() << inputs.description;
 	}
 	else { return; } // cancel pressed
 
@@ -403,10 +400,6 @@ void PayTab::addPerson()
 	{
 		// inputs given and OK pressed
 		inputs = inputDialog->getInputs();
-		qInfo() << inputs.firstName;
-		qInfo() << inputs.lastName;
-		qInfo() << inputs.nickName;
-		qInfo() << inputs.info;
 	}
 	else { return; } // cancel pressed
 

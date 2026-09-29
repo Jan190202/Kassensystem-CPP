@@ -8,6 +8,8 @@
 
 int64_t SqliteBalanceRepository::addBalanceEntry(const entry::Balance& entry)
 {
+	qDebug() << "-> addBalanceEntry";
+
 	QSqlQuery query;
 	query.prepare(
 		"INSERT INTO Balance"
@@ -22,21 +24,23 @@ int64_t SqliteBalanceRepository::addBalanceEntry(const entry::Balance& entry)
 	query.bindValue(":dateBookedSpecial", entry.dateBooked.toSqlSpecialValue());
 	query.bindValue(":dateAdded", entry.dateAdded.toString(Qt::ISODate));
 	query.bindValue(":comment", QString::fromStdString(entry.comment));
-
 	if (entry.personEntryID.has_value())
 		query.bindValue(":personID", entry.personEntryID.value());
 	else
 		query.bindValue(":personID", QVariant(QMetaType::fromType<qlonglong>()));
 
-	qDebug() << entry;
-
 	if (query.exec())
 		if (query.next())
+		{
+			qDebug() << "--> returns " << query.value(0).toLongLong();
 			return query.value(0).toLongLong();
+		}
 }
 
 std::expected<entry::Balance, GetEntryException> SqliteBalanceRepository::getBalanceEntry(const std::string& description) const
 {
+	qDebug() << "-> getBalanceEntry";
+
 	QSqlQuery query;
 	query.prepare(
 		"SELECT *"
@@ -63,9 +67,10 @@ std::expected<entry::Balance, GetEntryException> SqliteBalanceRepository::getBal
 
 std::vector<entry::Balance> SqliteBalanceRepository::getBalanceEntries(BalanceType type, const QDate& minDate) const
 {
+	qDebug() << "-> getBalanceEntries";
+
 	bool isTypeSpecific = hasFlag(type, BalanceType::Earning) ^ hasFlag(type, BalanceType::Spending); // either Earning or Spending, but not both
 	
-
 	QString compClause = sqliteUtils::registerDateCompareClause(
 		sqliteUtils::Op::largerOrEq,
 		RegisterDate{ minDate },
@@ -94,14 +99,9 @@ std::vector<entry::Balance> SqliteBalanceRepository::getBalanceEntries(BalanceTy
 	}
 	
 	std::vector<entry::Balance> entries;
-
 	if (query.exec())
-	{
 		while (query.next())
-		{
 			entries.emplace_back(getEntryFromQuery(query));
-		}
-	}
 
 	return entries;
 }

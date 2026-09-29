@@ -174,13 +174,6 @@ void BalanceTab::addEntry(BtnIndex mode)
 	{
 		// inputs given and OK pressed
 		inputs = inputDialog->getInputs();
-		qInfo() << inputs.description;
-		qInfo() << inputs.coveringpersonEntryID.has_value();
-		if (inputs.coveringpersonEntryID.has_value())
-		{
-			qInfo() << inputs.coveringpersonEntryID.value();
-		}
-		qInfo() << inputs.comment;
 	}
 	else { return; } // cancel pressed
 

@@ -7,6 +7,8 @@
 
 int64_t SqliteConsumptionRepository::addConsumptionEntry(const entry::Consumption& entry)
 {
+	qDebug() << "-> addConsumptionEntry";
+
 	QSqlQuery query;
 	query.prepare(
 		"INSERT INTO Consumption"
@@ -21,15 +23,18 @@ int64_t SqliteConsumptionRepository::addConsumptionEntry(const entry::Consumptio
 	query.bindValue(":nWater", entry.nWater);
 	query.bindValue(":otherExpense", entry.otherExpense);
 
-	qDebug() << entry;
-
 	if (query.exec())
 		if (query.next())
+		{
+			qDebug() << "--> returns " << query.value(0).toLongLong();
 			return query.value(0).toLongLong();
+		}
 }
 
 std::vector<entry::Consumption> SqliteConsumptionRepository::getConsumptionEntries(int64_t personEntryID) const
 {
+	qDebug() << "-> getConsumptionEntries";
+
 	QSqlQuery query;
 	query.prepare(
 		"SELECT Consumption.* "
@@ -40,7 +45,6 @@ std::vector<entry::Consumption> SqliteConsumptionRepository::getConsumptionEntri
 	query.bindValue(":personEntryID", personEntryID);
 
 	std::vector<entry::Consumption> entries;
-
 	if (query.exec())
 	{
 		while (query.next())

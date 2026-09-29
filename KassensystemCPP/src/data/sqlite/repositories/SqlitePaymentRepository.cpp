@@ -9,6 +9,8 @@
 
 int64_t SqlitePaymentRepository::addPaymentEntry(const entry::Payment& entry)
 {
+	qDebug() << "-> addPaymentEntry";
+
 	QSqlQuery query;
 	query.prepare(
 		"INSERT INTO Payment "
@@ -25,11 +27,16 @@ int64_t SqlitePaymentRepository::addPaymentEntry(const entry::Payment& entry)
 	
 	if (query.exec())
 		if (query.next())
+		{
+			qDebug() << "--> returns " << query.value(0).toLongLong();
 			return query.value(0).toLongLong();
+		}
 }
 
 int64_t SqlitePaymentRepository::addPaymentAllocationEntry(const entry::PaymentAllocation& entry)
 {
+	qDebug() << "-> addPaymentAllocationEntry";
+
 	QSqlQuery query;
 	query.prepare(
 		"INSERT INTO PaymentAllocation "
@@ -43,11 +50,16 @@ int64_t SqlitePaymentRepository::addPaymentAllocationEntry(const entry::PaymentA
 
 	if (query.exec())
 		if (query.next())
+		{
+			qDebug() << "--> returns " << query.value(0).toLongLong();
 			return query.value(0).toLongLong();
+		}
 }
 
 std::vector<entry::PaymentAllocation> SqlitePaymentRepository::getDebtsEntrysPaymentAllocationEntries(int64_t debtEntryID) const
 {
+	qDebug() << "-> getDebtsEntrysPaymentAllocationEntries";
+
 	QSqlQuery query;
 	query.prepare(
 		"SELECT ID, debtID, paymentID, amount "
@@ -68,16 +80,12 @@ std::vector<entry::PaymentAllocation> SqlitePaymentRepository::getDebtsEntrysPay
 				});
 		}
 
-	qDebug() << "DebtsEntryAllocationEntries: ";
-	for (auto& entry: entries)
-		qDebug() << entry;
-
 	return entries;
 }
 
 double SqlitePaymentRepository::getTotalAllocatedPayments(const QDate& minDate) const
 {
-	QSqlQuery query;
+	qDebug() << "-> getTotalAllocatedPayments";
 
 	QString compClause = sqliteUtils::registerDateCompareClause(
 		sqliteUtils::Op::largerOrEq,
@@ -86,6 +94,7 @@ double SqlitePaymentRepository::getTotalAllocatedPayments(const QDate& minDate) 
 		"Payment.dateBookedSpecial",
 		":minDate");
 
+	QSqlQuery query;
 	query.prepare(
 		"SELECT COALESCE(SUM(PaymentAllocation.amount),0) AS total "
 		"FROM PaymentAllocation "
@@ -96,5 +105,8 @@ double SqlitePaymentRepository::getTotalAllocatedPayments(const QDate& minDate) 
 
 	if (query.exec())
 		if (query.next())
+		{
+			qDebug() << "--> returns " << query.value(0).toDouble();
 			return query.value(0).toDouble();
+		}
 }

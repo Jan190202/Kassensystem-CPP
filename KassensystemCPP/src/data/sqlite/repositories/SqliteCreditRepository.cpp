@@ -9,6 +9,8 @@
 
 int64_t SqliteCreditRepository::addCreditEntry(const entry::Credit& entry)
 {
+	qDebug() << "-> addCreditEntry";
+	
 	QSqlQuery query;
 	query.prepare(
 		"INSERT INTO Credit "
@@ -25,11 +27,16 @@ int64_t SqliteCreditRepository::addCreditEntry(const entry::Credit& entry)
 
 	if (query.exec())
 		if (query.next())
+		{
+			qDebug() << "--> returns " << query.value(0).toLongLong();
 			return query.value(0).toLongLong();
+		}
 }
 
 double SqliteCreditRepository::getPersonsCredit(int64_t personEntryID) const
 {
+	qDebug() << "-> getPersonsCredit";
+	
 	QSqlQuery query;
 	query.prepare(
 		"SELECT COALESCE(SUM(amount),0) "
@@ -41,22 +48,23 @@ double SqliteCreditRepository::getPersonsCredit(int64_t personEntryID) const
 	if (query.exec())
 		if (query.next())
 		{
-			qDebug() << "Persons Credit: " << query.value(0).toDouble();
+			qDebug() << "--> returns " << query.value(0).toDouble();
 			return query.value(0).toDouble();
 		}
 }
 
 double SqliteCreditRepository::getTotalDepositedCredit(const QDate& minDate) const
 {
-	QSqlQuery query;
-
+	qDebug() << "-> getTotalDepositedCredit";
+	
 	QString compClause = sqliteUtils::registerDateCompareClause(
 		sqliteUtils::Op::largerOrEq,
 		RegisterDate{ minDate },
 		"dateBooked",
 		"dateBookedSpecial",
 		":minDate");
-
+	
+	QSqlQuery query;
 	query.prepare(
 		"SELECT COALESCE(SUM(amount),0) "
 		"FROM Credit "
@@ -67,7 +75,7 @@ double SqliteCreditRepository::getTotalDepositedCredit(const QDate& minDate) con
 	if (query.exec())
 		if (query.next())
 		{
-			qDebug() << "Total Desposited Credit: " << query.value(0).toDouble();
+			qDebug() << "--> returns " << query.value(0).toDouble();
 			return query.value(0).toDouble();
 		}
 }
