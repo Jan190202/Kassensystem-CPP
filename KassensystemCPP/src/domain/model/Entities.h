@@ -378,7 +378,7 @@ namespace registerFinancials
 		struct Details
 		{
 			double departmentEarnings, departmentSpendings;
-			double consumptionOwnShare;
+			double consumptionAllShares, consumptionOwnShare, consumptionForeignShare;
 			double paidDebt, settledValue, depositedCredit;
 		};
 

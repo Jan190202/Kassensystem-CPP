@@ -3,6 +3,7 @@
 #include "BalanceTabSettlementDialog.h"
 #include "GuiTypes.h"
 #include "qtutils/QtConversions.h"
+#include "qtutils/InstantToolTip.h"
 #include <QDate>
 #include <QFormLayout>
 #include <QGroupBox>
@@ -16,6 +17,7 @@
 #include <QDebug>
 #include <string>
 #include <algorithm>
+#include <cmath>
 
 BalanceTab::BalanceTab(const LowerButtonBundle& lowerButtons, BalanceService& balanceService, PersonRepository* personRepo, QWidget* parent) 
 	: lowerButtons(lowerButtons), balanceService(balanceService), personRepo(personRepo), BaseTab(parent) {}
@@ -253,11 +255,11 @@ void BalanceTab::refreshTables(const registerFinancials::Report& report) const
 
 void BalanceTab::refreshLables(const registerFinancials::Report& report) const
 {
-	auto row = [&](bool addsPositively, double num, QString desc, bool isLast) -> QString
+	auto row = [&](bool addsPositively, double num, QString desc, bool isLast, double decimals = 2) -> QString
 		{
 			QString color = addsPositively ? "#2e8b57" : "#c0392b"; // green / red
 			QString pre = addsPositively ? "+" : "-";
-			QString val = num >= 0 ? qtUtils::toCurrencyFormat(num) : ("(" + qtUtils::toCurrencyFormat(num) + ")");
+			QString val = num >= 0 ? qtUtils::toCurrencyFormat(num, decimals) : ("(" + qtUtils::toCurrencyFormat(num, decimals) + ")");
 
 			return QString(
 				"<tr>"
@@ -270,13 +272,45 @@ void BalanceTab::refreshLables(const registerFinancials::Report& report) const
 
 	auto& d = report.details;
 
-	QString cashExplanation =
+	// tooltip explanation for the cash difference
+	QString cashDiffExplanation =
 		"<table cellspacing=\"2\" cellpadding=\"0\">" +
 		row(true, d.departmentEarnings, "Einnahmen (ohne Verkäufe)", false) +
 		row(false, d.departmentSpendings, "Ausgaben", false) +
 		row(true, d.paidDebt, "bezahlte Verbräuche", false) +
 		row(false, d.settledValue, "85%-Abgabe", false) +
 		row(true, d.depositedCredit, "Guthaben", true) +
+		"</table>";
+
+	// tooltip explanation for the current savings
+	const double cashAfter = report.stateAfter.cash;
+	const double foreignAfter = report.stateAfter.foreignCash;
+	const double debtAfter = report.details.consumptionAllShares - report.details.paidDebt;
+	const double creditAfter = report.details.depositedCredit;
+	const double expectedSavings = report.stateAfter.savings;
+
+	const double savingsSum = cashAfter - foreignAfter + debtAfter - creditAfter;
+	const bool savingsMatch = std::abs(savingsSum - expectedSavings) < 1e-6;
+
+	const QString checkColor = savingsMatch ? "#2e8b57" : "#c0392b";
+	const QString checkText = savingsMatch ? "&#10004; korrekt"	: "&#10008; inkorrekt";
+
+	QString sumRow = QString(
+		"<tr><td colspan=\"3\"><hr></td></tr>"
+		"<tr>"
+		"<td style=\"font-weight:bold; padding-right:4px;\">=</td>"
+		"<td align=\"right\" style=\"font-weight:bold; padding-right:8px;\">%1</td>"
+		"<td style=\"color:%2; font-weight:bold;\">%3</td>"
+		"</tr>"
+	).arg(qtUtils::toCurrencyFormat(savingsSum, 3), checkColor, checkText);
+
+	QString savingsAfterExplanation =
+		"<table cellspacing=\"2\" cellpadding=\"0\">" +
+		row(true, cashAfter, "Barvermögen", false, 3) +
+		row(false, foreignAfter, "Fremdanteil", false, 3) +
+		row(true, debtAfter, "Schulden", false, 3) +
+		row(false, creditAfter, "Guthaben", true, 3) +
+		sumRow +
 		"</table>";
 
 	lEarnings->setText(qtUtils::toCurrencyFormat(report.totalEarnings, 3));
@@ -289,18 +323,22 @@ void BalanceTab::refreshLables(const registerFinancials::Report& report) const
 
 	lSavingsDifference->setText(qtUtils::toCurrencyFormat(report.savingsDiff, 3));
 	lCashDifference->setText(qtUtils::toCurrencyFormat(report.cashDiff));
-	lCashDifference->setToolTip(cashExplanation);
-
+	lCashDifference->setToolTip(cashDiffExplanation);
+	
 	afterBox->setTitle(formatHeader(report.stateAfter.date));
 	lSavingsAfter->setText(qtUtils::toCurrencyFormat(report.stateAfter.savings, 3));
+	lSavingsAfter->setToolTip(savingsAfterExplanation);
 	lCashAfter->setText(qtUtils::toCurrencyFormat(report.stateAfter.cash));
 	lForeignAfter->setText(qtUtils::toCurrencyFormat(report.stateAfter.foreignCash, 3));
+
+	// enable instant tooltips on hover
+	lCashDifference->installEventFilter(new InstantToolTipFilter(lCashDifference));
+	lSavingsAfter->installEventFilter(new InstantToolTipFilter(lSavingsAfter));
 }
 
 void BalanceTab::apply()
 {
-	// in future: buffer added entries / share settlements and only add them on apply
-	// TBD
+	// TBD: buffer added entries / share settlements and only add them on apply
 }
 
 QString BalanceTab::formatHeader(const QDate& date) const

@@ -73,10 +73,12 @@ registerFinancials::Report BalanceService::getReport() const
 	double departmentEarnings{}; // includes tips from overpayment
 	double departmentSpendings{};
 	double consumptionOwnShare{};
+	double consumptionAllShares{};
 	
 	for (const auto& entry : getBalanceEntries(BalanceType::earning, stateBefore.date)) departmentEarnings += entry.amount;
 	for (const auto& entry : getBalanceEntries(BalanceType::spending, stateBefore.date)) departmentSpendings += entry.amount;
 	consumptionOwnShare = debtRepo->getTotalShare(FinancialShare::own, stateBefore.date);
+	consumptionAllShares = debtRepo->getTotalShare(FinancialShare::all, stateBefore.date);
 
 	double savingsDiff = departmentEarnings - departmentSpendings + consumptionOwnShare;
 
@@ -123,7 +125,9 @@ registerFinancials::Report BalanceService::getReport() const
 		.details = registerFinancials::Report::Details{
 			.departmentEarnings = departmentEarnings,
 			.departmentSpendings = departmentSpendings,
+			.consumptionAllShares = consumptionAllShares,
 			.consumptionOwnShare = consumptionOwnShare,
+			.consumptionForeignShare = consumptionAllShares-consumptionOwnShare,
 			.paidDebt = paidDebt,
 			.settledValue = settledValue,
 			.depositedCredit = depositedCredit

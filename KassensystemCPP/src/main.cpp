@@ -119,8 +119,6 @@ int main(int argc, char* argv[])
 * - BalanceTab:
 *	- add basic calculator in balanceTab for cash counting
 *	- add info-icons (clickable/tooltip) -> get details on report calculation
-*		-> cashDiff (done)
-*		-> explanation for difference between current cash and current savings
 *	- BalanceTabDialog: option for adding any number of people with custom amounts (e.g. for coverage of entry fees for multiple people; currently, multiple entries necessary)
 * - add assets (icons, button icons, ...)
 * - display current player base by pulling from the web for name finding/spelling:
