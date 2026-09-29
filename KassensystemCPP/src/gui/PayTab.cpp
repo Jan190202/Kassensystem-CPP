@@ -329,7 +329,7 @@ void PayTab::apply()
 {
 	request::Payment request{
 		.personEntryID = nameSelect->currentData().toLongLong(),
-		.dateBooked = QDate::currentDate(),
+		.dateBooked = QDate::currentDate(), // TBD: add custom date selection option if needed
 		.amount = paymentSpinBox->value(),
 		.overpaymentType = btnSurplusToCredit->isChecked() ? OverpaymentDisposition::Credit : OverpaymentDisposition::Tip
 	};
@@ -351,7 +351,7 @@ void PayTab::redeemCredit(int64_t personEntryID)
 		entry::Credit{
 			.creditEntryID = 0,
 			.personEntryID = personEntryID,
-			.dateBooked = QDate::currentDate(),
+			.dateBooked = QDate::currentDate(), // TBD: add custom date selection option if needed
 			.amount = -redemptionAmount,
 			.description = "Einlösung von bestehendem Guthaben"
 		});
@@ -359,7 +359,7 @@ void PayTab::redeemCredit(int64_t personEntryID)
 	paymentService.addPayment(
 		request::Payment{
 		.personEntryID = personEntryID,
-		.dateBooked = QDate::currentDate(),
+		.dateBooked = QDate::currentDate(), // TBD: add custom date selection option if needed
 		.amount = redemptionAmount,
 		.overpaymentType = OverpaymentDisposition::Credit
 		});

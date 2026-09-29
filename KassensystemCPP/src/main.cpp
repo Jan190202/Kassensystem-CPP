@@ -104,7 +104,6 @@ int main(int argc, char* argv[])
 
 /*
 * Ideas:
-* - clear up date handling: use dateBooked in requests, add dateAdded (today) in entry, clean up initialization (GUI <-> Services)
 * - add new tab for manual database changes (dropDown for which repository + QTableView) with live SQL statement support for filtering / changing
 * - general architecture:
 *	- predefining cash, foreign cash, savings in state before, previous debts and credits all at the same time is redundant

@@ -180,7 +180,6 @@ void AddTab::addEntry()
 	connect(newEntry, &AddTabEntry::calcEntryCost, this, [this](ConsumptionInputs& inputs, double& entryCost)
 		{
 			request::Consumption request{
-				.dateBooked = QDate(),
 				.nBeer05 = inputs.nBeer05,
 				.nBeer04 = inputs.nBeer04,
 				.nSoftdrinks = inputs.nSoftdrinks,
