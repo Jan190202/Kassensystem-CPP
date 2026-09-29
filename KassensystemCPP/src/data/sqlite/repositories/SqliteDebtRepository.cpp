@@ -125,6 +125,10 @@ double SqliteDebtRepository::getTotalShare(FinancialShare share, const QDate& mi
 	);
 	query.bindValue(":minDate", minDate.toString(Qt::ISODate));
 
+	qDebug() << "in getTotalShare: " << "SELECT COALESCE(SUM(Debt.amount * " + shareString + "),0) AS share "
+		"FROM Debt "
+		"WHERE " + compClause + " ";
+
 	if (query.exec())
 		
 		if (query.next())
@@ -142,7 +146,7 @@ double SqliteDebtRepository::getForeignDue() const
 			"SELECT COALESCE(SUM(ShareSettlement.amount),0) as total "
 			"FROM ShareSettlement "
 		") "
-		"SELECT SUM(Debt.amount * Debt.foreignShare) - SettledShares.total AS foreignDue "
+		"SELECT ROUND(COALESCE(SUM(Debt.amount * Debt.foreignShare),0) - SettledShares.total,3) AS foreignDue "
 		"FROM Debt "
 		"CROSS JOIN SettledShares"
 	);
@@ -195,22 +199,25 @@ std::vector<entry::Outstanding> SqliteDebtRepository::getPersonsOutstandingEntri
 
 std::vector<entry::Outstanding> SqliteDebtRepository::getForeignShareOutstandingEntries(FilterType type) const
 {
-	QString sqlString;
-
-	if (type == FilterType::OmitFullyPaid) sqlString = " WHERE Debt.amount - COALESCE(GroupedShareSettlements.settled,0) > 0";
+	QString filter;
+	if (type == FilterType::OmitFullyPaid)
+		filter = " AND ROUND(Debt.amount * Debt.foreignShare - COALESCE(GroupedShareSettlements.settled, 0), 2) > 0";
 
 	QSqlQuery query;
 	query.prepare(
 		"WITH GroupedShareSettlements AS ( "
-		"SELECT ShareSettlementAllocation.debtID AS debtID, SUM(ShareSettlementAllocation.amount) AS settled "
-		"FROM ShareSettlementAllocation "
-		"GROUP BY ShareSettlementAllocation.debtID "
+			"SELECT ShareSettlementAllocation.debtID AS debtID, SUM(ShareSettlementAllocation.amount) AS settled "
+			"FROM ShareSettlementAllocation "
+			"GROUP BY ShareSettlementAllocation.debtID "
 		") "
-		"SELECT Debt.ID, Debt.dateBooked, Debt.dateBookedSpecial, Debt.amount, Debt.amount - COALESCE(GroupedShareSettlements.settled,0) AS remaining "
+		"SELECT "
+			"Debt.ID, Debt.dateBooked, Debt.dateBookedSpecial, "
+			"Debt.amount * Debt.foreignShare AS amount, "
+			"Debt.amount * Debt.foreignShare - COALESCE(GroupedShareSettlements.settled, 0) AS remaining "
 		"FROM Debt "
 		"LEFT OUTER JOIN GroupedShareSettlements ON Debt.ID = GroupedShareSettlements.debtID "
-		+ sqlString
-	); // TBD: error here (possibly also in PaymentRepository)
+		"WHERE Debt.foreignShare > 0" + filter
+	);
 
 	std::vector<entry::Outstanding> entries;
 

@@ -88,7 +88,7 @@ double SqliteShareSettlementRepository::getTotalAllocatedShareSettlements(const 
 		":minDate");
 
 	query.prepare(
-		"SELECT SUM(ShareSettlementAllocation.amount) AS total "
+		"SELECT COALESCE(SUM(ShareSettlementAllocation.amount),0) AS total "
 		"FROM ShareSettlementAllocation "
 		"JOIN ShareSettlement ON ShareSettlementAllocation.shareSettlementID = ShareSettlement.ID "
 		"WHERE " + compClause + " "

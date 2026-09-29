@@ -87,7 +87,7 @@ double SqlitePaymentRepository::getTotalAllocatedPayments(const QDate& minDate) 
 		":minDate");
 
 	query.prepare(
-		"SELECT SUM(PaymentAllocation.amount) AS total "
+		"SELECT COALESCE(SUM(PaymentAllocation.amount),0) AS total "
 		"FROM PaymentAllocation "
 		"LEFT OUTER JOIN Payment ON PaymentAllocation.paymentID = Payment.ID "
 		"WHERE " + compClause + " "

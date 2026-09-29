@@ -32,7 +32,7 @@ double SqliteCreditRepository::getPersonsCredit(int64_t personEntryID) const
 {
 	QSqlQuery query;
 	query.prepare(
-		"SELECT SUM(amount) "
+		"SELECT COALESCE(SUM(amount),0) "
 		"FROM Credit "
 		"WHERE personID = :personEntryID "
 	);
@@ -58,7 +58,7 @@ double SqliteCreditRepository::getTotalDepositedCredit(const QDate& minDate) con
 		":minDate");
 
 	query.prepare(
-		"SELECT SUM(amount) "
+		"SELECT COALESCE(SUM(amount),0) "
 		"FROM Credit "
 		"WHERE " + compClause + " "
 	);
