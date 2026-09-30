@@ -285,11 +285,11 @@ void BalanceTab::refreshLables(const registerFinancials::Report& report) const
 	// tooltip explanation for the current savings
 	const double cashAfter = report.stateAfter.cash;
 	const double foreignAfter = report.stateAfter.foreignCash;
-	const double debtAfter = report.details.consumptionAllShares - report.details.paidDebt;
-	const double creditAfter = report.details.depositedCredit;
+	const double debtAllTime = report.details.consumptionAllSharesAllTime - report.details.paidDebtAllTime;
+	const double creditAllTime = report.details.depositedCreditAllTime;
 	const double expectedSavings = report.stateAfter.savings;
 
-	const double savingsSum = cashAfter - foreignAfter + debtAfter - creditAfter;
+	const double savingsSum = cashAfter - foreignAfter + debtAllTime - creditAllTime;
 	const bool savingsMatch = std::abs(savingsSum - expectedSavings) < 1e-6;
 
 	const QString checkColor = savingsMatch ? "#2e8b57" : "#c0392b";
@@ -308,8 +308,8 @@ void BalanceTab::refreshLables(const registerFinancials::Report& report) const
 		"<table cellspacing=\"2\" cellpadding=\"0\">" +
 		row(true, cashAfter, "Barvermögen", false, 3) +
 		row(false, foreignAfter, "Fremdanteil", false, 3) +
-		row(true, debtAfter, "Schulden", false, 3) +
-		row(false, creditAfter, "Guthaben", true, 3) +
+		row(true, debtAllTime, "Schulden", false, 3) +
+		row(false, creditAllTime, "Guthaben", true, 3) +
 		sumRow +
 		"</table>";
 

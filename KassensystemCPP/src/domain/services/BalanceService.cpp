@@ -72,13 +72,15 @@ registerFinancials::Report BalanceService::getReport() const
 	// savingsDiff = (departmentEarnings - departmentSpendings) + virtual own consumption share
 	double departmentEarnings{}; // includes tips from overpayment
 	double departmentSpendings{};
-	double consumptionOwnShare{};
 	double consumptionAllShares{};
+	double consumptionOwnShare{};
+	double consumptionForeignShare{};
 	
 	for (const auto& entry : getBalanceEntries(BalanceType::earning, stateBefore.date)) departmentEarnings += entry.amount;
 	for (const auto& entry : getBalanceEntries(BalanceType::spending, stateBefore.date)) departmentSpendings += entry.amount;
-	consumptionOwnShare = debtRepo->getTotalShare(FinancialShare::own, stateBefore.date);
 	consumptionAllShares = debtRepo->getTotalShare(FinancialShare::all, stateBefore.date);
+	consumptionOwnShare = debtRepo->getTotalShare(FinancialShare::own, stateBefore.date);
+	consumptionForeignShare = consumptionAllShares - consumptionOwnShare;
 
 	double savingsDiff = departmentEarnings - departmentSpendings + consumptionOwnShare;
 
@@ -105,6 +107,13 @@ registerFinancials::Report BalanceService::getReport() const
 
 	double currentForeignCash = debtRepo->getForeignDue();
 
+	// all-time values for correctness check
+	double consumptionAllSharesAllTime = debtRepo->getTotalShare(FinancialShare::all, QDate(2000,1,1));
+	double consumptionOwnShareAllTime = debtRepo->getTotalShare(FinancialShare::own, QDate(2000, 1, 1));
+	double consumptionForeignShareAllTime = consumptionAllSharesAllTime - consumptionOwnShareAllTime;
+	double paidDebtAllTime = paymentRepo->getTotalAllocatedPayments(QDate(2000, 1, 1));
+	double depositedCreditAllTime = creditRepo->getTotalDepositedCredit(QDate(2000, 1, 1));
+
 
 	// struct construction
 	registerFinancials::State stateAfter{
@@ -127,10 +136,15 @@ registerFinancials::Report BalanceService::getReport() const
 			.departmentSpendings = departmentSpendings,
 			.consumptionAllShares = consumptionAllShares,
 			.consumptionOwnShare = consumptionOwnShare,
-			.consumptionForeignShare = consumptionAllShares-consumptionOwnShare,
+			.consumptionForeignShare = consumptionForeignShare,
 			.paidDebt = paidDebt,
 			.settledValue = settledValue,
-			.depositedCredit = depositedCredit
+			.depositedCredit = depositedCredit,
+			.consumptionAllSharesAllTime = consumptionAllSharesAllTime,
+			.consumptionOwnShareAllTime = consumptionOwnShareAllTime,
+			.consumptionForeignShareAllTime = consumptionForeignShareAllTime,
+			.paidDebtAllTime = paidDebtAllTime,
+			.depositedCreditAllTime = depositedCreditAllTime
 		}	
 	};
 

@@ -380,6 +380,8 @@ namespace registerFinancials
 			double departmentEarnings, departmentSpendings;
 			double consumptionAllShares, consumptionOwnShare, consumptionForeignShare;
 			double paidDebt, settledValue, depositedCredit;
+			double consumptionAllSharesAllTime, consumptionOwnShareAllTime, consumptionForeignShareAllTime;
+			double paidDebtAllTime, depositedCreditAllTime;
 		};
 
 		registerFinancials::State stateBefore, stateAfter;
