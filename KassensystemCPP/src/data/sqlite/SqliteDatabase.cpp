@@ -191,120 +191,6 @@ namespace sqliteDatabase
 			return false;
 		}
 
-		////////////////// FROM HERE: MIGRATION, DELETE FUNCTIONS AFTER ONE TIME USE ///////////
-
-		const QStringList kDatedTables{ "Balance", "Debt", "Credit" };
-		const QStringList kAddedOnlyTables{ "Payment", "ShareSettlement" };
-		const QStringList kCommentTables{ "Payment", "ShareSettlement" };
-
-		const QString kFallbackDate = "'2026-09-28'"; 
-
-		QStringList columnsOf(QSqlDatabase& db, const QString& table)
-		{
-			QStringList cols;
-			QSqlQuery q(db);
-			if (q.exec(QString("PRAGMA table_info(%1)").arg(table)))
-				while (q.next()) cols << q.value("name").toString();
-			return cols; 
-		}
-
-		bool needsMigration(const QString& table, const QStringList& cols)
-		{
-			if (cols.isEmpty()) return false;
-
-			if (kDatedTables.contains(table)
-				&& (!cols.contains("dateAdded") || !cols.contains("dateBookedSpecial")))
-				return true;
-
-			if (kAddedOnlyTables.contains(table)
-				&& (!cols.contains("dateAdded")
-					|| cols.contains("dateBooked") || cols.contains("dateBookedSpecial")))
-				return true;
-
-			if (kCommentTables.contains(table) && !cols.contains("comment"))
-				return true;
-
-			return false;
-		}
-
-		QString sourceExpression(const QString& col, const QStringList& oldCols)
-		{
-			if (oldCols.contains(col))                      
-				return col;                                
-
-			if (col == "dateBookedSpecial" || col == "comment")
-				return "NULL";
-
-			const bool hadLegacyDate = oldCols.contains("date");
-			if (col == "dateBooked")
-				return hadLegacyDate ? "date" : kFallbackDate;
-			if (col == "dateAdded")
-				return hadLegacyDate ? "COALESCE(date, " + kFallbackDate + ")" : kFallbackDate;
-
-			return col;   
-		}
-
-		bool rebuildTable(QSqlDatabase& db, const TableDef& def)
-		{
-			QSqlQuery q(db);
-			const auto run = [&](const QString& sql)
-				{
-					if (q.exec(sql)) return true;
-					qWarning() << "Migration of" << def.name << "failed:" << q.lastError().text() << "| SQL:" << sql;
-					return false;
-				};
-
-			const QString newName = def.name + "_new";
-			const QStringList oldCols = columnsOf(db, def.name);
-
-			if (!run(createTableSql(newName, def.body))) return false;
-
-			const QStringList newCols = columnsOf(db, newName);
-			QStringList selectExprs;
-			for (const QString& c : newCols)
-				selectExprs << sourceExpression(c, oldCols);
-
-			return run(QString("INSERT INTO %1 (%2) SELECT %3 FROM %4")
-				.arg(newName, newCols.join(", "), selectExprs.join(", "), def.name))
-				&& run(QString("DROP TABLE %1").arg(def.name))
-				&& run(QString("ALTER TABLE %1 RENAME TO %2").arg(newName, def.name));
-		}
-
-		bool migrateDatedTables(QSqlDatabase& db)
-		{
-			std::vector<const TableDef*> pending;
-			for (const auto& def : tableDefinitions())
-				if (needsMigration(def.name, columnsOf(db, def.name)))
-					pending.push_back(&def);
-
-			if (pending.empty()) return true;   
-
-			const QString backupPath = db.databaseName() + "."
-				+ QDateTime::currentDateTime().toString("yyyyMMdd-HHmmss") + ".bak";
-			if (!QFile::copy(db.databaseName(), backupPath))
-			{
-				qWarning() << "Could not create backup" << backupPath << "- migration aborted";
-				return false;
-			}
-
-			QSqlQuery q(db);
-			q.exec("PRAGMA foreign_keys");
-			const bool fkWasOn = q.next() && q.value(0).toBool();
-			q.exec("PRAGMA foreign_keys = OFF");
-
-			db.transaction();
-			bool ok = true;
-			for (const TableDef* def : pending)
-			{
-				ok = rebuildTable(db, *def);
-				if (!ok) break;
-			}
-			if (ok) ok = db.commit();
-			else db.rollback();
-
-			if (fkWasOn) q.exec("PRAGMA foreign_keys = ON");
-			return ok;
-		}
 	}
 
 	bool open(const std::string& dbPathStr)
@@ -314,7 +200,6 @@ namespace sqliteDatabase
 		QSqlDatabase db = QSqlDatabase::addDatabase("QSQLITE");
 
 		bool dbExists = QFile::exists(dbPath);
-		if (!dbExists) qWarning() << "Specified path for database doesn't exist. Creating blank database!";
 
 		db.setDatabaseName(dbPath); // or ":memory:" for in-memory database
 
@@ -327,13 +212,8 @@ namespace sqliteDatabase
 
 		if (!dbExists)
 		{
+			qWarning() << "Specified path for database doesn't exist. Creating blank database!";
 			initBlankDatabase(db);
-		}
-		else if (!migrateDatedTables(db))
-		{
-			qWarning() << "Database migration failed!";
-			db.close();
-			return false;
 		}
 
 		if (!verifySchema(db))
