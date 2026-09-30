@@ -47,12 +47,12 @@ add_custom_command(TARGET KassensystemCPP POST_BUILD
         --no-translations
 )
 
-target_compile_definitions(KassensystemCPP PRIVATE
-    $<$<CONFIG:Release>:QT_NO_DEBUG_OUTPUT>
-)
-target_compile_definitions(KassensystemCPP PRIVATE
-    $<$<CONFIG:Release>:QT_NO_INFO_OUTPUT>
-)
-target_compile_definitions(KassensystemCPP PRIVATE
-    $<$<CONFIG:Release>:QT_NO_WARNING_OUTPUT>
-)
+#target_compile_definitions(KassensystemCPP PRIVATE
+#    $<$<CONFIG:Release>:QT_NO_DEBUG_OUTPUT>
+#)
+#target_compile_definitions(KassensystemCPP PRIVATE
+#    $<$<CONFIG:Release>:QT_NO_INFO_OUTPUT>
+#)
+#target_compile_definitions(KassensystemCPP PRIVATE
+#    $<$<CONFIG:Release>:QT_NO_WARNING_OUTPUT>
+#)
