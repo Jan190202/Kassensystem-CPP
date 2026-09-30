@@ -9,7 +9,8 @@
 
 int64_t SqliteCreditRepository::addCreditEntry(const entry::Credit& entry)
 {
-	qDebug() << "-> addCreditEntry";
+	QDebug deb = qDebug();
+	deb << "-> addCreditEntry";
 	
 	QSqlQuery query;
 	query.prepare(
@@ -28,14 +29,17 @@ int64_t SqliteCreditRepository::addCreditEntry(const entry::Credit& entry)
 	if (query.exec())
 		if (query.next())
 		{
-			qDebug() << "--> returns " << query.value(0).toLongLong();
+			deb << "--> returns " << query.value(0).toLongLong();
 			return query.value(0).toLongLong();
 		}
+
+	deb << "--> failed";
 }
 
 double SqliteCreditRepository::getPersonsCredit(int64_t personEntryID) const
 {
-	qDebug() << "-> getPersonsCredit";
+	QDebug deb = qDebug();
+	deb << "-> getPersonsCredit";
 	
 	QSqlQuery query;
 	query.prepare(
@@ -48,14 +52,17 @@ double SqliteCreditRepository::getPersonsCredit(int64_t personEntryID) const
 	if (query.exec())
 		if (query.next())
 		{
-			qDebug() << "--> returns " << query.value(0).toDouble();
+			deb << "--> returns " << query.value(0).toDouble();
 			return query.value(0).toDouble();
 		}
+
+	deb << "--> failed";
 }
 
 double SqliteCreditRepository::getTotalDepositedCredit(const QDate& minDate) const
 {
-	qDebug() << "-> getTotalDepositedCredit";
+	QDebug deb = qDebug();
+	deb << "-> getTotalDepositedCredit";
 	
 	QString compClause = sqliteUtils::registerDateCompareClause(
 		sqliteUtils::Op::largerOrEq,
@@ -75,7 +82,9 @@ double SqliteCreditRepository::getTotalDepositedCredit(const QDate& minDate) con
 	if (query.exec())
 		if (query.next())
 		{
-			qDebug() << "--> returns " << query.value(0).toDouble();
+			deb << "--> returns " << query.value(0).toDouble();
 			return query.value(0).toDouble();
 		}
+
+	deb << "--> failed";
 }

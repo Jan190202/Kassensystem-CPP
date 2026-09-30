@@ -8,7 +8,8 @@
 
 int64_t SqliteBalanceRepository::addBalanceEntry(const entry::Balance& entry)
 {
-	qDebug() << "-> addBalanceEntry";
+	QDebug deb = qDebug();
+	deb << "-> addBalanceEntry";
 
 	QSqlQuery query;
 	query.prepare(
@@ -32,14 +33,17 @@ int64_t SqliteBalanceRepository::addBalanceEntry(const entry::Balance& entry)
 	if (query.exec())
 		if (query.next())
 		{
-			qDebug() << "--> returns " << query.value(0).toLongLong();
+			deb << "--> returns " << query.value(0).toLongLong();
 			return query.value(0).toLongLong();
 		}
+
+	deb << "--> failed";
 }
 
 std::expected<entry::Balance, GetEntryException> SqliteBalanceRepository::getBalanceEntry(const std::string& description) const
 {
-	qDebug() << "-> getBalanceEntry";
+	QDebug deb = qDebug();
+	deb << "-> getBalanceEntry";
 
 	QSqlQuery query;
 	query.prepare(
@@ -59,6 +63,8 @@ std::expected<entry::Balance, GetEntryException> SqliteBalanceRepository::getBal
 			foundEntry = getEntryFromQuery(query);
 		}
 	}
+	else
+		deb << "--> failed";
 	
 	if (foundEntry.has_value()) return foundEntry.value();
 
@@ -67,7 +73,8 @@ std::expected<entry::Balance, GetEntryException> SqliteBalanceRepository::getBal
 
 std::vector<entry::Balance> SqliteBalanceRepository::getBalanceEntries(BalanceType type, const QDate& minDate) const
 {
-	qDebug() << "-> getBalanceEntries";
+	QDebug deb = qDebug();
+	deb << "-> getBalanceEntries";
 
 	bool isTypeSpecific = hasFlag(type, BalanceType::earning) ^ hasFlag(type, BalanceType::spending); // either Earning or Spending, but not both
 	
@@ -102,6 +109,8 @@ std::vector<entry::Balance> SqliteBalanceRepository::getBalanceEntries(BalanceTy
 	if (query.exec())
 		while (query.next())
 			entries.emplace_back(getEntryFromQuery(query));
+	else
+		deb << "--> failed";
 
 	return entries;
 }

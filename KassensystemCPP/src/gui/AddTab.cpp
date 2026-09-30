@@ -39,6 +39,7 @@ void AddTab::initialize()
 
 	specialDateCheck = new QCheckBox("Sonstiger Zeitraum:", this);
 	specialDateCheck->setChecked(false);
+	specialDateCheck->setEnabled(false);
 
 	std::map<QString, RegisterDate::Special> specialMap = 
 	{
@@ -223,7 +224,7 @@ void AddTab::apply()
 		ConsumptionInputs inputs = entry->getEntryInputs();
 
 		RegisterDate date;
-		if (!specialDateCheck->isEnabled())
+		if (!specialDateCheck->isChecked())
 		{
 			QDate setDate = monthSelection->date();
 			int nDays = setDate.daysInMonth();

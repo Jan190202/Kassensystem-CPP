@@ -8,7 +8,8 @@
 
 int64_t SqlitePersonRepository::addPersonEntry(const entry::Person& entry)
 {
-	qDebug() << "-> addPersonEntry";
+	QDebug deb = qDebug();
+	deb << "-> addPersonEntry";
 	
 	QSqlQuery query;
 	query.prepare(
@@ -25,11 +26,14 @@ int64_t SqlitePersonRepository::addPersonEntry(const entry::Person& entry)
 	if (query.exec())
 		if (query.next())
 			return query.value(0).toLongLong();
+
+	deb << "--> failed";
 }
 
 std::expected<entry::Person, GetEntryException> SqlitePersonRepository::findPersonEntry(int64_t personEntryID) const
 {
-	qDebug() << "-> findPersonEntry";
+	QDebug deb = qDebug();
+	deb << "-> findPersonEntry";
 
 	QSqlQuery query;
 	query.prepare(
@@ -49,6 +53,8 @@ std::expected<entry::Person, GetEntryException> SqlitePersonRepository::findPers
 			foundPerson = getEntryFromQuery(query);
 		}
 	}
+	else
+		deb << "--> failed";
 
 	if (!foundPerson.has_value()) return std::unexpected(GetEntryException::entryNotFound);
 
@@ -57,7 +63,8 @@ std::expected<entry::Person, GetEntryException> SqlitePersonRepository::findPers
 
 std::vector<entry::Person> SqlitePersonRepository::getAllPersonEntries() const
 {
-	qDebug() << "-> getAllPersonEntries";
+	QDebug deb = qDebug();
+	deb << "-> getAllPersonEntries";
 
 	QSqlQuery query;
 	query.prepare(
@@ -69,6 +76,8 @@ std::vector<entry::Person> SqlitePersonRepository::getAllPersonEntries() const
 	if (query.exec())
 		while (query.next())
 			entries.emplace_back(getEntryFromQuery(query));
+	else
+		deb << "--> failed";
 
 	return entries;
 }

@@ -95,16 +95,6 @@ registerFinancials::Report BalanceService::getReport() const
 	depositedCredit = creditRepo->getTotalDepositedCredit(stateBefore.date);
 
 	double cashDiff = departmentEarnings - departmentSpendings + paidDebt - settledValue + depositedCredit;
-
-	qDebug() << "\nCreating financial report";
-	qDebug() << "\tConsumptionOwnShare:\t" << consumptionOwnShare;
-	qDebug() << "\tDepartmentEarnings:\t" << departmentEarnings;
-	qDebug() << "\tDepartmentSpendings:\t" << departmentSpendings;
-	qDebug() << "\tPaidDebt:\t\t" << paidDebt;
-	qDebug() << "\tSettledValue:\t\t" << settledValue;
-	qDebug() << "\tDepositedCredit:\t" << depositedCredit;
-	qDebug() << "";
-
 	double currentForeignCash = debtRepo->getForeignDue();
 
 	// all-time values for correctness check

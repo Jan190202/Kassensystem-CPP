@@ -110,6 +110,7 @@ int main(int argc, char* argv[])
 *		-> cash at specific time stamp would be enough as database entries from before arent cleared
 *		-> allow cash amount validation at any time, which either: refreshes state before, or, better: create new database saving the validation checks
 *		-> balance statistics are still displayed from beginning of year (if avaliable) to today
+*		-> currently disabled special date, as "unknown" should be counted as after date of state before -> cleanup after architecture change
 *	- remove consumption earnings from earnings table, display them in seperate section with more information
 * - class PendingChangeLog with entries PendingChanges for change tracking before saving/syncing
 *	- new button: sync -> save saves to local copy of database, sync pushes it to remote

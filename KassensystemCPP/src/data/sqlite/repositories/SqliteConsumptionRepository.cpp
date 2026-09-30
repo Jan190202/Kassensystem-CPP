@@ -7,7 +7,8 @@
 
 int64_t SqliteConsumptionRepository::addConsumptionEntry(const entry::Consumption& entry)
 {
-	qDebug() << "-> addConsumptionEntry";
+	QDebug deb = qDebug();
+	deb << "-> addConsumptionEntry";
 
 	QSqlQuery query;
 	query.prepare(
@@ -26,14 +27,17 @@ int64_t SqliteConsumptionRepository::addConsumptionEntry(const entry::Consumptio
 	if (query.exec())
 		if (query.next())
 		{
-			qDebug() << "--> returns " << query.value(0).toLongLong();
+			deb << "--> returns " << query.value(0).toLongLong();
 			return query.value(0).toLongLong();
 		}
+
+	deb << "--> failed";
 }
 
 std::vector<entry::Consumption> SqliteConsumptionRepository::getConsumptionEntries(int64_t personEntryID) const
 {
-	qDebug() << "-> getConsumptionEntries";
+	QDebug deb = qDebug();
+	deb << "-> getConsumptionEntries";
 
 	QSqlQuery query;
 	query.prepare(
@@ -61,6 +65,8 @@ std::vector<entry::Consumption> SqliteConsumptionRepository::getConsumptionEntri
 				});
 		}
 	}
+	else
+		deb << "--> failed";
 
 	return entries;
 }

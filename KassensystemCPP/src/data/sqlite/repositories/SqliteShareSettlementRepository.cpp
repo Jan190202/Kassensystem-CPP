@@ -9,7 +9,8 @@
 
 int64_t SqliteShareSettlementRepository::addShareSettlementEntry(const entry::ShareSettlement& entry)
 {
-	qDebug() << "-> addShareSettlementEntry";
+	QDebug deb = qDebug();
+	deb << "-> addShareSettlementEntry";
 
 	QSqlQuery query;
 	query.prepare(
@@ -25,14 +26,17 @@ int64_t SqliteShareSettlementRepository::addShareSettlementEntry(const entry::Sh
 	if (query.exec())
 		if (query.next())
 		{
-			qDebug() << "--> returns " << query.value(0).toLongLong();
+			deb << "--> returns " << query.value(0).toLongLong();
 			return query.value(0).toLongLong();
 		}
+	
+	deb << "--> failed";
 }
 
 int64_t SqliteShareSettlementRepository::addShareSettlementAllocationEntry(const entry::ShareSettlementAllocation& entry)
 {
-	qDebug() << "-> addShareSettlementAllocationEntry";
+	QDebug deb = qDebug();
+	deb << "-> addShareSettlementAllocationEntry";
 
 	QSqlQuery query;
 	query.prepare(
@@ -48,14 +52,17 @@ int64_t SqliteShareSettlementRepository::addShareSettlementAllocationEntry(const
 	if (query.exec())
 		if (query.next())
 		{
-			qDebug() << "--> returns " << query.value(0).toLongLong();
+			deb << "--> returns " << query.value(0).toLongLong();
 			return query.value(0).toLongLong();
 		}
+
+	deb << "--> failed";
 }
 
 std::vector<entry::ShareSettlementAllocation> SqliteShareSettlementRepository::getDebtEntrysShareSettlementAllocationEntries(int64_t debtEntryID) const
 {
-	qDebug() << "-> getDebtEntrysShareSettlementAllocationEntries";
+	QDebug deb = qDebug();
+	deb << "-> getDebtEntrysShareSettlementAllocationEntries";
 
 	QSqlQuery query;
 	query.prepare(
@@ -76,13 +83,16 @@ std::vector<entry::ShareSettlementAllocation> SqliteShareSettlementRepository::g
 				.amount = query.value("amount").toDouble()
 				});
 		}
+	else
+		deb << "--> failed";
 
 	return entries;
 }
 
 double SqliteShareSettlementRepository::getTotalAllocatedShareSettlements(const QDate& minDate) const
 {
-	qDebug() << "-> getTotalAllocatedShareSettlements";
+	QDebug deb = qDebug();
+	deb << "-> getTotalAllocatedShareSettlements";
 
 	QSqlQuery query;
 		query.prepare(
@@ -97,8 +107,10 @@ double SqliteShareSettlementRepository::getTotalAllocatedShareSettlements(const 
 	{
 		if (query.next())
 		{
-			qDebug() << "--> returns " << query.value(0).toDouble();
+			deb << "--> returns " << query.value(0).toDouble();
 			return query.value(0).toDouble();
 		}
 	}
+
+	deb << "--> failed";
 }

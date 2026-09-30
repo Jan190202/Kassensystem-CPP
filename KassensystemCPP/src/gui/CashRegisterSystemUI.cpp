@@ -59,6 +59,7 @@ void CashRegisterSystemUI::initUi(const ServiceBundle& serviceBundle, const Repo
 
 	connect(tabSelector, &QTabWidget::currentChanged, this, [this](int idx)
 		{
+			qDebug() << ""; // add new line for easier debugging
 			changeTab(static_cast<TabIndex>(idx));
 		});
 

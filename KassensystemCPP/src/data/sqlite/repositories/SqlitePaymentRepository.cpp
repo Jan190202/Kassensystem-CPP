@@ -9,7 +9,8 @@
 
 int64_t SqlitePaymentRepository::addPaymentEntry(const entry::Payment& entry)
 {
-	qDebug() << "-> addPaymentEntry";
+	QDebug deb = qDebug();
+	deb << "-> addPaymentEntry";
 
 	QSqlQuery query;
 	query.prepare(
@@ -27,14 +28,17 @@ int64_t SqlitePaymentRepository::addPaymentEntry(const entry::Payment& entry)
 	if (query.exec())
 		if (query.next())
 		{
-			qDebug() << "--> returns " << query.value(0).toLongLong();
+			deb << "--> returns " << query.value(0).toLongLong();
 			return query.value(0).toLongLong();
 		}
+
+	deb << "--> failed";
 }
 
 int64_t SqlitePaymentRepository::addPaymentAllocationEntry(const entry::PaymentAllocation& entry)
 {
-	qDebug() << "-> addPaymentAllocationEntry";
+	QDebug deb = qDebug();
+	deb << "-> addPaymentAllocationEntry";
 
 	QSqlQuery query;
 	query.prepare(
@@ -50,14 +54,17 @@ int64_t SqlitePaymentRepository::addPaymentAllocationEntry(const entry::PaymentA
 	if (query.exec())
 		if (query.next())
 		{
-			qDebug() << "--> returns " << query.value(0).toLongLong();
+			deb << "--> returns " << query.value(0).toLongLong();
 			return query.value(0).toLongLong();
 		}
+
+	deb << "--> failed";
 }
 
 std::vector<entry::PaymentAllocation> SqlitePaymentRepository::getDebtsEntrysPaymentAllocationEntries(int64_t debtEntryID) const
 {
-	qDebug() << "-> getDebtsEntrysPaymentAllocationEntries";
+	QDebug deb = qDebug();
+	deb << "-> getDebtsEntrysPaymentAllocationEntries";
 
 	QSqlQuery query;
 	query.prepare(
@@ -78,13 +85,16 @@ std::vector<entry::PaymentAllocation> SqlitePaymentRepository::getDebtsEntrysPay
 				.amount = query.value("amount").toDouble()
 				});
 		}
+	else
+		deb << "--> failed";
 
 	return entries;
 }
 
 double SqlitePaymentRepository::getTotalAllocatedPayments(const QDate& minDate) const
 {
-	qDebug() << "-> getTotalAllocatedPayments";
+	QDebug deb = qDebug();
+	deb << "-> getTotalAllocatedPayments";
 
 	QSqlQuery query;
 	query.prepare(
@@ -98,7 +108,9 @@ double SqlitePaymentRepository::getTotalAllocatedPayments(const QDate& minDate) 
 	if (query.exec())
 		if (query.next())
 		{
-			qDebug() << "--> returns " << query.value(0).toDouble();
+			deb << "--> returns " << query.value(0).toDouble();
 			return query.value(0).toDouble();
 		}
+
+	deb << "--> failed";
 }
