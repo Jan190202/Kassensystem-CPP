@@ -64,7 +64,9 @@ int main(int argc, char* argv[])
 	qDebug() << "Local database: " << syncManager.getLocalDatabasePath();
 	qDebug() << "Remote database: " << syncManager.getRemoteDatabasePath();
 	std::string dbPath = syncManager.getLocalDatabasePath();
-	sqliteDatabase::open(dbPath);
+	SqliteDatabase sqliteDB{};
+	sqliteDB.open(dbPath);
+	QSqlDatabase& db = sqliteDB.getDatabase();
 	qDebug() << "";
 
 	// create session control
@@ -91,7 +93,7 @@ int main(int argc, char* argv[])
 
 	// start UI
 	qDebug() << "-Starting up GUI-";
-	CashRegisterSystemUI sysUI(serviceBundle, repoBundle, controller);
+	CashRegisterSystemUI sysUI(serviceBundle, repoBundle, controller, db);
 	sysUI.show();
 	qDebug() << "";
 
