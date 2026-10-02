@@ -536,16 +536,16 @@ void PayTab::exportData()
 	else { return; } // cancel pressed
 
 	// get values
-	std::vector<exportType::personDebt> entries = paymentService.getDebtsAll();
+	std::vector<exportType::PersonDebt> entries = paymentService.getDebtsAll();
 
 	// sort values
 	switch (inputs.var)
 	{
 	case PayTabExportDialog::SortingVariable::name:
-		std::ranges::sort(entries, {}, &exportType::personDebt::name);
+		std::ranges::sort(entries, {}, &exportType::PersonDebt::name);
 		break;
 	case PayTabExportDialog::SortingVariable::debt:
-		std::ranges::sort(entries, std::ranges::greater{}, &exportType::personDebt::debt);
+		std::ranges::sort(entries, std::ranges::greater{}, &exportType::PersonDebt::debt);
 		break;
 	}
 

@@ -4,7 +4,7 @@
 
 namespace exporter
 {
-	void toClipboard(const std::vector<exportType::personDebt>& entries);
-	void toCSV(const std::vector<exportType::personDebt>& entries, const std::string& savePath);
-	void toWeb(const std::vector<exportType::personDebt>& entries);
+	void toClipboard(const std::vector<exportType::PersonDebt>& entries);
+	void toCSV(const std::vector<exportType::PersonDebt>& entries, const std::string& savePath);
+	void toWeb(const std::vector<exportType::PersonDebt>& entries);
 }

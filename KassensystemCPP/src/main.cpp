@@ -106,27 +106,26 @@ int main(int argc, char* argv[])
 
 /*
 * Ideas:
-* - add new tab for manual database changes (dropDown for which repository + QTableView) with live SQL statement support for filtering / changing
-* - general architecture:
-*	- predefining cash, foreign cash, savings in state before, previous debts and credits all at the same time is redundant
-*		-> cash at specific time stamp would be enough as database entries from before arent cleared
-*		-> allow cash amount validation at any time, which either: refreshes state before, or, better: create new database saving the validation checks
-*		-> balance statistics are still displayed from beginning of year (if avaliable) to today
-*		-> currently disabled special date, as "unknown" should be counted as after date of state before -> cleanup after architecture change
-*	- remove consumption earnings from earnings table, display them in seperate section with more information
 * - class PendingChangeLog with entries PendingChanges for change tracking before saving/syncing
-*	- new button: sync -> save saves to local copy of database, sync pushes it to remote
-*	- apply (save) button only active when changes were made
-*	- save button only active when applied 
-*	- "changes" window to show applied changes for inspection before saving
+*		- new button: sync -> save saves to local copy of database, sync pushes it to remote
+*		- apply (save) button only active when changes were made
+*		- save button only active when applied
+*		- "changes" window to show applied changes for inspection before saving
+* - general architecture:
+*		- predefining cash, foreign cash, savings in state before, previous debts and credits all at the same time is redundant
+*				-> cash at specific time stamp would be enough as database entries from before arent cleared
+*				-> allow cash amount validation at any time, which either: refreshes state before, or, better: create new database saving the validation checks
+*				-> balance statistics are still displayed from beginning of year (if avaliable) to today
+*				-> currently disabled special date, as "unknown" should be counted as after date of state before -> cleanup after architecture change
+*		- remove consumption earnings from earnings table, display them in seperate section with more information
 * - BalanceTab:
-*	- add basic calculator in balanceTab for cash counting
-*	- add info-icons (clickable/tooltip) -> get details on report calculation
-*	- BalanceTabDialog: option for adding any number of people with custom amounts (e.g. for coverage of entry fees for multiple people; currently, multiple entries necessary)
+*		- add basic calculator in balanceTab for cash counting
+*		- add info-icons (clickable/tooltip) -> get details on report calculation
+*		- BalanceTabDialog: option for adding any number of people with custom amounts (e.g. for coverage of entry fees for multiple people; currently, multiple entries necessary)
 * - add assets (icons, button icons, ...)
 * - display current player base by pulling from the web for name finding/spelling:
-*	-> https://www.mytischtennis.de/click-tt/ByTTV/26--27/verein/102084/SV_Untereuerheim/meldungendetails/E/vr
-*	-> https://www.mytischtennis.de/click-tt/ByTTV/26--27/verein/102084/SV_Untereuerheim/meldungendetails/MJ19/vr
+*		-> https://www.mytischtennis.de/click-tt/ByTTV/26--27/verein/102084/SV_Untereuerheim/meldungendetails/E/vr
+*		-> https://www.mytischtennis.de/click-tt/ByTTV/26--27/verein/102084/SV_Untereuerheim/meldungendetails/MJ19/vr
 * - add optional "commit" message at saving for easier change tracking (new database)
 * - web-API: get debt per person
 */ 

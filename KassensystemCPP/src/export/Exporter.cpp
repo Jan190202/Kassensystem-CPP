@@ -80,7 +80,7 @@ namespace exporter
 			return std::format("{:.2f}", debt);
 		}
 
-		Formats getTextFormats(const std::vector<exportType::personDebt>& entries)
+		Formats getTextFormats(const std::vector<exportType::PersonDebt>& entries)
 		{
 			Formats formats;
 
@@ -123,7 +123,7 @@ namespace exporter
 			return formats;
 		}
 	
-		QImage renderCellsAsImage(const std::vector<exportType::personDebt>& entries, Theme theme)
+		QImage renderCellsAsImage(const std::vector<exportType::PersonDebt>& entries, Theme theme)
 		{		
 			int scale = 3;
 
@@ -174,7 +174,7 @@ namespace exporter
 		}
 	}
 
-	void toClipboard(const std::vector<exportType::personDebt>& entries)
+	void toClipboard(const std::vector<exportType::PersonDebt>& entries)
 	{
 		Formats formats = getTextFormats(entries);
 		QImage image = renderCellsAsImage(entries, Theme::dark);
@@ -188,7 +188,7 @@ namespace exporter
 		QApplication::clipboard()->setMimeData(data);
 	}
 
-	void toCSV(const std::vector<exportType::personDebt>& entries, const std::string& savePath)
+	void toCSV(const std::vector<exportType::PersonDebt>& entries, const std::string& savePath)
 	{
 		std::string csvContent = getTextFormats(entries).csv;
 
@@ -216,7 +216,7 @@ namespace exporter
 			// handle close error
 	}
 
-	void toWeb(const std::vector<exportType::personDebt>& entries)
+	void toWeb(const std::vector<exportType::PersonDebt>& entries)
 	{
 
 	}

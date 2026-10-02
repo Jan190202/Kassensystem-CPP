@@ -340,7 +340,7 @@ namespace entry
 
 namespace exportType
 {
-	struct personDebt
+	struct PersonDebt
 	{
 		std::string name;
 		double debt;

@@ -98,16 +98,16 @@ int64_t PaymentService::addTip(int64_t personEntryID, double amount, const Regis
 		});
 }
 
-std::vector<exportType::personDebt> PaymentService::getDebtsAll() const
+std::vector<exportType::PersonDebt> PaymentService::getDebtsAll() const
 {
 	auto personVec = personRepo->getAllPersonEntries();
 	
-	std::vector<exportType::personDebt> debtEntries;
+	std::vector<exportType::PersonDebt> debtEntries;
 	debtEntries.reserve(personVec.size());
 
 	for (const auto& entry : personVec)
 	{
-		debtEntries.emplace_back(exportType::personDebt{
+		debtEntries.emplace_back(exportType::PersonDebt{
 			.name = entry.getFullName(),
 			.debt = debtRepo->getPersonsDue(entry.personEntryID) - creditRepo->getPersonsCredit(entry.personEntryID)
 			});
