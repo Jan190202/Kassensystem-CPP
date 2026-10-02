@@ -11,6 +11,7 @@
 #include <QHeaderView>
 #include <QCompleter>
 #include <optional>
+#include <algorithm>
 
 ManualTab::ManualTab(const LowerButtonBundle& lowerButtons, const RepositoryBundle& repoBundle, QSqlDatabase& db, QWidget* parent)
 	: lowerButtons(lowerButtons), repoBundle(repoBundle), db(db), BaseTab(parent) {}
@@ -18,7 +19,12 @@ ManualTab::ManualTab(const LowerButtonBundle& lowerButtons, const RepositoryBund
 void ManualTab::initialize()
 {
 	tableSelect = new QComboBox();
-	tableSelect->insertItems(0, db.tables());
+	QStringList tableNames = db.tables();
+	std::sort(tableNames.begin(), tableNames.end(), [](const QString& a, const QString& b)
+		{
+			return a < b;
+		});
+	tableSelect->insertItems(0, tableNames);
 	tableSelect->setEditable(false);
 	tableSelect->setMinimumWidth(300);
 
@@ -31,9 +37,9 @@ void ManualTab::initialize()
 	completer->setFilterMode(Qt::MatchContains);
 	nameSelect->setCompleter(completer);
 	nameSelect->setEnabled(false);
-	tableSelect->setMinimumWidth(200);
+	nameSelect->setMinimumWidth(300);
 
-	toggleNameSelect = new QCheckBox();
+	toggleNameSelect = new QCheckBox("nach Person filtern");
 	toggleNameSelect->setChecked(false);
 
 	auto* filterLayout = new QHBoxLayout();
@@ -46,7 +52,7 @@ void ManualTab::initialize()
 	model->setEditStrategy(QSqlTableModel::OnManualSubmit);
 	tableView = new QTableView();
 	tableView->verticalHeader()->hide();
-	tableView->horizontalHeader()->setSectionResizeMode(QHeaderView::ResizeToContents);
+	tableView->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
 
 	auto* mainLayout = new QVBoxLayout(this);
 	mainLayout->addLayout(filterLayout);
