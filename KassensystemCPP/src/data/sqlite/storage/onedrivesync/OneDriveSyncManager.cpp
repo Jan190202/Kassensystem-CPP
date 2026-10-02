@@ -1,4 +1,5 @@
 #include "OneDriveSyncManager.h"
+#include "system/SystemConfig.h"
 #include <QSqlDatabase>
 #include <QSqlQuery>
 #include <QStandardPaths>
@@ -34,6 +35,12 @@ void OneDriveSyncManager::sync()
 	bool databaseChanged = true; // TBD: check if local database changed
 	if (databaseChanged) 
 	{
+		if (systemConfig::isDebug())
+		{
+			qDebug() << "Syncing prevented because of debug mode!";
+			return;
+		}
+
 		pushToRemote();
 		pushToBackup();
 	}

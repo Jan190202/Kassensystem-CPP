@@ -3,7 +3,6 @@
 #include "PayTab.h"
 #include "BalanceTab.h"
 #include "ManualTab.h"
-#include "system/SystemConfig.h"
 #include <QCoreApplication>
 #include <QHBoxLayout>
 #include <QVBoxLayout>
@@ -31,9 +30,6 @@ void CashRegisterSystemUI::initUi(const ServiceBundle& serviceBundle, const Repo
 	lowerButtons.btnCancel = new QPushButton("Cancel", this);
 	lowerButtons.btnApply = new QPushButton("Apply", this);
 	lowerButtons.btnSave = new QPushButton("Save && Sync", this);
-	
-	if (systemConfig::isDebug())
-		lowerButtons.btnSave->setEnabled(false); // only for precaution to prevent data manipulation in debug mode
 	
 	buttonBar->addWidget(lowerButtons.btnCancel);
 	buttonBar->addWidget(lowerButtons.btnApply);
