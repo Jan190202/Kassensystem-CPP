@@ -6,6 +6,8 @@
 class QComboBox;
 class QTableView;
 class QSqlDatabase;
+class QSqlTableModel;
+class QCheckBox;
 
 class ManualTab : public BaseTab
 {
@@ -18,9 +20,12 @@ public:
 
 private:
 	QComboBox* tableSelect;
+	QCheckBox* toggleNameSelect;
+	QComboBox* nameSelect;
 	QTableView* tableView;
 
 	QSqlDatabase& db;
+	QSqlTableModel* model;
 
 	const LowerButtonBundle& lowerButtons;
 	const RepositoryBundle& repoBundle;

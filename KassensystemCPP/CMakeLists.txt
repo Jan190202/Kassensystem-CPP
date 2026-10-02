@@ -33,6 +33,9 @@ add_custom_command(
 )
 
 # Qt-Integration
+find_package(Qt6 REQUIRED COMPONENTS Core)
+target_link_libraries(KassensystemCPP PRIVATE Qt6::Core)
+
 find_package(Qt6 REQUIRED COMPONENTS Widgets)
 target_link_libraries(KassensystemCPP PRIVATE Qt6::Widgets)
 
