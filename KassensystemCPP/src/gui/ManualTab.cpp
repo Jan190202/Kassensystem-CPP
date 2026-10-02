@@ -13,8 +13,8 @@
 #include <optional>
 #include <algorithm>
 
-ManualTab::ManualTab(const LowerButtonBundle& lowerButtons, const RepositoryBundle& repoBundle, QSqlDatabase& db, QWidget* parent)
-	: lowerButtons(lowerButtons), repoBundle(repoBundle), db(db), BaseTab(parent) {}
+ManualTab::ManualTab(const LowerButtonBundle& lowerButtons, const RepositoryBundle& repoBundle, QSqlDatabase& db, PendingChangeLog& log, QWidget* parent)
+	: lowerButtons(lowerButtons), repoBundle(repoBundle), db(db), log(log), BaseTab(parent) {}
 
 void ManualTab::initialize()
 {
@@ -69,6 +69,21 @@ void ManualTab::initialize()
 	connect(nameSelect, &QComboBox::currentIndexChanged, this, [&]() {refresh(); });
 
 	connect(lowerButtons.btnApply, &QPushButton::clicked, this, [&]() {apply(); });
+
+	connect(model, &QSqlTableModel::beforeInsert, this, [&](QSqlRecord& record) // TBD: implement row insertion
+		{
+			log.record("Eintrag manuell hinzugefügt"); // TBD: reconstruct entry from record and send to log
+		});
+
+	connect(model, &QSqlTableModel::beforeDelete, this, [&](int row) // TBD: implement row deletion
+		{
+			log.record("Eintrag in " + model->tableName().toStdString() + " manuell gelöscht"); 
+		});
+
+	connect(model, &QSqlTableModel::beforeUpdate, this, [&](int row, QSqlRecord& record)
+		{
+			log.record("Eintrag manuell bearbeitet"); // TBD: reconstruct entry from record and send to log
+		});
 
 	refresh();
 }

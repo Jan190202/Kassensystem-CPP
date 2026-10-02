@@ -1,8 +1,8 @@
 #include "BalanceService.h"
 #include <optional>
 
-BalanceService::BalanceService(const RepositoryBundle& repoBundle, const registerFinancials::State& stateBefore)
-	: balanceRepo(repoBundle.balanceRepo), creditRepo(repoBundle.creditRepo), debtRepo(repoBundle.debtRepo), personRepo(repoBundle.personRepo), shareSettlementRepo(repoBundle.shareSettlementRepo), paymentRepo(repoBundle.paymentRepo), stateBefore(stateBefore) {}
+BalanceService::BalanceService(const RepositoryBundle& repoBundle, const registerFinancials::State& stateBefore, PendingChangeLog& log)
+	: balanceRepo(repoBundle.balanceRepo), creditRepo(repoBundle.creditRepo), debtRepo(repoBundle.debtRepo), personRepo(repoBundle.personRepo), shareSettlementRepo(repoBundle.shareSettlementRepo), paymentRepo(repoBundle.paymentRepo), stateBefore(stateBefore), log(log) {}
 
 int64_t BalanceService::addBalanceItem(const request::Balance& request)
 {
@@ -22,6 +22,7 @@ int64_t BalanceService::addBalanceItem(const request::Balance& request)
 		addCredit(entry.personEntryID.value(), entry.amount, entry.dateBooked, "Abteilungsausgabe übernommen");
 	}
 	
+	log.record(PendingChangeLog::ChangeType::add, entry);
 	return balanceRepo->addBalanceEntry(entry);
 }
 
@@ -29,15 +30,17 @@ int64_t BalanceService::addCredit(int64_t personEntryID, double amount, const Re
 {
 	// potential validity check here
 	
-	return creditRepo->addCreditEntry(
-		entry::Credit{ 
-			.creditEntryID = 0, 
-			.personEntryID = personEntryID, 
-			.dateBooked = date, 
+	auto entry = entry::Credit{
+			.creditEntryID = 0,
+			.personEntryID = personEntryID,
+			.dateBooked = date,
 			.dateAdded = QDate::currentDate(),
-			.amount = amount, 
-			.description = description 
-		});
+			.amount = amount,
+			.description = description
+	};
+
+	log.record(PendingChangeLog::ChangeType::add, entry);
+	return creditRepo->addCreditEntry(entry);
 }
 
 std::vector<entry::Balance> BalanceService::getBalanceEntries(BalanceType type, const QDate& minDate) const
@@ -158,6 +161,7 @@ AddSettlementException BalanceService::addShareSettlement(request::ShareSettleme
 	};
 
 	int64_t settlementEntryID = shareSettlementRepo->addShareSettlementEntry(entry);
+	log.record(PendingChangeLog::ChangeType::add, entry);
 
 	double overpaymentAmount = addShareSettlementAllocation(settlementEntryID, entry.amount);
 

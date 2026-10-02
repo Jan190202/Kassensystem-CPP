@@ -14,7 +14,7 @@ class CashRegisterSystemUI : public QMainWindow
 {
 	Q_OBJECT
 public:
-	CashRegisterSystemUI(const ServiceBundle& serviceBundle, const RepositoryBundle& repoBundle, const SessionController& controller, QSqlDatabase& db, QWidget* parent = nullptr);
+	CashRegisterSystemUI(const ServiceBundle& serviceBundle, const RepositoryBundle& repoBundle, const SessionController& controller, QSqlDatabase& db, PendingChangeLog& log, QWidget* parent = nullptr);
 private:
 	enum class TabIndex
 	{
@@ -27,6 +27,6 @@ private:
 	int activeTab = 0;
 	std::array<bool, 4> loadedTabs = {false};
 
-	void initUi(const ServiceBundle& serviceBundle, const RepositoryBundle& repoBundle, const SessionController& controller, QSqlDatabase& db);
+	void initUi(const ServiceBundle& serviceBundle, const RepositoryBundle& repoBundle, const SessionController& controller, QSqlDatabase& db, PendingChangeLog& log);
 	void changeTab(TabIndex idx);
 };

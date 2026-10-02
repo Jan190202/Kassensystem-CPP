@@ -2,8 +2,8 @@
 #include <QDebug>
 #include <regex>
 
-ConsumptionService::ConsumptionService(const RepositoryBundle& repoBundle, const PriceList& priceList)
-	: consumptionRepo(repoBundle.consumptionRepo), debtRepo(repoBundle.debtRepo), personRepo(repoBundle.personRepo), priceList(priceList) {}
+ConsumptionService::ConsumptionService(const RepositoryBundle& repoBundle, const PriceList& priceList, PendingChangeLog& log)
+	: consumptionRepo(repoBundle.consumptionRepo), debtRepo(repoBundle.debtRepo), personRepo(repoBundle.personRepo), priceList(priceList), log(log) {}
 
 void ConsumptionService::addConsumption(const request::Consumption& request)
 {
@@ -22,14 +22,17 @@ void ConsumptionService::addConsumption(const request::Consumption& request)
 		if (result.has_value())
 		{
 			PersonStringSpecifiers spec = result.value();
-			personEntryID = personRepo->addPersonEntry(
-				entry::Person{
+
+			auto entry = entry::Person{
 					.personEntryID = 0,
 					.firstName = spec.firstName,
 					.lastName = spec.lastName,
 					.nickName = spec.nickName,
 					.info = spec.info
-				});
+			};
+
+			personEntryID = personRepo->addPersonEntry(entry);
+			log.record(PendingChangeLog::ChangeType::add, entry);
 		}
 		else
 		{
@@ -58,6 +61,8 @@ void ConsumptionService::addConsumption(const request::Consumption& request)
 
 	entry::Consumption cEntry{ .consumptionEntryID = 0, .debtEntryID = dEntryID, .nBeer05 = request.nBeer05 , .nBeer04 = request.nBeer04, .nSoftdrinks = request.nSoftdrinks, .nWater = request.nWater, .otherExpense = request.otherExpense };
 	int64_t cEntryID = consumptionRepo->addConsumptionEntry(cEntry);
+
+	log.record(PendingChangeLog::ChangeType::add, dEntry, std::optional<entry::Consumption>{cEntry});
 }
 
 double ConsumptionService::calculateDebt(const request::Consumption& request) const

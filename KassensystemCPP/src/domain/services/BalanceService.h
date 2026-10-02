@@ -15,7 +15,7 @@ class BalanceService
 public:
 	inline static const QDate earliestDate = QDate{ 2000,1,1 };
 
-	BalanceService(const RepositoryBundle& repoBundle, const registerFinancials::State& stateBefore);
+	BalanceService(const RepositoryBundle& repoBundle, const registerFinancials::State& stateBefore, PendingChangeLog& log);
 	int64_t addBalanceItem(const request::Balance& request);
 	AddSettlementException addShareSettlement(request::ShareSettlement request);
 
@@ -33,4 +33,5 @@ private:
 	ShareSettlementRepository* shareSettlementRepo;
 	PaymentRepository* paymentRepo;
 	const registerFinancials::State& stateBefore;
+	PendingChangeLog& log;
 };

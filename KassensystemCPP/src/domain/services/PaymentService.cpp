@@ -2,8 +2,8 @@
 #include <expected>
 #include <algorithm>
 
-PaymentService::PaymentService(const RepositoryBundle& repoBundle)
-	: paymentRepo(repoBundle.paymentRepo), creditRepo(repoBundle.creditRepo), debtRepo(repoBundle.debtRepo), consumptionRepo(repoBundle.consumptionRepo), balanceRepo(repoBundle.balanceRepo), personRepo(repoBundle.personRepo) {}
+PaymentService::PaymentService(const RepositoryBundle& repoBundle, PendingChangeLog& log)
+	: paymentRepo(repoBundle.paymentRepo), creditRepo(repoBundle.creditRepo), debtRepo(repoBundle.debtRepo), consumptionRepo(repoBundle.consumptionRepo), balanceRepo(repoBundle.balanceRepo), personRepo(repoBundle.personRepo), log(log) {}
 
 void PaymentService::addPayment(const request::Payment& request)
 {
@@ -20,6 +20,8 @@ void PaymentService::addPayment(const request::Payment& request)
 
 	int64_t paymentEntryID = paymentRepo->addPaymentEntry(entry);
 	double overpaymentAmount = addPaymentAllocation(paymentEntryID, entry.personEntryID, entry.amount);
+
+	log.record(PendingChangeLog::ChangeType::add, entry);
 
 	if (overpaymentAmount > 1e-9)
 	{
@@ -69,33 +71,37 @@ double PaymentService::addPaymentAllocation(int64_t paymentEntryID, int64_t pers
 int64_t PaymentService::addCredit(int64_t personEntryID, double amount, const RegisterDate& date, const std::string& description)
 {
 	// potential validity check here
-	
-	return creditRepo->addCreditEntry(
-		entry::Credit{ 
-			.creditEntryID = 0, 
-			.personEntryID = personEntryID, 
-			.dateBooked = date, 
+
+	auto entry = entry::Credit{
+			.creditEntryID = 0,
+			.personEntryID = personEntryID,
+			.dateBooked = date,
 			.dateAdded = QDate::currentDate(),
-			.amount = amount, 
+			.amount = amount,
 			.description = description
-		});
+	};
+
+	log.record(PendingChangeLog::ChangeType::add, entry);
+	return creditRepo->addCreditEntry(entry);
 }
 
 int64_t PaymentService::addTip(int64_t personEntryID, double amount, const RegisterDate& date)
 {
 	// potential validity check here
 	
-	return balanceRepo->addBalanceEntry(
-		entry::Balance{ 
-		.balanceEntryID = 0, 
-		.type = BalanceType::earning, 
+	auto entry = entry::Balance{
+		.balanceEntryID = 0,
+		.type = BalanceType::earning,
 		.description = "Trinkgeld bei Schuldenbegleichung",
-		.amount = amount, 
-		.dateBooked = date, 
+		.amount = amount,
+		.dateBooked = date,
 		.dateAdded = QDate::currentDate(),
-		.comment = "", 
-		.personEntryID = personEntryID 
-		});
+		.comment = "",
+		.personEntryID = personEntryID
+	};
+
+	log.record(PendingChangeLog::ChangeType::add, entry);
+	return balanceRepo->addBalanceEntry(entry);
 }
 
 std::vector<exportType::PersonDebt> PaymentService::getDebtsAll() const

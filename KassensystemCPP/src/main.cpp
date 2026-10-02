@@ -69,7 +69,8 @@ int main(int argc, char* argv[])
 	QSqlDatabase& db = sqliteDB.getDatabase();
 	qDebug() << "";
 
-	// create session control
+	// create session control and changelog
+	PendingChangeLog log{};
 	SqliteSessionController sqliteController{ syncManager };
 	SessionController& controller = sqliteController;
 
@@ -83,9 +84,9 @@ int main(int argc, char* argv[])
 	ShareSettlementRepository* seRep	= new SqliteShareSettlementRepository();
 	RepositoryBundle repoBundle{ .personRepo = peRep, .consumptionRepo = coRep, .debtRepo = deRep, .paymentRepo = paRep, .creditRepo = crRep, .balanceRepo = baRep, .shareSettlementRepo = seRep };
 
-	ConsumptionService		coSer(repoBundle, priceList);
-	BalanceService			baSer(repoBundle, financialStateBefore);
-	PaymentService			paSer(repoBundle);
+	ConsumptionService		coSer(repoBundle, priceList, log);
+	BalanceService			baSer(repoBundle, financialStateBefore, log);
+	PaymentService			paSer(repoBundle, log);
 	ServiceBundle serviceBundle{ .consumptionService = coSer, .paymentService = paSer, .balanceService = baSer };
 
 	// domain testing
@@ -93,7 +94,7 @@ int main(int argc, char* argv[])
 
 	// start UI
 	qDebug() << "-Starting up GUI-";
-	CashRegisterSystemUI sysUI(serviceBundle, repoBundle, controller, db);
+	CashRegisterSystemUI sysUI(serviceBundle, repoBundle, controller, db, log);
 	sysUI.show();
 	qDebug() << "";
 
@@ -101,14 +102,16 @@ int main(int argc, char* argv[])
 	int returnValue = app.exec();
 	qDebug() << "";
 
+	for (const auto& logEntry : log.pendingChanges())
+		qDebug() << logEntry.time.toString("hh'h'mm'min'ss's'") << ": " << QString::fromStdString(logEntry.description);
+
 	return returnValue;
 }
 
 /*
 * Ideas:
-* - class PendingChangeLog with entries PendingChanges for change tracking before saving/syncing
-*		- new button: sync -> save saves to local copy of database, sync pushes it to remote
-*		- apply (save) button only active when changes were made
+* - Changelog
+*		- apply button only active when changes were made
 *		- save button only active when applied
 *		- "changes" window to show applied changes for inspection before saving
 * - general architecture:

@@ -40,7 +40,7 @@ struct PersonStringSpecifiers
 class ConsumptionService
 {
 public:
-	ConsumptionService(const RepositoryBundle& repoBundle, const PriceList& priceList);
+	ConsumptionService(const RepositoryBundle& repoBundle, const PriceList& priceList, PendingChangeLog& log);
 	void addConsumption(const request::Consumption& request);
 
 	std::expected<void,validityError::Code> isRequestValid(const request::Consumption& request) const;
@@ -53,4 +53,5 @@ private:
 	DebtRepository* debtRepo;
 	PersonRepository* personRepo;
 	const PriceList& priceList;
+	PendingChangeLog& log;
 };

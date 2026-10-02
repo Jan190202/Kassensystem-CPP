@@ -7,7 +7,7 @@
 class PaymentService
 {
 public:
-	PaymentService(const RepositoryBundle& repoBundle);
+	PaymentService(const RepositoryBundle& repoBundle, PendingChangeLog& log);
 	void addPayment(const request::Payment& request);
 	int64_t addCredit(int64_t personEntryID, double amount, const RegisterDate& date, const std::string& description);
 	std::vector<exportType::PersonDebt> getDebtsAll() const;
@@ -21,4 +21,5 @@ private:
 	ConsumptionRepository* consumptionRepo;
 	BalanceRepository* balanceRepo;
 	PersonRepository* personRepo;
+	PendingChangeLog& log;
 };

@@ -12,14 +12,14 @@
 #include <QMainWindow>
 #include <QDebug>
 
-CashRegisterSystemUI::CashRegisterSystemUI(const ServiceBundle& serviceBundle, const RepositoryBundle& repoBundle, const SessionController& controller, QSqlDatabase& db, QWidget* parent) : QMainWindow(parent)
+CashRegisterSystemUI::CashRegisterSystemUI(const ServiceBundle& serviceBundle, const RepositoryBundle& repoBundle, const SessionController& controller, QSqlDatabase& db, PendingChangeLog& log, QWidget* parent) : QMainWindow(parent)
 {
 	setWindowTitle(QStringLiteral("Kassensystem"));
 	resize(1000, 600);
-	initUi(serviceBundle, repoBundle, controller, db);
+	initUi(serviceBundle, repoBundle, controller, db, log);
 }
 
-void CashRegisterSystemUI::initUi(const ServiceBundle& serviceBundle, const RepositoryBundle& repoBundle, const SessionController& controller, QSqlDatabase& db)
+void CashRegisterSystemUI::initUi(const ServiceBundle& serviceBundle, const RepositoryBundle& repoBundle, const SessionController& controller, QSqlDatabase& db, PendingChangeLog& log)
 {
 	//main widget for all contents
 	QWidget*		central		= new QWidget(this);
@@ -30,7 +30,7 @@ void CashRegisterSystemUI::initUi(const ServiceBundle& serviceBundle, const Repo
 	QHBoxLayout* buttonBar = new QHBoxLayout();
 	lowerButtons.btnCancel = new QPushButton("Cancel", this);
 	lowerButtons.btnApply = new QPushButton("Apply", this);
-	lowerButtons.btnSave = new QPushButton("Save", this); 
+	lowerButtons.btnSave = new QPushButton("Save && Sync", this);
 	
 	if (systemConfig::isDebug())
 		lowerButtons.btnSave->setEnabled(false); // only for precaution to prevent data manipulation in debug mode
@@ -49,14 +49,14 @@ void CashRegisterSystemUI::initUi(const ServiceBundle& serviceBundle, const Repo
 		new PayTab(lowerButtons, serviceBundle.paymentService, repoBundle.personRepo, repoBundle.consumptionRepo, repoBundle.debtRepo, repoBundle.creditRepo), 
 		new AddTab(lowerButtons, serviceBundle.consumptionService, repoBundle.personRepo), 
 		new BalanceTab(lowerButtons, serviceBundle.balanceService, repoBundle.personRepo),
-		new ManualTab(lowerButtons, repoBundle, db) };
+		new ManualTab(lowerButtons, repoBundle, db, log) };
 
 	tabSelector->addTab(tabs.at(static_cast<int>(TabIndex::pay)), QStringLiteral("Schulden begleichen"));
 	tabSelector->addTab(tabs.at(static_cast<int>(TabIndex::add)), QStringLiteral("Einträge hinzufügen"));
 	tabSelector->addTab(tabs.at(static_cast<int>(TabIndex::balance)), QStringLiteral("Abteilungsbilanz bearbeiten"));
 	tabSelector->addTab(tabs.at(static_cast<int>(TabIndex::manual)), QStringLiteral("Manuelle Anpassung"));
 	
-	TabIndex initialTab = TabIndex::manual; // initialize first tab
+	TabIndex initialTab = TabIndex::pay; // initialize first tab
 	changeTab(initialTab);
 	tabSelector->setCurrentIndex(static_cast<int>(initialTab));
 

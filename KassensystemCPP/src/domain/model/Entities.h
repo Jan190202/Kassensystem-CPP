@@ -4,10 +4,12 @@
 #include <QDebug>
 #include <QString>
 #include <QDate>
+#include <QDateTime>
 #include <string>
 #include <ostream>
 #include <cstdint>
 #include <variant>
+#include <map>
 
 class RegisterDate
 {
@@ -390,6 +392,40 @@ namespace registerFinancials
 		Details details;
 	};
 }
+
+class PendingChangeLog
+{
+public:
+	struct Change
+	{
+		QDateTime time;
+		std::string description;
+	};
+
+	enum class ChangeType
+	{
+		add, remove, mutate
+	};
+
+	PendingChangeLog() = default;
+
+	void record(ChangeType, const entry::Balance&);
+	void record(ChangeType, const entry::Debt&, const std::optional<entry::Consumption>&);
+	void record(ChangeType, const entry::Credit&);
+	void record(ChangeType, const entry::Payment&);
+	void record(ChangeType, const entry::Person&);
+	void record(ChangeType, const entry::ShareSettlement&);
+	void record(const std::string& description);
+
+	bool hasPendingChanges() const;
+	const std::vector<Change>& pendingChanges() const;
+private:
+	std::vector<Change> log;
+
+	std::map<ChangeType, std::string> actionVerb = { {ChangeType::add, "hinzugefügt"}, {ChangeType::remove, "gelöscht"}, {ChangeType::mutate, "verändert"} };
+
+	void addLogEntry(const std::string& description);
+};
 
 struct PriceList
 {
