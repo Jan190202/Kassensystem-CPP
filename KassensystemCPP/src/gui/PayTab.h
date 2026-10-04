@@ -1,6 +1,7 @@
 #pragma once
 #include "BaseTab.h"
 #include "domain/services/PaymentService.h"
+#include "domain/services/PersonService.h"
 #include "domain/model/Requests.h"
 #include "GuiTypes.h"
 #include "common/Utils.h"
@@ -18,7 +19,7 @@ class PayTab : public BaseTab
 	Q_OBJECT
 	
 public:
-	PayTab(const LowerButtonBundle& lowerButtons, PaymentService& paymentService, 
+	PayTab(const LowerButtonBundle& lowerButtons, PaymentService& paymentService, PersonService& personService, 
 			PersonRepository* personRepo, ConsumptionRepository* consumptionRepo, DebtRepository* debtRepo, CreditRepository* creditRepo,
 			QWidget* parent = nullptr);
 	virtual void initialize() override;
@@ -51,6 +52,7 @@ private:
 	QTableWidget*	tblConsumption		= nullptr; 
 
 	PaymentService& paymentService;
+	PersonService& personService;
 	PersonRepository* personRepo;
 	ConsumptionRepository* consumptionRepo;
 	DebtRepository* debtRepo;

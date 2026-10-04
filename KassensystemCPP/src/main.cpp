@@ -8,6 +8,7 @@
 #include "domain/services/ConsumptionService.h"
 #include "domain/services/PaymentService.h"
 #include "domain/services/BalanceService.h"
+#include "domain/services/PersonService.h"
 
 #include "data/sqlite/repositories/SqliteBalanceRepository.h";
 #include "data/sqlite/repositories/SqliteConsumptionRepository.h";
@@ -84,10 +85,11 @@ int main(int argc, char* argv[])
 	ShareSettlementRepository* seRep	= new SqliteShareSettlementRepository();
 	RepositoryBundle repoBundle{ .personRepo = peRep, .consumptionRepo = coRep, .debtRepo = deRep, .paymentRepo = paRep, .creditRepo = crRep, .balanceRepo = baRep, .shareSettlementRepo = seRep };
 
-	ConsumptionService		coSer(repoBundle, priceList, log);
 	BalanceService			baSer(repoBundle, financialStateBefore, log);
 	PaymentService			paSer(repoBundle, log);
-	ServiceBundle serviceBundle{ .consumptionService = coSer, .paymentService = paSer, .balanceService = baSer };
+	PersonService			peSer(repoBundle, log);
+	ConsumptionService		coSer(peSer, repoBundle, priceList, log);
+	ServiceBundle serviceBundle{ .consumptionService = coSer, .paymentService = paSer, .balanceService = baSer, .personService = peSer };
 
 	// domain testing
 	//testing::addTestEntries(repoBundle, serviceBundle);

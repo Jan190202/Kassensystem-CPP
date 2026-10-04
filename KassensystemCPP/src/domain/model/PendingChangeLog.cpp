@@ -68,3 +68,8 @@ void PendingChangeLog::addLogEntry(const std::string& description)
 		description
 	);
 }
+
+void PendingChangeLog::clear()
+{
+	log.clear();
+}

@@ -11,14 +11,14 @@
 #include <QMainWindow>
 #include <QDebug>
 
-CashRegisterSystemUI::CashRegisterSystemUI(const ServiceBundle& serviceBundle, const RepositoryBundle& repoBundle, const SessionController& controller, QSqlDatabase& db, PendingChangeLog& log, QWidget* parent) : QMainWindow(parent)
+CashRegisterSystemUI::CashRegisterSystemUI(const ServiceBundle& serviceBundle, const RepositoryBundle& repoBundle, const SessionController& controller, QSqlDatabase& db, PendingChangeLog& log, QWidget* parent) : log(log), QMainWindow(parent)
 {
 	setWindowTitle(QStringLiteral("Kassensystem"));
 	resize(1000, 600);
-	initUi(serviceBundle, repoBundle, controller, db, log);
+	initUi(serviceBundle, repoBundle, controller, db);
 }
 
-void CashRegisterSystemUI::initUi(const ServiceBundle& serviceBundle, const RepositoryBundle& repoBundle, const SessionController& controller, QSqlDatabase& db, PendingChangeLog& log)
+void CashRegisterSystemUI::initUi(const ServiceBundle& serviceBundle, const RepositoryBundle& repoBundle, const SessionController& controller, QSqlDatabase& db)
 {
 	//main widget for all contents
 	QWidget*		central		= new QWidget(this);
@@ -30,6 +30,7 @@ void CashRegisterSystemUI::initUi(const ServiceBundle& serviceBundle, const Repo
 	lowerButtons.btnCancel = new QPushButton("Cancel", this);
 	lowerButtons.btnApply = new QPushButton("Apply", this);
 	lowerButtons.btnSave = new QPushButton("Save && Sync", this);
+	lowerButtons.btnSave->setEnabled(false); // disabled, until changes were made
 	
 	buttonBar->addWidget(lowerButtons.btnCancel);
 	buttonBar->addWidget(lowerButtons.btnApply);
@@ -42,7 +43,7 @@ void CashRegisterSystemUI::initUi(const ServiceBundle& serviceBundle, const Repo
 	rootLayout->insertWidget(0, tabSelector);
 
 	tabs = { 
-		new PayTab(lowerButtons, serviceBundle.paymentService, repoBundle.personRepo, repoBundle.consumptionRepo, repoBundle.debtRepo, repoBundle.creditRepo), 
+		new PayTab(lowerButtons, serviceBundle.paymentService, serviceBundle.personService, repoBundle.personRepo, repoBundle.consumptionRepo, repoBundle.debtRepo, repoBundle.creditRepo),
 		new AddTab(lowerButtons, serviceBundle.consumptionService, repoBundle.personRepo), 
 		new BalanceTab(lowerButtons, serviceBundle.balanceService, repoBundle.personRepo),
 		new ManualTab(lowerButtons, repoBundle, db, log) };
@@ -72,6 +73,8 @@ void CashRegisterSystemUI::initUi(const ServiceBundle& serviceBundle, const Repo
 		{
 			controller.save();
 			controller.sync();
+			log.clear();
+			lowerButtons.btnSave->setEnabled(false);
 		});
 }
 
@@ -96,5 +99,6 @@ void CashRegisterSystemUI::changeTab(TabIndex activeTab)
 	connect(lowerButtons.btnApply, &QPushButton::clicked, this, [=]()
 		{
 			tabs.at(activeTabNum)->apply();
+			lowerButtons.btnSave->setEnabled(log.hasPendingChanges());
 		});
 }
