@@ -36,10 +36,12 @@ private:
 	void nameChanged();
 	void displayTable();
 	void addTableEntry();
-	void deleteTabEntry();
+	void deleteTableEntry();
+	void unhideAllRows();
 
 	QComboBox* tableSelect;
 	QPushButton* btnAddEntry;
+	QPushButton* btnDeleteEntry;
 	QCheckBox* toggleNameSelect;
 	QComboBox* nameSelect;
 	QTableView* tableView;

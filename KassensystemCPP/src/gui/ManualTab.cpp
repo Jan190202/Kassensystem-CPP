@@ -11,6 +11,7 @@
 #include <QHeaderView>
 #include <QCompleter>
 #include <QPushButton>
+#include <QMessageBox>
 #include <optional>
 #include <algorithm>
 
@@ -32,6 +33,9 @@ void ManualTab::initialize()
 	btnAddEntry = new QPushButton("+");
 	btnAddEntry->setMaximumWidth(30);
 
+	btnDeleteEntry = new QPushButton("-");
+	btnDeleteEntry->setMaximumWidth(30);
+
 	nameSelect = new QComboBox(this);
 	nameSelect->setEditable(true);
 	nameSelect->setCurrentIndex(-1);
@@ -49,6 +53,7 @@ void ManualTab::initialize()
 	auto* filterLayout = new QHBoxLayout();
 	filterLayout->addWidget(tableSelect);
 	filterLayout->addWidget(btnAddEntry);
+	filterLayout->addWidget(btnDeleteEntry);
 	filterLayout->addStretch();
 	filterLayout->addWidget(toggleNameSelect);
 	filterLayout->addWidget(nameSelect);
@@ -58,6 +63,8 @@ void ManualTab::initialize()
 	tableView = new QTableView();
 	tableView->verticalHeader()->hide();
 	tableView->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
+	tableView->setSelectionBehavior(QAbstractItemView::SelectRows);
+	tableView->setSelectionMode(QAbstractItemView::SingleSelection);
 
 	auto* mainLayout = new QVBoxLayout(this);
 	mainLayout->addLayout(filterLayout);
@@ -80,10 +87,11 @@ void ManualTab::initialize()
 
 	connect(lowerButtons.btnApply, &QPushButton::clicked, this, [&]() {apply(); });
 
-	connect(model, &QSqlTableModel::dataChanged, this, [&](const QModelIndex& topLeft, const QModelIndex& bottomRight)
-		{
-			lowerButtons.btnApply->setEnabled(true);
-		});
+	auto enableApplyButton = [&]() {lowerButtons.btnApply->setEnabled(true);};
+	connect(model, &QAbstractItemModel::dataChanged,		this, enableApplyButton);
+	connect(model, &QAbstractItemModel::headerDataChanged,	this, enableApplyButton);
+	connect(model, &QAbstractItemModel::rowsInserted,		this, enableApplyButton);
+	connect(model, &QAbstractItemModel::rowsRemoved,		this, enableApplyButton);
 
 	connect(model, &QSqlTableModel::beforeInsert, this, [&](QSqlRecord& record) // TBD: implement row insertion
 		{
@@ -102,7 +110,10 @@ void ManualTab::initialize()
 
 	connect(btnAddEntry, &QPushButton::clicked, this, [&]() { addTableEntry(); });
 
+	connect(btnDeleteEntry, &QPushButton::clicked, this, [&]() { deleteTableEntry(); });
+
 	refresh();
+	lowerButtons.btnApply->setEnabled(true);
 }
 
 void ManualTab::refresh()
@@ -205,16 +216,36 @@ void ManualTab::displayTable()
 void ManualTab::apply()
 {
 	model->submitAll();
+	model->select();
+	unhideAllRows();
 	lowerButtons.btnApply->setEnabled(false);
 }
 
 void ManualTab::addTableEntry()
 {
 	QSqlRecord newRecord = model->record();
-	model->insertRecord(-1, newRecord);
+	
+	int row = -1; // if no row is selected, add at the end
+	const QModelIndex idx = tableView->currentIndex();
+	if (idx.isValid())
+		row = idx.row()+1;
+
+	model->insertRecord(row, newRecord);
 }
 
-void ManualTab::deleteTabEntry()
+void ManualTab::deleteTableEntry()
 {
-	// TBD
+	const QModelIndex idx = tableView->currentIndex();
+	if (!idx.isValid()) return;
+	const int row = idx.row();
+	if (!model->removeRow(row)) return;
+
+	tableView->setRowHidden(row, true);
+	tableView->setCurrentIndex(QModelIndex());
+}
+
+void ManualTab::unhideAllRows()
+{
+	for (int r = 0; r < model->rowCount(); ++r)
+		tableView->setRowHidden(r, false);
 }
