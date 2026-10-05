@@ -13,7 +13,7 @@ const std::vector<PendingChangeLog::Change>& PendingChangeLog::pendingChanges() 
 
 void PendingChangeLog::record(ChangeType type, const entry::Balance& entry)
 {
-	std::string description = std::format("Bilanz {} - Beschreibung: \"{}\", Betrag: {}, ausgelegt von: {}", actionVerb.at(type), entry.description, entry.amount, entry.personEntryID.has_value() ? std::to_string(entry.personEntryID.value()) : "Niemand");
+	std::string description = std::format("Bilanz {} - Beschreibung: \"{}\", Betrag: {}, ausgelegt von: {}", actionVerb.at(type), entry.description, entry.amount, entry.personEntryID.has_value() ? std::to_string(entry.personEntryID.value()) : "niemand");
 	
 	addLogEntry(description);
 }

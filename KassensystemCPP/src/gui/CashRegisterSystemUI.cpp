@@ -94,13 +94,18 @@ void CashRegisterSystemUI::changeTab(TabIndex activeTab)
 		loadedTabs.at(activeTabNum) = true;
 	}
 
+	auto refreshSaveButton = [=]()
+		{
+			lowerButtons.btnSave->setEnabled(log.hasPendingChanges());
+			lowerButtons.btnSave->setToolTip(QString::fromStdString(log.printPendingChanges()));
+		};
+
 	// apply button only controls the active tab
 	lowerButtons.btnApply->disconnect();
 	connect(lowerButtons.btnApply, &QPushButton::clicked, this, [=]()
 		{
 			tabs.at(activeTabNum)->apply();
-			lowerButtons.btnSave->setEnabled(log.hasPendingChanges());
-			lowerButtons.btnSave->setToolTip(QString::fromStdString(log.printPendingChanges()));
+			refreshSaveButton();
 		});
 
 	lowerButtons.btnApply->setEnabled(false);
@@ -112,7 +117,6 @@ void CashRegisterSystemUI::changeTab(TabIndex activeTab)
 
 	connect(tabs.at(activeTabNum), &BaseTab::instantChangesMade, this, [=]()
 		{
-			lowerButtons.btnSave->setEnabled(log.hasPendingChanges());
-			lowerButtons.btnSave->setToolTip(QString::fromStdString(log.printPendingChanges()));
+			refreshSaveButton();
 		});
 }

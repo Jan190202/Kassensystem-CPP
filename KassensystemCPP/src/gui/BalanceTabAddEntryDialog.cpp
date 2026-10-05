@@ -184,6 +184,8 @@ BalanceTabAddEntryDialog::BalanceTabAddEntryDialog(BtnIndex mode, std::vector<en
 
 	setMinimumWidth(520);
 	adjustSize();
+
+	edtDescription->setFocus(Qt::TabFocusReason);
 }
 
 BalanceTabAddEntryDialog::inputs BalanceTabAddEntryDialog::getInputs() const
