@@ -33,7 +33,10 @@ public:
 	virtual void apply() override;
 
 private:
+	void nameChanged();
+	void displayTable();
 	void addTableEntry();
+	void deleteTabEntry();
 
 	QComboBox* tableSelect;
 	QPushButton* btnAddEntry;

@@ -63,15 +63,20 @@ void ManualTab::initialize()
 	mainLayout->addLayout(filterLayout);
 	mainLayout->addWidget(tableView);
 
-	connect(tableSelect, &QComboBox::currentIndexChanged, this, [&]() {refresh(); });
+	connect(tableSelect, &QComboBox::currentIndexChanged, this, [&]() 
+		{
+			model->setTable(tableSelect->currentText());
+			nameChanged();
+			displayTable();
+		});
 
 	connect(toggleNameSelect, &QCheckBox::checkStateChanged, this, [&](Qt::CheckState state)
 		{
 			nameSelect->setEnabled(state == Qt::Checked);
-			refresh();
+			nameChanged();
 		});
 
-	connect(nameSelect, &QComboBox::currentIndexChanged, this, [&]() {refresh(); });
+	connect(nameSelect, &QComboBox::currentIndexChanged, this, [&]() {nameChanged(); });
 
 	connect(lowerButtons.btnApply, &QPushButton::clicked, this, [&]() {apply(); });
 
@@ -102,13 +107,7 @@ void ManualTab::initialize()
 
 void ManualTab::refresh()
 {
-	// first refresh name select
-	// -> if disabled, keep disabled and refresh names
-	// -> if enabled, refresh names and try keeping last name. if not found, set to placeholder
-	// after name refresh, if name select is enabled and table has nameID, filter by selected nameID
-
-
-	// 1. refresh name select
+	// refresh name select
 	QSignalBlocker blocker(nameSelect);
 
 	bool isPlaceholder = false;
@@ -143,9 +142,19 @@ void ManualTab::refresh()
 		if (indexForOldID.has_value()) nameSelect->setCurrentIndex(indexForOldID.value());
 	}
 
-	// 3. refresh tables
+	// refresh table
 	model->setTable(tableSelect->currentText());
 
+	// apply filters and display
+	nameChanged();
+	displayTable();
+}
+
+void ManualTab::nameChanged()
+{
+	// reset filter
+	model->setFilter("");
+	
 	// search for personID column
 	std::optional<QString> personColumnName;
 	std::optional<QString> debtColumnName;
@@ -156,7 +165,7 @@ void ManualTab::refresh()
 			personColumnName = "personID";
 			break;
 		}
-		else if (model->tableName() == "Person" && record.fieldName(i) == "ID") 
+		else if (model->tableName() == "Person" && record.fieldName(i) == "ID")
 		{
 			personColumnName = "ID";
 			break;
@@ -183,8 +192,10 @@ void ManualTab::refresh()
 	}
 
 	model->select();
+}
 
-	// display
+void ManualTab::displayTable()
+{
 	tableView->setModel(model);
 	int idColumnIndex = model->fieldIndex("ID");
 	if (idColumnIndex != -1) tableView->setItemDelegateForColumn(idColumnIndex, new ReadOnlyDelegate(tableView)); // set ID column to read-only
@@ -201,4 +212,9 @@ void ManualTab::addTableEntry()
 {
 	QSqlRecord newRecord = model->record();
 	model->insertRecord(-1, newRecord);
+}
+
+void ManualTab::deleteTabEntry()
+{
+	// TBD
 }
