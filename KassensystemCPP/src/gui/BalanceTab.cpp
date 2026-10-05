@@ -19,8 +19,8 @@
 #include <algorithm>
 #include <cmath>
 
-BalanceTab::BalanceTab(const LowerButtonBundle& lowerButtons, BalanceService& balanceService, PersonRepository* personRepo, QWidget* parent) 
-	: lowerButtons(lowerButtons), balanceService(balanceService), personRepo(personRepo), BaseTab(parent) {}
+BalanceTab::BalanceTab(BalanceService& balanceService, PersonRepository* personRepo, QWidget* parent) 
+	: balanceService(balanceService), personRepo(personRepo), BaseTab(parent) {}
 
 void BalanceTab::initialize()
 {

@@ -25,8 +25,10 @@ private:
 	LowerButtonBundle lowerButtons;
 	PendingChangeLog& log;
 
-	int activeTab = 0;
 	std::array<bool, 4> loadedTabs = {false};
+
+	TabIndex activeTab = TabIndex::pay;
+	bool activeTabHasTemporaryChanges = false;
 
 	void initUi(const ServiceBundle& serviceBundle, const RepositoryBundle& repoBundle, const SessionController& controller, QSqlDatabase& db);
 	void changeTab(TabIndex idx);

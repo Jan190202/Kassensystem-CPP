@@ -24,7 +24,7 @@
 #include <map>
 #include <ranges>
 
-AddTab::AddTab(const LowerButtonBundle& lowerButtons, ConsumptionService& consumptionService, PersonRepository* personRepo, QWidget* parent) : lowerButtons(lowerButtons), consumptionService(consumptionService), personRepo(personRepo), BaseTab(parent) {}
+AddTab::AddTab(ConsumptionService& consumptionService, PersonRepository* personRepo, QWidget* parent) : consumptionService(consumptionService), personRepo(personRepo), BaseTab(parent) {}
 
 void AddTab::initialize()
 {

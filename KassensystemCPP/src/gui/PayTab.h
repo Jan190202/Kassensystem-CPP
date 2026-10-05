@@ -19,7 +19,7 @@ class PayTab : public BaseTab
 	Q_OBJECT
 	
 public:
-	PayTab(const LowerButtonBundle& lowerButtons, PaymentService& paymentService, PersonService& personService, 
+	PayTab(PaymentService& paymentService, PersonService& personService, 
 			PersonRepository* personRepo, ConsumptionRepository* consumptionRepo, DebtRepository* debtRepo, CreditRepository* creditRepo,
 			QWidget* parent = nullptr);
 	virtual void initialize() override;
@@ -57,7 +57,6 @@ private:
 	ConsumptionRepository* consumptionRepo;
 	DebtRepository* debtRepo;
 	CreditRepository* creditRepo;
-	const LowerButtonBundle& lowerButtons;
 
 	double total{}, settled{}, due{}, credit{};
 

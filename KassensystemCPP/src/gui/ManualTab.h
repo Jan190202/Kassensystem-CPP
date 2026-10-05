@@ -27,7 +27,7 @@ class ManualTab : public BaseTab
 {
 	Q_OBJECT
 public:
-	ManualTab(const LowerButtonBundle& lowerButtons, const RepositoryBundle& repoBundle, QSqlDatabase& db, PendingChangeLog& log, QWidget* parent = nullptr);
+	ManualTab(const RepositoryBundle& repoBundle, QSqlDatabase& db, PendingChangeLog& log, QWidget* parent = nullptr);
 	virtual void initialize() override;
 	virtual void refresh() override;
 	virtual void apply() override;
@@ -51,6 +51,5 @@ private:
 
 	PendingChangeLog& log;
 
-	const LowerButtonBundle& lowerButtons;
 	const RepositoryBundle& repoBundle;
 };

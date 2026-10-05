@@ -15,8 +15,8 @@
 #include <optional>
 #include <algorithm>
 
-ManualTab::ManualTab(const LowerButtonBundle& lowerButtons, const RepositoryBundle& repoBundle, QSqlDatabase& db, PendingChangeLog& log, QWidget* parent)
-	: lowerButtons(lowerButtons), repoBundle(repoBundle), db(db), log(log), BaseTab(parent) {}
+ManualTab::ManualTab(const RepositoryBundle& repoBundle, QSqlDatabase& db, PendingChangeLog& log, QWidget* parent)
+	: repoBundle(repoBundle), db(db), log(log), BaseTab(parent) {}
 
 void ManualTab::initialize()
 {
@@ -85,13 +85,11 @@ void ManualTab::initialize()
 
 	connect(nameSelect, &QComboBox::currentIndexChanged, this, [&]() {nameChanged(); });
 
-	connect(lowerButtons.btnApply, &QPushButton::clicked, this, [&]() {apply(); });
-
-	auto enableApplyButton = [&]() {lowerButtons.btnApply->setEnabled(true);};
-	connect(model, &QAbstractItemModel::dataChanged,		this, enableApplyButton);
-	connect(model, &QAbstractItemModel::headerDataChanged,	this, enableApplyButton);
-	connect(model, &QAbstractItemModel::rowsInserted,		this, enableApplyButton);
-	connect(model, &QAbstractItemModel::rowsRemoved,		this, enableApplyButton);
+	auto flagTemporary = [&]() { Q_EMIT temporaryChangesExist(true); };
+	connect(model, &QAbstractItemModel::dataChanged,		this, flagTemporary);
+	connect(model, &QAbstractItemModel::headerDataChanged,	this, flagTemporary);
+	connect(model, &QAbstractItemModel::rowsInserted,		this, flagTemporary);
+	connect(model, &QAbstractItemModel::rowsRemoved,		this, flagTemporary);
 
 	connect(model, &QSqlTableModel::beforeInsert, this, [&](QSqlRecord& record) // TBD: implement row insertion
 		{
@@ -113,7 +111,6 @@ void ManualTab::initialize()
 	connect(btnDeleteEntry, &QPushButton::clicked, this, [&]() { deleteTableEntry(); });
 
 	refresh();
-	lowerButtons.btnApply->setEnabled(true);
 }
 
 void ManualTab::refresh()
@@ -218,7 +215,8 @@ void ManualTab::apply()
 	model->submitAll();
 	model->select();
 	unhideAllRows();
-	lowerButtons.btnApply->setEnabled(false);
+	
+	Q_EMIT temporaryChangesExist(false);
 }
 
 void ManualTab::addTableEntry()

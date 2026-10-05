@@ -19,10 +19,11 @@ class AddTab : public BaseTab
 {
 	Q_OBJECT
 public:
-	AddTab(const LowerButtonBundle& lowerButtons, ConsumptionService& consumptionService, PersonRepository* personRepo, QWidget* parent = nullptr);
+	AddTab(ConsumptionService& consumptionService, PersonRepository* personRepo, QWidget* parent = nullptr);
 	virtual void initialize() override;
 	virtual void refresh() override;
 	virtual void apply() override;
+
 private slots:
 	void addEntry();
 
@@ -43,5 +44,4 @@ private:
 
 	ConsumptionService& consumptionService;
 	PersonRepository* personRepo;
-	const LowerButtonBundle& lowerButtons;
 };

@@ -13,7 +13,7 @@ class BalanceTab : public BaseTab
 {
 	Q_OBJECT
 public:
-	BalanceTab(const LowerButtonBundle& lowerButtons, BalanceService& balanceService, PersonRepository* personRepo, QWidget* parent = nullptr);
+	BalanceTab(BalanceService& balanceService, PersonRepository* personRepo, QWidget* parent = nullptr);
 	virtual void initialize() override;
 	virtual void refresh() override;
 	virtual void apply() override;
@@ -43,6 +43,5 @@ private:
 	
 	BalanceService& balanceService;
 	PersonRepository* personRepo;
-	const LowerButtonBundle& lowerButtons;
 	registerFinancials::Report report;
 };

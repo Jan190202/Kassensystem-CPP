@@ -10,6 +10,7 @@ public:
 	virtual void initialize() = 0;
 	virtual void refresh() = 0;
 	virtual void apply() = 0;
+
 Q_SIGNALS:
 	void temporaryChangesExist(bool doExist);
 	void instantChangesMade();

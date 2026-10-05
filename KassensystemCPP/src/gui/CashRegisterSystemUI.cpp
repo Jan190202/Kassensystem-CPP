@@ -9,6 +9,8 @@
 #include <QTabWidget>
 #include <QPushButton>
 #include <QMainWindow>
+#include <QMessageBox>
+#include <QSignalBlocker>
 #include <QDebug>
 
 CashRegisterSystemUI::CashRegisterSystemUI(const ServiceBundle& serviceBundle, const RepositoryBundle& repoBundle, const SessionController& controller, QSqlDatabase& db, PendingChangeLog& log, QWidget* parent) : log(log), QMainWindow(parent)
@@ -43,24 +45,33 @@ void CashRegisterSystemUI::initUi(const ServiceBundle& serviceBundle, const Repo
 	rootLayout->insertWidget(0, tabSelector);
 
 	tabs = { 
-		new PayTab(lowerButtons, serviceBundle.paymentService, serviceBundle.personService, repoBundle.personRepo, repoBundle.consumptionRepo, repoBundle.debtRepo, repoBundle.creditRepo),
-		new AddTab(lowerButtons, serviceBundle.consumptionService, repoBundle.personRepo), 
-		new BalanceTab(lowerButtons, serviceBundle.balanceService, repoBundle.personRepo),
-		new ManualTab(lowerButtons, repoBundle, db, log) };
+		new PayTab(serviceBundle.paymentService, serviceBundle.personService, repoBundle.personRepo, repoBundle.consumptionRepo, repoBundle.debtRepo, repoBundle.creditRepo),
+		new AddTab(serviceBundle.consumptionService, repoBundle.personRepo), 
+		new BalanceTab(serviceBundle.balanceService, repoBundle.personRepo),
+		new ManualTab(repoBundle, db, log) };
 
 	tabSelector->addTab(tabs.at(static_cast<int>(TabIndex::pay)), QStringLiteral("Schulden begleichen"));
 	tabSelector->addTab(tabs.at(static_cast<int>(TabIndex::add)), QStringLiteral("Einträge hinzufügen"));
 	tabSelector->addTab(tabs.at(static_cast<int>(TabIndex::balance)), QStringLiteral("Abteilungsbilanz bearbeiten"));
 	tabSelector->addTab(tabs.at(static_cast<int>(TabIndex::manual)), QStringLiteral("Manuelle Anpassung"));
 	
-	TabIndex initialTab = TabIndex::pay; // initialize first tab
-	changeTab(initialTab);
-	tabSelector->setCurrentIndex(static_cast<int>(initialTab));
+	changeTab(activeTab);
+	tabSelector->setCurrentIndex(static_cast<int>(activeTab));
 
-	connect(tabSelector, &QTabWidget::currentChanged, this, [this](int idx)
+	connect(tabSelector, &QTabWidget::currentChanged, this, [&, tabSelector](int idx)
 		{
+			if (activeTabHasTemporaryChanges)
+				if (QMessageBox::question(this, tr("Tab-Wechsel"), tr("Änderungen verwerfen?")) != QMessageBox::Yes)
+				{
+					QSignalBlocker blocker(tabSelector);
+					tabSelector->setCurrentIndex(static_cast<int>(activeTab));
+					return;
+				}
+
+			activeTab = static_cast<TabIndex>(idx);
+			changeTab(activeTab);
+
 			qDebug() << ""; // add new line for easier debugging
-			changeTab(static_cast<TabIndex>(idx));
 		});
 
 	connect(lowerButtons.btnCancel, &QPushButton::clicked, this, [&]() 
@@ -94,6 +105,8 @@ void CashRegisterSystemUI::changeTab(TabIndex activeTab)
 		loadedTabs.at(activeTabNum) = true;
 	}
 
+	activeTabHasTemporaryChanges = false;
+
 	auto refreshSaveButton = [=]()
 		{
 			lowerButtons.btnSave->setEnabled(log.hasPendingChanges());
@@ -112,6 +125,7 @@ void CashRegisterSystemUI::changeTab(TabIndex activeTab)
 	tabs.at(activeTabNum)->disconnect();
 	connect(tabs.at(activeTabNum), &BaseTab::temporaryChangesExist, this, [=](bool doExist)
 		{
+			activeTabHasTemporaryChanges = doExist;
 			lowerButtons.btnApply->setEnabled(doExist);
 		});
 

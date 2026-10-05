@@ -25,8 +25,8 @@
 #include <QSignalBlocker>
 #include <algorithm>
 
-PayTab::PayTab(const LowerButtonBundle& lowerButtons, PaymentService& paymentService, PersonService& personService, PersonRepository* personRepo, ConsumptionRepository* consumptionRepo, DebtRepository* debtRepo, CreditRepository* creditRepo, QWidget* parent) 
-	: lowerButtons(lowerButtons), paymentService(paymentService), personService(personService), personRepo(personRepo), consumptionRepo(consumptionRepo), debtRepo(debtRepo), creditRepo(creditRepo), BaseTab(parent) {}
+PayTab::PayTab(PaymentService& paymentService, PersonService& personService, PersonRepository* personRepo, ConsumptionRepository* consumptionRepo, DebtRepository* debtRepo, CreditRepository* creditRepo, QWidget* parent) 
+	: paymentService(paymentService), personService(personService), personRepo(personRepo), consumptionRepo(consumptionRepo), debtRepo(debtRepo), creditRepo(creditRepo), BaseTab(parent) {}
 
 void PayTab::initialize()
 {
