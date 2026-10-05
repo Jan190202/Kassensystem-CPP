@@ -2,12 +2,26 @@
 #include "BaseTab.h"
 #include "app/RepositoryBundle.h"
 #include "GuiTypes.h"
+#include <QStyledItemDelegate>
 
 class QComboBox;
 class QTableView;
 class QSqlDatabase;
 class QSqlTableModel;
 class QCheckBox;
+class QPushButton;
+
+
+class ReadOnlyDelegate : public QStyledItemDelegate 
+{
+public:
+	using QStyledItemDelegate::QStyledItemDelegate;
+
+	QWidget* createEditor(QWidget*, const QStyleOptionViewItem&, const QModelIndex&) const override 
+	{
+		return nullptr; // returns no editor -> read-only
+	}
+};
 
 class ManualTab : public BaseTab
 {
@@ -19,7 +33,10 @@ public:
 	virtual void apply() override;
 
 private:
+	void addTableEntry();
+
 	QComboBox* tableSelect;
+	QPushButton* btnAddEntry;
 	QCheckBox* toggleNameSelect;
 	QComboBox* nameSelect;
 	QTableView* tableView;

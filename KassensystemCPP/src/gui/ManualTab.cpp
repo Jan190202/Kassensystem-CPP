@@ -10,6 +10,7 @@
 #include <QHBoxLayout>
 #include <QHeaderView>
 #include <QCompleter>
+#include <QPushButton>
 #include <optional>
 #include <algorithm>
 
@@ -28,6 +29,9 @@ void ManualTab::initialize()
 	tableSelect->setEditable(false);
 	tableSelect->setMinimumWidth(300);
 
+	btnAddEntry = new QPushButton("+");
+	btnAddEntry->setMaximumWidth(30);
+
 	nameSelect = new QComboBox(this);
 	nameSelect->setEditable(true);
 	nameSelect->setCurrentIndex(-1);
@@ -44,6 +48,7 @@ void ManualTab::initialize()
 
 	auto* filterLayout = new QHBoxLayout();
 	filterLayout->addWidget(tableSelect);
+	filterLayout->addWidget(btnAddEntry);
 	filterLayout->addStretch();
 	filterLayout->addWidget(toggleNameSelect);
 	filterLayout->addWidget(nameSelect);
@@ -89,6 +94,8 @@ void ManualTab::initialize()
 		{
 			log.record("Eintrag in " + model->tableName().toStdString() + " manuell bearbeitet"); 
 		});
+
+	connect(btnAddEntry, &QPushButton::clicked, this, [&]() { addTableEntry(); });
 
 	refresh();
 }
@@ -179,10 +186,19 @@ void ManualTab::refresh()
 
 	// display
 	tableView->setModel(model);
+	int idColumnIndex = model->fieldIndex("ID");
+	if (idColumnIndex != -1) tableView->setItemDelegateForColumn(idColumnIndex, new ReadOnlyDelegate(tableView)); // set ID column to read-only
 	tableView->show();
 }
 
 void ManualTab::apply()
 {
 	model->submitAll();
+	lowerButtons.btnApply->setEnabled(false);
+}
+
+void ManualTab::addTableEntry()
+{
+	QSqlRecord newRecord = model->record();
+	model->insertRecord(-1, newRecord);
 }
