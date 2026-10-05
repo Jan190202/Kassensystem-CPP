@@ -190,6 +190,8 @@ void BalanceTab::addEntry(BtnIndex mode)
 			.coveringpersonEntryID = inputs.coveringpersonEntryID
 		});
 
+	Q_EMIT instantChangesMade();
+
 	refresh();
 } 
 
@@ -336,10 +338,7 @@ void BalanceTab::refreshLables(const registerFinancials::Report& report) const
 	lSavingsAfter->installEventFilter(new InstantToolTipFilter(lSavingsAfter));
 }
 
-void BalanceTab::apply()
-{
-	// TBD: buffer added entries / share settlements and only add them on apply
-}
+void BalanceTab::apply() {}
 
 QString BalanceTab::formatHeader(const QDate& date) const
 {
@@ -366,6 +365,8 @@ void BalanceTab::addSettlement()
 			.amount = inputs.amount,
 			.comment = inputs.comment 
 		});
+
+	Q_EMIT instantChangesMade();
 
 	switch (returnMsg) // currently not needed; can be used for error presentation like an error dialog if needed
 	{

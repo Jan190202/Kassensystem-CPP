@@ -13,7 +13,7 @@ const std::vector<PendingChangeLog::Change>& PendingChangeLog::pendingChanges() 
 
 void PendingChangeLog::record(ChangeType type, const entry::Balance& entry)
 {
-	std::string description = std::format("Bilanz {} - Beschreibung: \"{}\", Betrag: {}, ausgelegt von: {}", actionVerb.at(type), entry.description, entry.amount, entry.personEntryID.has_value() ? std::to_string(entry.personEntryID.value()) : "-");
+	std::string description = std::format("Bilanz {} - Beschreibung: \"{}\", Betrag: {}, ausgelegt von: {}", actionVerb.at(type), entry.description, entry.amount, entry.personEntryID.has_value() ? std::to_string(entry.personEntryID.value()) : "Niemand");
 	
 	addLogEntry(description);
 }
@@ -37,14 +37,14 @@ void PendingChangeLog::record(ChangeType type, const entry::Credit& entry)
 
 void PendingChangeLog::record(ChangeType type, const entry::Payment& entry)
 {
-	std::string description = std::format("Zahlung {} - Person: {}, Betrag: {}, Überlauf: ", actionVerb.at(type), entry.personEntryID, entry.amount, entry.overpaymentType==OverpaymentDisposition::credit ? "Guthaben" : "Trinkgeld");
+	std::string description = std::format("Zahlung {} - Person: {}, Betrag: {}, Überlauf: {}", actionVerb.at(type), entry.personEntryID, entry.amount, entry.overpaymentType==OverpaymentDisposition::credit ? "Guthaben" : "Trinkgeld");
 
 	addLogEntry(description);
 }
 
 void PendingChangeLog::record(ChangeType type, const entry::Person& entry)
 {
-	std::string description = std::format("Person {} - ", actionVerb.at(type), entry.getFullSpecifier());
+	std::string description = std::format("Person {} - Bezeichner: {} ", actionVerb.at(type), entry.getFullSpecifier());
 
 	addLogEntry(description);
 }
@@ -72,4 +72,17 @@ void PendingChangeLog::addLogEntry(const std::string& description)
 void PendingChangeLog::clear()
 {
 	log.clear();
+}
+
+std::string PendingChangeLog::printPendingChanges() const
+{
+	std::string out;
+
+	for (size_t i = 0; i < log.size(); i++)
+	{
+		auto logEntry = log.at(i);
+		out += std::format("{}. {}\n", i+1, logEntry.description);
+	}
+
+	return out;
 }

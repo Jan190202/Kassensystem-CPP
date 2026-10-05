@@ -419,6 +419,7 @@ public:
 
 	bool hasPendingChanges() const;
 	const std::vector<Change>& pendingChanges() const;
+	std::string printPendingChanges() const;
 	void clear();
 private:
 	std::vector<Change> log;

@@ -100,5 +100,19 @@ void CashRegisterSystemUI::changeTab(TabIndex activeTab)
 		{
 			tabs.at(activeTabNum)->apply();
 			lowerButtons.btnSave->setEnabled(log.hasPendingChanges());
+			lowerButtons.btnSave->setToolTip(QString::fromStdString(log.printPendingChanges()));
+		});
+
+	lowerButtons.btnApply->setEnabled(false);
+	tabs.at(activeTabNum)->disconnect();
+	connect(tabs.at(activeTabNum), &BaseTab::temporaryChangesExist, this, [=](bool doExist)
+		{
+			lowerButtons.btnApply->setEnabled(doExist);
+		});
+
+	connect(tabs.at(activeTabNum), &BaseTab::instantChangesMade, this, [=]()
+		{
+			lowerButtons.btnSave->setEnabled(log.hasPendingChanges());
+			lowerButtons.btnSave->setToolTip(QString::fromStdString(log.printPendingChanges()));
 		});
 }

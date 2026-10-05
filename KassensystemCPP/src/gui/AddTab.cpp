@@ -191,6 +191,8 @@ void AddTab::addEntry()
 
 	// set tabulator switch from last widget of lowest entry to addButton
 	QWidget::setTabOrder(newEntry->getLastWidget(), btnAddEntry);
+
+	Q_EMIT temporaryChangesExist(true);
 }
 
 void AddTab::removeEntry(AddTabEntry* entry)
@@ -204,6 +206,8 @@ void AddTab::removeEntry(AddTabEntry* entry)
 	delete entry;
 
 	shiftEntries();
+
+	if (entries.empty()) Q_EMIT temporaryChangesExist(false);
 }
 
 void AddTab::shiftEntries()

@@ -195,6 +195,11 @@ void PayTab::initialize()
 	mainLayout->addWidget(vLine);
 	mainLayout->addWidget(tblConsumption, 3);
 
+	// disable so no actions can be done while placeholder is set in nameSelect
+	btnAddCredit->setEnabled(false);
+	btnUseCredit->setEnabled(false);
+	btnExport->setEnabled(false);
+
 	refresh();
 
 	connect(nameSelect->lineEdit(), &QLineEdit::editingFinished, nameSelect, [&]() 
@@ -252,11 +257,20 @@ void PayTab::initialize()
 			}
 		});
 
+	connect(paymentSpinBox, &QDoubleSpinBox::valueChanged, this, [&](double currentValue)
+		{
+			Q_EMIT temporaryChangesExist(currentValue > 1e-9 && nameSelect->currentIndex() != -1);
+		});
+
 	connect(nameSelect, &QComboBox::currentIndexChanged, this, [&]() { nameChanged(); });
 }
 
 void PayTab::nameChanged()
 {
+	btnAddCredit->setEnabled(true);
+	btnUseCredit->setEnabled(true);
+	btnExport->setEnabled(true);
+
 	int64_t personEntryID = nameSelect->currentData().toLongLong();
 
 	total = debtRepo->getPersonsTotal(personEntryID);
@@ -363,6 +377,8 @@ void PayTab::redeemCredit(int64_t personEntryID)
 		.amount = redemptionAmount,
 		.overpaymentType = OverpaymentDisposition::credit
 		});
+
+	Q_EMIT instantChangesMade();
 }
 
 void PayTab::allRedeemCredit()
@@ -370,6 +386,9 @@ void PayTab::allRedeemCredit()
 	std::vector<entry::Person> personVec = personRepo->getAllPersonEntries();
 	for (const auto& entry : personVec)
 		redeemCredit(entry.personEntryID);
+
+	Q_EMIT instantChangesMade();
+
 	refresh();
 }
 
@@ -387,6 +406,8 @@ void PayTab::addCredit()
 	else { return; } // cancel pressed
 
 	paymentService.addCredit(personEntryID, inputs.amount, inputs.date, inputs.description);
+
+	Q_EMIT instantChangesMade();
 
 	refresh();
 }
@@ -418,6 +439,8 @@ void PayTab::addPerson()
 			.nickName = inputs.nickName,
 			.info = inputs.info
 		});
+
+	Q_EMIT instantChangesMade();
 
 	refresh();
 }
