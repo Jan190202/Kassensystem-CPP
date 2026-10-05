@@ -27,7 +27,7 @@ public:
 
 	PersonService(const RepositoryBundle& repoBundle, PendingChangeLog& log);
 
-	std::expected< int64_t, validityError::Name > findOrCreatePerson(const std::variant<int64_t, std::string>& personInput); // if variant has ID -> get 
+	std::expected< entry::Person, validityError::Name > findOrCreatePerson(const std::variant<entry::Person, std::string>& personInput); // if variant has ID -> get 
 	int64_t addPerson(const entry::Person& person);
 
 	std::expected< PersonStringSpecifiers, validityError::Name > isValidNameFormat(const std::string& nameRequest) const;

@@ -24,7 +24,7 @@ public:
 		double amount;
 		RegisterDate date;
 		std::string comment;
-		std::optional<int64_t> coveringpersonEntryID;
+		std::optional<entry::Person> coveringPerson;
 	};
 
 	BalanceTabAddEntryDialog(BtnIndex mode, std::vector<entry::Person>& personVec, QWidget* parent);

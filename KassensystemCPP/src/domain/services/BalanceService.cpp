@@ -14,25 +14,25 @@ int64_t BalanceService::addBalanceItem(const request::Balance& request)
 		.dateBooked = request.dateBooked,
 		.dateAdded = QDate::currentDate(),
 		.comment = request.comment,
-		.personEntryID = request.coveringpersonEntryID
+		.person = request.coveringPerson
 	};
 
-	if (request.coveringpersonEntryID.has_value() && hasFlag(entry.type, BalanceType::spending))
+	if (request.coveringPerson.has_value() && hasFlag(entry.type, BalanceType::spending))
 	{
-		addCredit(entry.personEntryID.value(), entry.amount, entry.dateBooked, "Abteilungsausgabe übernommen");
+		addCredit(entry.person.value(), entry.amount, entry.dateBooked, "Abteilungsausgabe übernommen");
 	}
 	
 	log.record(PendingChangeLog::ChangeType::add, entry);
 	return balanceRepo->addBalanceEntry(entry);
 }
 
-int64_t BalanceService::addCredit(int64_t personEntryID, double amount, const RegisterDate& date, const std::string& description)
+int64_t BalanceService::addCredit(const entry::Person& person, double amount, const RegisterDate& date, const std::string& description)
 {
 	// potential validity check here
 	
 	auto entry = entry::Credit{
 			.creditEntryID = 0,
-			.personEntryID = personEntryID,
+			.person = person,
 			.dateBooked = date,
 			.dateAdded = QDate::currentDate(),
 			.amount = amount,

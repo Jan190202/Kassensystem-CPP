@@ -1,5 +1,6 @@
 #include "Utils.h"
 #include <algorithm>
+#include <format>
 
 namespace utils
 {
@@ -20,5 +21,12 @@ namespace utils
 			if (!std::isupper(c)) 
 				isUpper = false;
 		return isUpper;
+	}
+
+	std::string toCurrencyFormat(double amount, int decimals)
+	{
+		std::string formatString = "{" + std::string(":.") + std::to_string(decimals) + "f" + "} {}"; // e.g. "{:.2f} {}"
+		std::string symbol = eurSymbol();
+		return std::vformat(formatString, std::make_format_args(amount, symbol));
 	}
 }

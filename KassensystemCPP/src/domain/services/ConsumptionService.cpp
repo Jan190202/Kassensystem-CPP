@@ -8,14 +8,14 @@ void ConsumptionService::addConsumption(const request::Consumption& request)
 {
 	double amount = calculateDebt(request);
 	
-	int64_t personEntryID{};
+	entry::Person person{};
 	if (auto result = personService.findOrCreatePerson(request.personInput); !result.has_value()) return;
-	else personEntryID = result.value();
+	else person = result.value();
 
 	// add debt and consumption entry
 	entry::Debt dEntry{ 
 		.debtEntryID = 0, 
-		.personEntryID = personEntryID, 
+		.person = person, 
 		.dateBooked = request.dateBooked, 
 		.dateAdded = QDate::currentDate(), 
 		.amount = amount

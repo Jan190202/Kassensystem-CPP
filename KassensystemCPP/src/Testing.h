@@ -58,34 +58,34 @@ namespace testing
 		qDebug() << "";
 
 		// total,allDates: 80 (12+68), totalShare,>=2026: 40 (6+34)
-		request::Consumption cReq1{ .personInput = p4ID, .dateBooked = QDate::currentDate(), .otherExpense = 10 };
-		request::Consumption cReq2{ .personInput = p4ID, .dateBooked = QDate(2025,1,1), .otherExpense = 10 };
-		request::Consumption cReq3{ .personInput = p4ID, .dateBooked = QDate(2025,7,7), .otherExpense = 10 };
-		request::Consumption cReq4{ .personInput = p4ID, .dateBooked = QDate(2025,12,31), .otherExpense = 10 };
-		request::Consumption cReq5{ .personInput = "Maja Apfel", .dateBooked = QDate(2026,1,1), .otherExpense = 10 };
-		request::Consumption cReq6{ .personInput = "Max Birne", .dateBooked = QDate(2026,5,5), .otherExpense = 10 };
-		request::Consumption cReq7{ .personInput = p1ID, .dateBooked = QDate::currentDate(), .otherExpense = 10 };
-		request::Consumption cReq8{ .personInput = p2ID, .dateBooked = QDate(2026,5,5), .otherExpense = 10 };
+		request::Consumption cReq1{ .dateBooked = QDate::currentDate(), .otherExpense = 10 };
+		request::Consumption cReq2{ .dateBooked = QDate(2025,1,1), .otherExpense = 10 };
+		request::Consumption cReq3{ .dateBooked = QDate(2025,7,7), .otherExpense = 10 };
+		request::Consumption cReq4{ .dateBooked = QDate(2025,12,31), .otherExpense = 10 };
+		request::Consumption cReq5{ .dateBooked = QDate(2026,1,1), .otherExpense = 10 };
+		request::Consumption cReq6{ .dateBooked = QDate(2026,5,5), .otherExpense = 10 };
+		request::Consumption cReq7{ .dateBooked = QDate::currentDate(), .otherExpense = 10 };
+		request::Consumption cReq8{ .dateBooked = QDate(2026,5,5), .otherExpense = 10 };
 
 		// 6xEarning (>=2026 --> 1,2,9,10, total: 40), 4xSpending (>=2026 --> 3,4,5,6, total: 40), p1ID --> credit: 30
-		request::Balance bReq1{ .type = BalanceType::earning,  .description = "Eintrag 1", .amount = 10, .dateBooked = QDate::currentDate(), .comment = "Kommentar 1", .coveringpersonEntryID = std::nullopt };
-		request::Balance bReq2{ .type = BalanceType::earning,  .description = "Eintrag 2", .amount = 10, .dateBooked = QDate::currentDate(), .comment = "Kommentar 2", .coveringpersonEntryID = std::nullopt };
-		request::Balance bReq3{ .type = BalanceType::spending, .description = "Eintrag 3", .amount = 10, .dateBooked = QDate::currentDate(), .comment = "Kommentar 3", .coveringpersonEntryID = p1ID };
-		request::Balance bReq4{ .type = BalanceType::spending, .description = "Eintrag 4", .amount = 10, .dateBooked = QDate::currentDate(), .comment = "Kommentar 4", .coveringpersonEntryID = p1ID };
-		request::Balance bReq5{ .type = BalanceType::spending, .description = "Eintrag 5", .amount = 10, .dateBooked = QDate::currentDate(), .comment = "Kommentar 5", .coveringpersonEntryID = p1ID };
-		request::Balance bReq6{ .type = BalanceType::spending, .description = "Eintrag 6", .amount = 10, .dateBooked = QDate::currentDate(), .comment = "Kommentar 6", .coveringpersonEntryID = std::nullopt };
-		request::Balance bReq7{ .type = BalanceType::earning, .description = "Eintrag 7", .amount = 10, .dateBooked = QDate(2025,12,31), .comment = "Kommentar 7", .coveringpersonEntryID = std::nullopt };
-		request::Balance bReq8{ .type = BalanceType::earning, .description = "Eintrag 8", .amount = 10, .dateBooked = QDate(2025,12,31), .comment = "Kommentar 8", .coveringpersonEntryID = std::nullopt };
-		request::Balance bReq9{ .type = BalanceType::earning, .description = "Eintrag 9", .amount = 10, .dateBooked = QDate(2026,1,1), .comment = "Kommentar 9", .coveringpersonEntryID = std::nullopt };
-		request::Balance bReq10{ .type = BalanceType::earning, .description = "Eintrag 10", .amount = 10, .dateBooked = QDate(2026,1,2), .comment = "Kommentar 10", .coveringpersonEntryID = std::nullopt };
+		request::Balance bReq1{ .type = BalanceType::earning,  .description = "Eintrag 1", .amount = 10, .dateBooked = QDate::currentDate(), .comment = "Kommentar 1"};
+		request::Balance bReq2{ .type = BalanceType::earning,  .description = "Eintrag 2", .amount = 10, .dateBooked = QDate::currentDate(), .comment = "Kommentar 2"};
+		request::Balance bReq3{ .type = BalanceType::spending, .description = "Eintrag 3", .amount = 10, .dateBooked = QDate::currentDate(), .comment = "Kommentar 3"};
+		request::Balance bReq4{ .type = BalanceType::spending, .description = "Eintrag 4", .amount = 10, .dateBooked = QDate::currentDate(), .comment = "Kommentar 4"};
+		request::Balance bReq5{ .type = BalanceType::spending, .description = "Eintrag 5", .amount = 10, .dateBooked = QDate::currentDate(), .comment = "Kommentar 5"};
+		request::Balance bReq6{ .type = BalanceType::spending, .description = "Eintrag 6", .amount = 10, .dateBooked = QDate::currentDate(), .comment = "Kommentar 6"};
+		request::Balance bReq7{ .type = BalanceType::earning, .description = "Eintrag 7", .amount = 10, .dateBooked = QDate(2025,12,31), .comment = "Kommentar 7"};
+		request::Balance bReq8{ .type = BalanceType::earning, .description = "Eintrag 8", .amount = 10, .dateBooked = QDate(2025,12,31), .comment = "Kommentar 8"};
+		request::Balance bReq9{ .type = BalanceType::earning, .description = "Eintrag 9", .amount = 10, .dateBooked = QDate(2026,1,1), .comment = "Kommentar 9"};
+		request::Balance bReq10{ .type = BalanceType::earning, .description = "Eintrag 10", .amount = 10, .dateBooked = QDate(2026,1,2), .comment = "Kommentar 10"};
 
 		// p1ID --> total: 15, toCredit: 5, toTip: 10, >=2026: 8
-		request::Payment pEntry1{ .personEntryID = p1ID, .amount = 1, .overpaymentType = OverpaymentDisposition::credit };
-		request::Payment pEntry2{ .personEntryID = p1ID, .amount = 1, .overpaymentType = OverpaymentDisposition::credit };
-		request::Payment pEntry3{ .personEntryID = p1ID, .amount = 1, .overpaymentType = OverpaymentDisposition::credit };
-		request::Payment pEntry4{ .personEntryID = p1ID, .amount = 2, .overpaymentType = OverpaymentDisposition::credit };
-		request::Payment pEntry5{ .personEntryID = p1ID, .amount = 5, .overpaymentType = OverpaymentDisposition::tip };
-		request::Payment pEntry6{ .personEntryID = p1ID, .amount = 5, .overpaymentType = OverpaymentDisposition::tip };
+		request::Payment pEntry1{ .amount = 1, .overpaymentType = OverpaymentDisposition::credit };
+		request::Payment pEntry2{ .amount = 1, .overpaymentType = OverpaymentDisposition::credit };
+		request::Payment pEntry3{ .amount = 1, .overpaymentType = OverpaymentDisposition::credit };
+		request::Payment pEntry4{ .amount = 2, .overpaymentType = OverpaymentDisposition::credit };
+		request::Payment pEntry5{ .amount = 5, .overpaymentType = OverpaymentDisposition::tip };
+		request::Payment pEntry6{ .amount = 5, .overpaymentType = OverpaymentDisposition::tip };
 
 		// total: 30
 		request::ShareSettlement sEntry1{ .amount = 10 };

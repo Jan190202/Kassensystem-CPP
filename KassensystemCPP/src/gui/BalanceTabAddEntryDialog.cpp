@@ -118,7 +118,7 @@ BalanceTabAddEntryDialog::BalanceTabAddEntryDialog(BtnIndex mode, std::vector<en
 	for (size_t i = personVec.size(); i-- > 0; )
 		edtCoveringPerson->addItem(
 			nameList.at(i),
-			personVec.at(i).personEntryID
+			QVariant::fromValue(personVec.at(i))
 		);
 
 	auto* statusLayout = new QHBoxLayout;
@@ -197,9 +197,9 @@ BalanceTabAddEntryDialog::inputs BalanceTabAddEntryDialog::getInputs() const
 			RegisterDate{static_cast<RegisterDate::Special>(edtSpecial->currentData().toInt())} :
 			RegisterDate{edtDate->date()},
 		.comment = edtComment->toPlainText().toStdString(),
-		.coveringpersonEntryID = edtIsCovered->isChecked() ? 
-			std::optional<int64_t>(edtCoveringPerson->currentData().toLongLong()) : 
-			std::optional<int64_t>(std::nullopt) 
+		.coveringPerson = edtIsCovered->isChecked() ? 
+			std::optional<entry::Person>(edtCoveringPerson->currentData().value<entry::Person>()) : 
+			std::optional<entry::Person>(std::nullopt)
 			// std::optional-casting needed as ternary operator expects same datatypes in both branches
 	};
 }

@@ -1,4 +1,5 @@
 #pragma once
+#include "domain/model/Entities.h"
 #include <QPushButton>
 #include <string>
 #include <variant>
@@ -17,7 +18,7 @@ struct LowerButtonBundle
 
 struct ConsumptionInputs
 {
-	std::variant<int64_t, std::string> personInput;
+	std::variant<entry::Person, std::string> personInput;
 	int nBeer05, nBeer04, nSoftdrinks, nWater;
 	double otherExpense;
 };

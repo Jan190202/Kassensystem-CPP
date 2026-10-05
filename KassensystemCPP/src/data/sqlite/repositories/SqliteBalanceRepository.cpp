@@ -86,8 +86,11 @@ std::vector<entry::Balance> SqliteBalanceRepository::getBalanceEntries(BalanceTy
 		":minDate");
 
 	QString sqlStatement =
-		"SELECT * "
+		"SELECT "
+			"Balance.ID, Balance.type, Balance.description, Balance.amount, Balance.dateBooked, Balance.dateBookedSpecial, Balance.dateAdded, Balance.comment, Balance.personID, "
+			"Person.firstName, Person.lastName, Person.nickName, Person.info "
 		"FROM Balance "
+		"LEFT OUTER JOIN Person ON Balance.personID = Person.ID "
 		"WHERE " + compClause + " ";
 
 	if (isTypeSpecific)
@@ -129,6 +132,15 @@ entry::Balance SqliteBalanceRepository::getEntryFromQuery(const QSqlQuery& query
 				RegisterDate{static_cast<RegisterDate::Special>(query.value("dateBookedSpecial").toInt())},
 		.dateAdded = query.value("dateAdded").toDate(),
 		.comment = query.value("comment").toString().toStdString(),
-		.personEntryID = query.value("personID").toLongLong()
+		.person = 
+			!query.value("personID").isNull() ?
+				std::optional<entry::Person>(entry::Person{
+					.personEntryID = query.value("personID").toLongLong(),
+					.firstName = query.value("firstName").toString().toStdString(),
+					.lastName = query.value("lastName").toString().toStdString(),
+					.nickName = query.value("nickName").toString().toStdString(),
+					.info = query.value("info").toString().toStdString()
+					}) :
+				std::optional<entry::Person>(std::nullopt)
 	};
 }

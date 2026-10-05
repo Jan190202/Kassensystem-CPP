@@ -218,7 +218,7 @@ void PayTab::initialize()
 
 	connect(btnUseCredit, &QPushButton::clicked, this, [&]()
 		{
-			redeemCredit(nameSelect->currentData().toLongLong());
+			redeemCredit(nameSelect->currentData().value<entry::Person>());
 			refresh(); // moved refresh out of redemmCredit so allRedeemCredit doesn't refresh after every person
 		});
 
@@ -271,7 +271,7 @@ void PayTab::nameChanged()
 	btnUseCredit->setEnabled(true);
 	btnExport->setEnabled(true);
 
-	int64_t personEntryID = nameSelect->currentData().toLongLong();
+	int64_t personEntryID = nameSelect->currentData().value<entry::Person>().personEntryID;
 
 	total = debtRepo->getPersonsTotal(personEntryID);
 	settled = debtRepo->getPersonsPaid(personEntryID);
@@ -305,7 +305,8 @@ void PayTab::refresh()
 	bool isPlaceholder = false;
 	if (nameSelect->currentIndex() == -1) isPlaceholder = true;
 
-	int64_t oldID = nameSelect->currentData().toLongLong();
+	bool isOldIDValid = nameSelect->currentData().canConvert<entry::Person>();
+	int64_t oldID = nameSelect->currentData().value<entry::Person>().personEntryID;
 
 	nameSelect->clear();
 	
@@ -320,9 +321,8 @@ void PayTab::refresh()
 	std::optional<size_t> indexForOldID;
 	for (size_t i = personVec.size(); i-- > 0; ) // loop backward to insert in inverse-alphabetical order (i = size()-1 ... 0)
 	{
-		int64_t itemID = personVec.at(i).personEntryID;
-		nameSelect->addItem(nameList.at(i), itemID);
-		if (itemID == oldID) indexForOldID = personVec.size()-i-1; // == 0 ... size()-1
+		nameSelect->addItem(nameList.at(i), QVariant::fromValue(personVec.at(i)));
+		if (personVec.at(i).personEntryID == oldID && isOldIDValid) indexForOldID = personVec.size()-i-1; // == 0 ... size()-1
 	}
 
 	if (isPlaceholder) // set to placeholder again
@@ -342,7 +342,7 @@ void PayTab::refresh()
 void PayTab::apply()
 {
 	request::Payment request{
-		.personEntryID = nameSelect->currentData().toLongLong(),
+		.person = nameSelect->currentData().value<entry::Person>(),
 		.amount = paymentSpinBox->value(),
 		.comment = "", // TBD: temporary, retrieve through GUI later
 		.overpaymentType = btnSurplusToCredit->isChecked() ? OverpaymentDisposition::credit : OverpaymentDisposition::tip
@@ -353,27 +353,24 @@ void PayTab::apply()
 	refresh();
 }
 
-void PayTab::redeemCredit(int64_t personEntryID)
+void PayTab::redeemCredit(const entry::Person& person)
 {
-	double personDue = debtRepo->getPersonsDue(personEntryID);
-	double personCredit = creditRepo->getPersonsCredit(personEntryID);
+	double personDue = debtRepo->getPersonsDue(person.personEntryID);
+	double personCredit = creditRepo->getPersonsCredit(person.personEntryID);
 
 	double redemptionAmount = std::min(personCredit, personDue);
 	if (redemptionAmount == 0) return;
 
-	creditRepo->addCreditEntry(
-		entry::Credit{
-			.creditEntryID = 0,
-			.personEntryID = personEntryID,
-			.dateBooked = QDate::currentDate(),
-			.dateAdded = QDate::currentDate(),
+	paymentService.addCredit(request::Credit{
+			.person = person,
 			.amount = -redemptionAmount,
+			.dateBooked = QDate::currentDate(),
 			.description = "Einlösung von bestehendem Guthaben"
 		});
 
 	paymentService.addPayment(
 		request::Payment{
-		.personEntryID = personEntryID,
+		.person = person,
 		.amount = redemptionAmount,
 		.overpaymentType = OverpaymentDisposition::credit
 		});
@@ -385,7 +382,7 @@ void PayTab::allRedeemCredit()
 {
 	std::vector<entry::Person> personVec = personRepo->getAllPersonEntries();
 	for (const auto& entry : personVec)
-		redeemCredit(entry.personEntryID);
+		redeemCredit(entry);
 
 	Q_EMIT instantChangesMade();
 
@@ -394,7 +391,7 @@ void PayTab::allRedeemCredit()
 
 void PayTab::addCredit()
 {
-	int64_t personEntryID = nameSelect->currentData().toLongLong();
+	entry::Person person = nameSelect->currentData().value<entry::Person>();
 	PayTabAddCreditDialog::inputs inputs;
 
 	auto* inputDialog = new PayTabAddCreditDialog(this);
@@ -405,7 +402,14 @@ void PayTab::addCredit()
 	}
 	else { return; } // cancel pressed
 
-	paymentService.addCredit(personEntryID, inputs.amount, inputs.date, inputs.description);
+	paymentService.addCredit(
+		request::Credit{
+			.person = person,
+			.amount = inputs.amount,
+			.dateBooked = inputs.date,
+			.description = inputs.description
+		}
+	);
 
 	Q_EMIT instantChangesMade();
 

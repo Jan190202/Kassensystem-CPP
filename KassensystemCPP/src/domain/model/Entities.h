@@ -68,14 +68,12 @@ namespace entry
 
 		std::string toString() const
 		{
-			return 
-				"fullSpecifier: " + getFullSpecifier() + ", " + 
-				"personEntryID: " + std::to_string(personEntryID);
+			return std::format("{} ({})", getFullName(), personEntryID);
 		}
 
 		friend std::ostream& operator<<(std::ostream& out, const Person& person)
 		{
-			out << person.toString();
+			out << "fullSpecifier: " << person.getFullSpecifier() << ", " << "personEntryID: " << std::to_string(person.personEntryID);
 			return out;
 		}
 		

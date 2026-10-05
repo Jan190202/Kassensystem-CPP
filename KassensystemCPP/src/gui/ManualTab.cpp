@@ -70,9 +70,14 @@ void ManualTab::initialize()
 
 	connect(lowerButtons.btnApply, &QPushButton::clicked, this, [&]() {apply(); });
 
+	connect(model, &QSqlTableModel::dataChanged, this, [&](const QModelIndex& topLeft, const QModelIndex& bottomRight)
+		{
+			lowerButtons.btnApply->setEnabled(true);
+		});
+
 	connect(model, &QSqlTableModel::beforeInsert, this, [&](QSqlRecord& record) // TBD: implement row insertion
 		{
-			log.record("Eintrag manuell hinzugefügt"); // TBD: reconstruct entry from record and send to log
+			log.record("Eintrag in " + model->tableName().toStdString() + " manuell hinzugefügt");
 		});
 
 	connect(model, &QSqlTableModel::beforeDelete, this, [&](int row) // TBD: implement row deletion
@@ -82,7 +87,7 @@ void ManualTab::initialize()
 
 	connect(model, &QSqlTableModel::beforeUpdate, this, [&](int row, QSqlRecord& record)
 		{
-			log.record("Eintrag manuell bearbeitet"); // TBD: reconstruct entry from record and send to log
+			log.record("Eintrag in " + model->tableName().toStdString() + " manuell bearbeitet"); 
 		});
 
 	refresh();
@@ -102,7 +107,8 @@ void ManualTab::refresh()
 	bool isPlaceholder = false;
 	if (nameSelect->currentIndex() == -1) isPlaceholder = true;
 
-	int64_t oldID = nameSelect->currentData().toLongLong();
+	bool isOldIDValid = nameSelect->currentData().canConvert<entry::Person>();
+	int64_t oldID = nameSelect->currentData().value<entry::Person>().personEntryID;
 
 	nameSelect->clear();
 
@@ -117,9 +123,8 @@ void ManualTab::refresh()
 	std::optional<size_t> indexForOldID;
 	for (size_t i = personVec.size(); i-- > 0; ) // loop backward to insert in inverse-alphabetical order (i = size()-1 ... 0)
 	{
-		int64_t itemID = personVec.at(i).personEntryID;
-		nameSelect->addItem(nameList.at(i), itemID);
-		if (itemID == oldID) indexForOldID = personVec.size() - i - 1; // == 0 ... size()-1
+		nameSelect->addItem(nameList.at(i), QVariant::fromValue(personVec.at(i)));
+		if (personVec.at(i).personEntryID == oldID && isOldIDValid) indexForOldID = personVec.size() - i - 1; // == 0 ... size()-1
 	}
 
 	if (isPlaceholder) // set to placeholder again
@@ -159,7 +164,7 @@ void ManualTab::refresh()
 	std::optional<int64_t> filterID;
 	if (toggleNameSelect->isChecked())
 		if (nameSelect->currentIndex() != -1)
-			filterID = nameSelect->currentData().toLongLong();
+			filterID = nameSelect->currentData().value<entry::Person>().personEntryID;
 
 	// filter if needed
 	if (filterID.has_value())

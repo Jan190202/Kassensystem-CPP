@@ -10,7 +10,7 @@ int64_t PersonService::addPerson(const entry::Person& entry)
 	return personRepo->addPersonEntry(entry);
 }
 
-std::expected< int64_t, validityError::Name > PersonService::findOrCreatePerson(const std::variant<int64_t, std::string>& personInput)
+std::expected< entry::Person, validityError::Name > PersonService::findOrCreatePerson(const std::variant<entry::Person, std::string>& personInput)
 {
 	if (std::holds_alternative<std::string>(personInput)) // new name, no avaliable ID
 	{
@@ -21,15 +21,16 @@ std::expected< int64_t, validityError::Name > PersonService::findOrCreatePerson(
 		{
 			PersonStringSpecifiers spec = result.value();
 
-			return addPerson(
-				entry::Person{
-					.personEntryID = 0,
-					.firstName = spec.firstName,
-					.lastName = spec.lastName,
-					.nickName = spec.nickName,
-					.info = spec.info
-				}
-			);
+			auto entry = entry::Person{
+				.personEntryID = 0,
+				.firstName = spec.firstName,
+				.lastName = spec.lastName,
+				.nickName = spec.nickName,
+				.info = spec.info
+			};
+
+			entry.personEntryID = addPerson(entry);
+			return entry;
 		}
 		else
 		{
@@ -52,7 +53,7 @@ std::expected< int64_t, validityError::Name > PersonService::findOrCreatePerson(
 	}
 	else
 	{
-		return std::get<int64_t>(personInput);
+		return std::get<entry::Person>(personInput);
 	}
 }
 

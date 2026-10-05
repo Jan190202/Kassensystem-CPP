@@ -11,7 +11,7 @@ void PaymentService::addPayment(const request::Payment& request)
 
 	entry::Payment entry{
 		.paymentEntryID = 0,
-		.personEntryID = request.personEntryID,
+		.person = request.person,
 		.dateAdded= QDate::currentDate(),
 		.amount = request.amount,
 		.comment = request.comment,
@@ -19,7 +19,7 @@ void PaymentService::addPayment(const request::Payment& request)
 	};
 
 	int64_t paymentEntryID = paymentRepo->addPaymentEntry(entry);
-	double overpaymentAmount = addPaymentAllocation(paymentEntryID, entry.personEntryID, entry.amount);
+	double overpaymentAmount = addPaymentAllocation(paymentEntryID, entry.person.personEntryID, entry.amount);
 
 	log.record(PendingChangeLog::ChangeType::add, entry);
 
@@ -28,10 +28,10 @@ void PaymentService::addPayment(const request::Payment& request)
 		switch (entry.overpaymentType)
 		{
 		case OverpaymentDisposition::credit:
-			addCredit(entry.personEntryID, overpaymentAmount, entry.dateAdded, "Guthaben durch Einzahlung/Überbezahlung");
+			addCredit(entry.person, overpaymentAmount, entry.dateAdded, "Guthaben durch Einzahlung/Überbezahlung");
 			break;
 		case OverpaymentDisposition::tip:
-			addTip(entry.personEntryID, overpaymentAmount, entry.dateAdded);
+			addTip(entry.person, overpaymentAmount, entry.dateAdded);
 			break;
 		}
 	}
@@ -68,13 +68,18 @@ double PaymentService::addPaymentAllocation(int64_t paymentEntryID, int64_t pers
 	return amountLeft;
 }
 
-int64_t PaymentService::addCredit(int64_t personEntryID, double amount, const RegisterDate& date, const std::string& description)
+int64_t PaymentService::addCredit(const request::Credit& request)
+{
+	return addCredit(request.person, request.amount, request.dateBooked, request.description);
+}
+
+int64_t PaymentService::addCredit(const entry::Person& person, double amount, const RegisterDate& date, const std::string& description)
 {
 	// potential validity check here
 
 	auto entry = entry::Credit{
 			.creditEntryID = 0,
-			.personEntryID = personEntryID,
+			.person = person,
 			.dateBooked = date,
 			.dateAdded = QDate::currentDate(),
 			.amount = amount,
@@ -85,7 +90,7 @@ int64_t PaymentService::addCredit(int64_t personEntryID, double amount, const Re
 	return creditRepo->addCreditEntry(entry);
 }
 
-int64_t PaymentService::addTip(int64_t personEntryID, double amount, const RegisterDate& date)
+int64_t PaymentService::addTip(const entry::Person& person, double amount, const RegisterDate& date)
 {
 	// potential validity check here
 	
@@ -97,7 +102,7 @@ int64_t PaymentService::addTip(int64_t personEntryID, double amount, const Regis
 		.dateBooked = date,
 		.dateAdded = QDate::currentDate(),
 		.comment = "",
-		.personEntryID = personEntryID
+		.person = person
 	};
 
 	log.record(PendingChangeLog::ChangeType::add, entry);

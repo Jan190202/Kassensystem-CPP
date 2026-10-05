@@ -187,7 +187,7 @@ void BalanceTab::addEntry(BtnIndex mode)
 			.amount = inputs.amount,
 			.dateBooked = inputs.date,
 			.comment = inputs.comment,
-			.coveringpersonEntryID = inputs.coveringpersonEntryID
+			.coveringPerson = inputs.coveringPerson
 		});
 
 	Q_EMIT instantChangesMade();

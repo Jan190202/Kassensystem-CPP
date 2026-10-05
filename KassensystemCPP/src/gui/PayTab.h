@@ -28,7 +28,7 @@ public:
 
 private:
 	void nameChanged();
-	void redeemCredit(int64_t personEntryID);
+	void redeemCredit(const entry::Person& person);
 	void allRedeemCredit();
 	void addCredit();
 	void addPerson();

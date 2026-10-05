@@ -25,7 +25,7 @@ AddTabEntry::AddTabEntry(std::vector<entry::Person>& personVec, QWidget* parent)
 	for (size_t i = personVec.size(); i-- > 0; ) // loop backward to insert in inverse-alphabetical order
 		nameSelect->addItem(
 			nameList.at(i), 
-			QVariant::fromValue(personVec.at(i).personEntryID)
+			QVariant::fromValue(personVec.at(i))
 		);
 	nameSelect->setEditable(true);
 	nameSelect->setDuplicatesEnabled(false);
@@ -171,11 +171,11 @@ void AddTabEntry::removeFromGrid(QGridLayout* grid)
 
 ConsumptionInputs AddTabEntry::getEntryInputs() const
 {
-	std::variant<int64_t, std::string> personInput;
+	std::variant<entry::Person, std::string> personInput;
 	QVariant currentData = nameSelect->currentData();
 	if (currentData.isValid())
 	{
-		personInput = currentData.toLongLong();
+		personInput = currentData.value<entry::Person>();
 	}
 	else
 	{
