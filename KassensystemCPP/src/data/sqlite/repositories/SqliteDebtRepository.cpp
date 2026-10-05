@@ -18,7 +18,7 @@ int64_t SqliteDebtRepository::addDebtEntry(const entry::Debt& entry)
 		"VALUES (:personID, :dateBooked, :dateBookedSpecial, :dateAdded, :amount, :foreignShare)"
 		"RETURNING ID"
 	);
-	query.bindValue(":personID", entry.personEntryID);
+	query.bindValue(":personID", entry.person.personEntryID);
 	query.bindValue(":dateBooked", entry.dateBooked.toSqlDateValue());
 	query.bindValue(":dateBookedSpecial", entry.dateBooked.toSqlSpecialValue());
 	query.bindValue(":dateAdded", entry.dateAdded.toString(Qt::ISODate));

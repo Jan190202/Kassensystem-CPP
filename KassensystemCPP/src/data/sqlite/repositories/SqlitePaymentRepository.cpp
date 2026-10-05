@@ -19,7 +19,7 @@ int64_t SqlitePaymentRepository::addPaymentEntry(const entry::Payment& entry)
 		"VALUES (:personID, :dateAdded, :amount, :comment, :overpaymentType) "
 		"RETURNING ID "
 	);
-	query.bindValue(":personID", entry.personEntryID);
+	query.bindValue(":personID", entry.person.personEntryID);
 	query.bindValue(":dateAdded", entry.dateAdded.toString(Qt::ISODate));
 	query.bindValue(":amount", entry.amount);
 	query.bindValue(":comment", QString::fromStdString(entry.comment));

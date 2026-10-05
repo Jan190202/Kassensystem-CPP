@@ -19,7 +19,7 @@ int64_t SqliteCreditRepository::addCreditEntry(const entry::Credit& entry)
 		"VALUES (:personID, :dateBooked, :dateBookedSpecial, :dateAdded, :amount, :description) "
 		"RETURNING ID"
 	);
-	query.bindValue(":personID", entry.personEntryID);
+	query.bindValue(":personID", entry.person.personEntryID);
 	query.bindValue(":dateBooked", entry.dateBooked.toSqlDateValue());
 	query.bindValue(":dateBookedSpecial", entry.dateBooked.toSqlSpecialValue());
 	query.bindValue(":dateAdded", entry.dateAdded.toString(Qt::ISODate));

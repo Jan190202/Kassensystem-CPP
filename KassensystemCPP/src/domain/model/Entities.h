@@ -66,10 +66,16 @@ namespace entry
 		std::string getInfo() const;
 		std::string getFullSpecifier() const;
 
+		std::string toString() const
+		{
+			return 
+				"fullSpecifier: " + getFullSpecifier() + ", " + 
+				"personEntryID: " + std::to_string(personEntryID);
+		}
+
 		friend std::ostream& operator<<(std::ostream& out, const Person& person)
 		{
-			out << "fullSpecifier: " << person.getFullSpecifier() << ", "
-				<< "personEntryID: " << person.personEntryID;
+			out << person.toString();
 			return out;
 		}
 		
@@ -91,7 +97,7 @@ namespace entry
 		RegisterDate dateBooked;
 		QDate dateAdded;
 		std::string comment;
-		std::optional<int64_t> personEntryID;
+		std::optional<Person> person;
 
 		friend std::ostream& operator<<(std::ostream& out, const Balance& entry)
 		{
@@ -102,7 +108,7 @@ namespace entry
 				<< "dateBooked: " << entry.dateBooked << ", "
 				<< "dateAdded: " << entry.dateAdded.toString("dd.MM.yyyy").toStdString() << ", "
 				<< "comment: " << entry.comment << ", "
-				<< "personEntryID: " << (entry.personEntryID.has_value() ? std::to_string(entry.personEntryID.value()) : "NULL");
+				<< "person: " << (entry.person.has_value() ? entry.person.value().toString() : "NULL");
 
 			return out;
 		}
@@ -148,7 +154,7 @@ namespace entry
 	struct Debt
 	{
 		int64_t debtEntryID;
-		int64_t personEntryID;
+		Person person;
 		RegisterDate dateBooked;
 		QDate dateAdded;
 		double amount;
@@ -157,7 +163,7 @@ namespace entry
 		friend std::ostream& operator<<(std::ostream& out, const Debt& entry)
 		{
 			out << "debtEntryID: " << entry.debtEntryID << ", "
-				<< "personEntryID: " << entry.personEntryID << ", "
+				<< "person: " << entry.person.toString() << ", "
 				<< "dateBooked: " << entry.dateBooked << ", "
 				<< "dateAdded: " << entry.dateAdded.toString("dd.MM.yyyy").toStdString() << ", "
 				<< "amount: " << entry.amount << ", "
@@ -204,7 +210,7 @@ namespace entry
 	struct Payment
 	{
 		int64_t paymentEntryID;
-		int64_t personEntryID;
+		Person person;
 		QDate dateAdded;
 		double amount;
 		std::string comment;
@@ -213,7 +219,7 @@ namespace entry
 		friend std::ostream& operator<<(std::ostream& out, const Payment& entry)
 		{
 			out << "paymentEntryID: " << entry.paymentEntryID << ", "
-				<< "personEntryID: " << entry.personEntryID << ", "
+				<< "person: " << entry.person.toString() << ", "
 				<< "dateAdded: " << entry.dateAdded.toString("dd.MM.yyyy").toStdString() << ", "
 				<< "amount: " << entry.amount << ", "
 				<< "comment: " << entry.comment << ", "
@@ -260,7 +266,7 @@ namespace entry
 	struct Credit
 	{
 		int64_t creditEntryID;
-		int64_t personEntryID;
+		Person person;
 		RegisterDate dateBooked;
 		QDate dateAdded;
 		double amount;
@@ -269,7 +275,7 @@ namespace entry
 		friend std::ostream& operator<<(std::ostream& out, const Credit& entry)
 		{
 			out << "creditEntryID: " << entry.creditEntryID << ", "
-				<< "personEntryID: " << entry.personEntryID << ", "
+				<< "person: " << entry.person.toString() << ", "
 				<< "dateBooked: " << entry.dateBooked << ", "
 				<< "dateAdded: " << entry.dateAdded.toString("dd.MM.yyyy").toStdString() << ", "
 				<< "amount: " << entry.amount << ", "
