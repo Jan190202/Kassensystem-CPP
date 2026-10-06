@@ -1,7 +1,7 @@
-#include "BalanceTab.h"
-#include "BalanceTabAddEntryDialog.h"
-#include "BalanceTabSettlementDialog.h"
-#include "GuiTypes.h"
+#include "gui/tabs/BalanceTab.h"
+#include "gui/dialogs/BalanceTabAddEntryDialog.h"
+#include "gui/dialogs/BalanceTabSettlementDialog.h"
+#include "gui/types/GuiTypes.h"
 #include "qtutils/QtConversions.h"
 #include "qtutils/InstantToolTip.h"
 #include <QDate>

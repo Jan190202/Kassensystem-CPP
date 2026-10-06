@@ -1,6 +1,6 @@
 #pragma once
-#include "BaseTab.h"
-#include "GuiTypes.h"
+#include "gui/interfaces/BaseTab.h"
+#include "gui/types/GuiTypes.h"
 #include "domain/services/BalanceService.h"
 #include "common/Utils.h"
 #include <QDate> 

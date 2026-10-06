@@ -1,4 +1,5 @@
-#include "PayTabAddPersonDialog.h"
+#include "gui/dialogs/PayTabAddCreditDialog.h"
+#include "qtutils/QtConversions.h"
 #include <QDialog>
 #include <QWidget>
 #include <QPushButton>
@@ -8,31 +9,40 @@
 #include <QString>
 #include <QLabel>
 #include <QLineEdit>
+#include <QDateEdit>
+#include <QDoubleSpinBox>
+#include <QDate>
 #include <QFrame>
 #include <QFont>
+#include <QPlainTextEdit>
 #include <string>
 
-PayTabAddPersonDialog::PayTabAddPersonDialog(QWidget* parent) : QDialog(parent)
+PayTabAddCreditDialog::PayTabAddCreditDialog(QWidget* parent) : QDialog(parent)
 {
-	setWindowTitle("Eintrag hinzufügen");
-	
+	setWindowTitle("Guthaben hinzufügen");
+
 	QFont boldFont = font();
 	boldFont.setBold(true);
 
-	edtFirstName	= new QLineEdit();
-	edtLastName		= new QLineEdit();
-	edtNickName		= new QLineEdit();
-	edtInfo			= new QLineEdit();
+	edtAmount = new QDoubleSpinBox();
+	edtAmount->setRange(0.0, 1'000'000.0);
+	edtAmount->setDecimals(2);
+	edtAmount->setSuffix(QStringLiteral(" ") + qtUtils::eurSymbol());
+	edtAmount->setSingleStep(1.0);
+	edtAmount->setAlignment(Qt::AlignLeft | Qt::AlignVCenter);
 
-	auto* lblFirstName = new QLabel(QStringLiteral("Vor-/Gruppenname:"));
-	auto* lblLastName = new QLabel(QStringLiteral("Nachname:"));
-	auto* lblNickName = new QLabel(QStringLiteral("Spitzname:"));
-	auto* lblInfo = new QLabel(QStringLiteral("Info:"));
-	
-	lblFirstName->setFont(boldFont);
-	lblLastName->setFont(boldFont);
-	lblNickName->setFont(boldFont);
-	lblInfo->setFont(boldFont);
+	edtDate = new QDateEdit(QDate::currentDate());
+	edtDate->setDisplayFormat(QStringLiteral("dd MMMM yy"));
+	edtDate->setCalendarPopup(true);
+
+	edtDescription = new QLineEdit();
+
+	auto* lblAmount = new QLabel(QStringLiteral("Neues Guthaben:"));
+	lblAmount->setFont(boldFont);
+	auto* lblDate = new QLabel(QStringLiteral("Datum:"));
+	lblDate->setFont(boldFont);
+	auto* lblDescription = new QLabel(QStringLiteral("Beschreibung:"));
+	lblDescription->setFont(boldFont);
 
 	auto* form = new QFormLayout;
 	form->setLabelAlignment(Qt::AlignLeft);
@@ -41,11 +51,10 @@ PayTabAddPersonDialog::PayTabAddPersonDialog(QWidget* parent) : QDialog(parent)
 	form->setVerticalSpacing(10);
 	form->setRowWrapPolicy(QFormLayout::WrapAllRows);
 
-	form->addRow(lblFirstName, edtFirstName);
-	form->addRow(lblLastName, edtLastName);
-	form->addRow(lblNickName, edtNickName);
-	form->addRow(lblInfo, edtInfo);
-	
+	form->addRow(lblAmount, edtAmount);
+	form->addRow(lblDate, edtDate);
+	form->addRow(lblDescription, edtDescription);
+
 	auto* bottomSeparator = new QFrame;
 	bottomSeparator->setFrameShape(QFrame::HLine);
 	bottomSeparator->setFrameShadow(QFrame::Sunken);
@@ -77,12 +86,11 @@ PayTabAddPersonDialog::PayTabAddPersonDialog(QWidget* parent) : QDialog(parent)
 	adjustSize();
 }
 
-PayTabAddPersonDialog::inputs PayTabAddPersonDialog::getInputs() const
+PayTabAddCreditDialog::inputs PayTabAddCreditDialog::getInputs() const
 {
-	return PayTabAddPersonDialog::inputs{
-		.firstName = edtFirstName->text().toStdString(),
-		.lastName = edtLastName->text().toStdString(),
-		.nickName = edtNickName->text().toStdString(),
-		.info = edtInfo->text().toStdString()
+	return PayTabAddCreditDialog::inputs{
+		.amount = edtAmount->value(),
+		.date = edtDate->date(),
+		.description = edtDescription->text().toStdString()
 	};
 }

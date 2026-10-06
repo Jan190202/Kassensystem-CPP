@@ -1,5 +1,5 @@
 #pragma once
-#include "GuiTypes.h"
+#include "gui/types/GuiTypes.h"
 #include "qtutils/QtConversions.h"
 #include <QObject>
 #include <QList>

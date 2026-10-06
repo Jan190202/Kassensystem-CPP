@@ -1,4 +1,4 @@
-#include "AddTabEntry.h"
+#include "gui/components/AddTabEntry.h"
 #include "qtutils/QtConversions.h"
 #include <QComboBox>
 #include <QDoubleSpinBox>

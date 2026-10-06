@@ -1,5 +1,5 @@
 #include "gui/CashRegisterSystemUI.h"
-#include "gui/GuiTypes.h"
+#include "gui/types/GuiTypes.h"
 
 #include "domain/model/Entities.h"
 #include "domain/model/Requests.h"

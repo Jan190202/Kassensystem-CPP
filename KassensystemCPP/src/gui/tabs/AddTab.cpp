@@ -1,6 +1,6 @@
-#include "AddTab.h"
-#include "AddTabEntry.h"
-#include "GuiTypes.h"
+#include "gui/tabs/AddTab.h"
+#include "gui/components/AddTabEntry.h"
+#include "gui/types/GuiTypes.h"
 #include "qtutils/QtConversions.h"
 #include <QDate>
 #include <QDateEdit>
@@ -254,8 +254,8 @@ void AddTab::apply()
 
 		if (requestValidity.has_value())
 		{
-			removeEntry(entry);
 			consumptionService.addConsumption(request);
+			removeEntry(entry);
 		}
 		else
 		{

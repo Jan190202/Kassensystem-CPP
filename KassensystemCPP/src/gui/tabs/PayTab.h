@@ -1,9 +1,9 @@
 #pragma once
-#include "BaseTab.h"
+#include "gui/interfaces/BaseTab.h"
+#include "gui/types/GuiTypes.h"
 #include "domain/services/PaymentService.h"
 #include "domain/services/PersonService.h"
 #include "domain/model/Requests.h"
-#include "GuiTypes.h"
 #include "common/Utils.h"
 
 class QComboBox;

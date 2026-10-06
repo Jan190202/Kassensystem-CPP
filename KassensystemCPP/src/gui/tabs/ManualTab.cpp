@@ -1,5 +1,5 @@
 #pragma once
-#include "ManualTab.h"
+#include "gui/tabs/ManualTab.h"
 #include "qtutils/QtConversions.h"
 #include <QComboBox>
 #include <QCheckBox>

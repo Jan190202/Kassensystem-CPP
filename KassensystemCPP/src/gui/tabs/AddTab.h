@@ -1,9 +1,7 @@
 #pragma once
-
-#include "BaseTab.h"
+#include "gui/interfaces/BaseTab.h"
+#include "gui/types/GuiTypes.h"
 #include "domain/services/ConsumptionService.h"
-#include "GuiTypes.h"
-
 #include <vector>
 #include <variant>
 

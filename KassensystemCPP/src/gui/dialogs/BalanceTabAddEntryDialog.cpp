@@ -1,4 +1,4 @@
-#include "BalanceTabAddEntryDialog.h"
+#include "gui/dialogs/BalanceTabAddEntryDialog.h"
 #include "qtutils/QtConversions.h"
 #include <QDialog>
 #include <QWidget>

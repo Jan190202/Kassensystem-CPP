@@ -1,7 +1,7 @@
 #pragma once
-#include "BaseTab.h"
+#include "gui/interfaces/BaseTab.h"
+#include "gui/types/GuiTypes.h"
 #include "app/RepositoryBundle.h"
-#include "GuiTypes.h"
 #include <QStyledItemDelegate>
 
 class QComboBox;

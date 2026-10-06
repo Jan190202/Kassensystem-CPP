@@ -1,6 +1,8 @@
 #pragma once
+#include "gui/components/TextPopupWidget.h"
 #include "domain/model/Entities.h"
 #include <QPushButton>
+#include <QToolButton>
 #include <string>
 #include <variant>
 
@@ -14,6 +16,7 @@ struct LowerButtonBundle
 	QPushButton* btnCancel;
 	QPushButton* btnApply;
 	QPushButton* btnSave;
+	TextPopupWidget* btnInfo;
 };
 
 struct ConsumptionInputs

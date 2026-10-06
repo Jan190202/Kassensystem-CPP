@@ -1,4 +1,4 @@
-#include "PayTabExportDialog.h"
+#include "gui/dialogs/PayTabExportDialog.h"
 #include <QPushButton>
 #include <QRadioButton>
 #include <QButtonGroup>

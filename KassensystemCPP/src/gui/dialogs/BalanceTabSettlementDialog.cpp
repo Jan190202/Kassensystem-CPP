@@ -1,4 +1,4 @@
-#include "BalanceTabSettlementDialog.h"
+#include "gui/dialogs/BalanceTabSettlementDialog.h"
 #include "qtutils/QtConversions.h"
 #include <QDoubleSpinBox>
 #include <QDateEdit>

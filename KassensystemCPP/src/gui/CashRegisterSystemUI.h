@@ -1,6 +1,6 @@
 #pragma once
-#include "BaseTab.h"
-#include "GuiTypes.h"
+#include "gui/interfaces/BaseTab.h"
+#include "gui/types/GuiTypes.h"
 #include "app/ServiceBundle.h"
 #include "app/RepositoryBundle.h"
 #include "domain/SessionController.h"
@@ -32,4 +32,5 @@ private:
 
 	void initUi(const ServiceBundle& serviceBundle, const RepositoryBundle& repoBundle, const SessionController& controller, QSqlDatabase& db);
 	void changeTab(TabIndex idx);
+	void refreshButtonBar();
 };

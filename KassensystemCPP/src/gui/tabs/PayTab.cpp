@@ -1,8 +1,8 @@
-#include "PayTab.h"
+#include "gui/tabs/PayTab.h"
+#include "gui/dialogs/PayTabAddCreditDialog.h"
+#include "gui/dialogs/PayTabAddPersonDialog.h"
+#include "gui/dialogs/PayTabExportDialog.h"
 #include "qtutils/QtConversions.h"
-#include "PayTabAddCreditDialog.h"
-#include "PayTabAddPersonDialog.h"
-#include "PayTabExportDialog.h"
 #include "export/Exporter.h"
 #include <QButtonGroup>
 #include <QCheckBox>

@@ -1,8 +1,9 @@
-#include "CashRegisterSystemUI.h"
-#include "AddTab.h"
-#include "PayTab.h"
-#include "BalanceTab.h"
-#include "ManualTab.h"
+#include "gui/CashRegisterSystemUI.h"
+#include "gui/tabs/AddTab.h"
+#include "gui/tabs/PayTab.h"
+#include "gui/tabs/BalanceTab.h"
+#include "gui/tabs/ManualTab.h"
+#include "gui/components/TextPopupWidget.h"
 #include <QCoreApplication>
 #include <QHBoxLayout>
 #include <QVBoxLayout>
@@ -11,6 +12,7 @@
 #include <QMainWindow>
 #include <QMessageBox>
 #include <QSignalBlocker>
+#include <QMenu>
 #include <QDebug>
 
 CashRegisterSystemUI::CashRegisterSystemUI(const ServiceBundle& serviceBundle, const RepositoryBundle& repoBundle, const SessionController& controller, QSqlDatabase& db, PendingChangeLog& log, QWidget* parent) : log(log), QMainWindow(parent)
@@ -28,16 +30,19 @@ void CashRegisterSystemUI::initUi(const ServiceBundle& serviceBundle, const Repo
 	QVBoxLayout*    rootLayout	= new QVBoxLayout(central);
 
 	// lower buttons
-	QHBoxLayout* buttonBar = new QHBoxLayout();
 	lowerButtons.btnCancel = new QPushButton("Cancel", this);
 	lowerButtons.btnApply = new QPushButton("Apply", this);
 	lowerButtons.btnSave = new QPushButton("Save && Sync", this);
+	lowerButtons.btnInfo = new TextPopupWidget(TextPopupWidget::PopupPos::topLeft, this);
 	lowerButtons.btnSave->setEnabled(false); // disabled, until changes were made
+	lowerButtons.btnInfo->setEnabled(false); // disabled, until changes were made
 	
+	QHBoxLayout* buttonBar = new QHBoxLayout();
 	buttonBar->addWidget(lowerButtons.btnCancel);
+	buttonBar->addStretch();
 	buttonBar->addWidget(lowerButtons.btnApply);
 	buttonBar->addWidget(lowerButtons.btnSave);
-	buttonBar->insertStretch(1);			// 1==position, cancel button flushed left, others flushed right
+	buttonBar->addWidget(lowerButtons.btnInfo);
 	rootLayout->addLayout(buttonBar);           
 
 	//tabs
@@ -85,7 +90,7 @@ void CashRegisterSystemUI::initUi(const ServiceBundle& serviceBundle, const Repo
 			controller.save();
 			controller.sync();
 			log.clear();
-			lowerButtons.btnSave->setEnabled(false);
+			refreshButtonBar();
 		});
 }
 
@@ -106,31 +111,36 @@ void CashRegisterSystemUI::changeTab(TabIndex activeTab)
 	}
 
 	activeTabHasTemporaryChanges = false;
+	refreshButtonBar();
 
-	auto refreshSaveButton = [=]()
-		{
-			lowerButtons.btnSave->setEnabled(log.hasPendingChanges());
-			lowerButtons.btnSave->setToolTip(QString::fromStdString(log.printPendingChanges()));
-		};
+
 
 	// apply button only controls the active tab
 	lowerButtons.btnApply->disconnect();
 	connect(lowerButtons.btnApply, &QPushButton::clicked, this, [=]()
 		{
 			tabs.at(activeTabNum)->apply();
-			refreshSaveButton();
+			refreshButtonBar();
 		});
 
-	lowerButtons.btnApply->setEnabled(false);
 	tabs.at(activeTabNum)->disconnect();
 	connect(tabs.at(activeTabNum), &BaseTab::temporaryChangesExist, this, [=](bool doExist)
 		{
+			qDebug() << "changesExistEMIT: " << doExist;
 			activeTabHasTemporaryChanges = doExist;
-			lowerButtons.btnApply->setEnabled(doExist);
+			refreshButtonBar();
 		});
 
 	connect(tabs.at(activeTabNum), &BaseTab::instantChangesMade, this, [=]()
 		{
-			refreshSaveButton();
+			refreshButtonBar();
 		});
+}
+
+void CashRegisterSystemUI::refreshButtonBar()
+{
+	lowerButtons.btnApply->setEnabled(activeTabHasTemporaryChanges);
+	lowerButtons.btnSave->setEnabled(log.hasPendingChanges());
+	lowerButtons.btnInfo->setEnabled(log.hasPendingChanges());
+	lowerButtons.btnInfo->setPlainText(QString::fromStdString(log.printPendingChanges()));
 }
