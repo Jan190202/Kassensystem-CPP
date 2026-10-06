@@ -198,7 +198,6 @@ void PayTab::initialize()
 	// disable so no actions can be done while placeholder is set in nameSelect
 	btnAddCredit->setEnabled(false);
 	btnUseCredit->setEnabled(false);
-	btnExport->setEnabled(false);
 
 	refresh();
 
@@ -269,7 +268,6 @@ void PayTab::nameChanged()
 {
 	btnAddCredit->setEnabled(true);
 	btnUseCredit->setEnabled(true);
-	btnExport->setEnabled(true);
 
 	int64_t personEntryID = nameSelect->currentData().value<entry::Person>().personEntryID;
 
