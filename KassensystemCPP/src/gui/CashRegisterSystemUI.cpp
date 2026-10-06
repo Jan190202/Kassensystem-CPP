@@ -142,5 +142,5 @@ void CashRegisterSystemUI::refreshButtonBar()
 	lowerButtons.btnApply->setEnabled(activeTabHasTemporaryChanges);
 	lowerButtons.btnSave->setEnabled(log.hasPendingChanges());
 	lowerButtons.btnInfo->setEnabled(log.hasPendingChanges());
-	lowerButtons.btnInfo->setPlainText(QString::fromStdString(log.printPendingChanges()));
+	lowerButtons.btnInfo->setRichText(QString::fromStdString(log.printPendingChanges(PendingChangeLog::TextFormat::rich)));
 }

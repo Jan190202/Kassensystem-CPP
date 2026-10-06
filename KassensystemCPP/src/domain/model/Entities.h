@@ -400,15 +400,33 @@ namespace registerFinancials
 class PendingChangeLog
 {
 public:
-	struct Change
-	{
-		QDateTime time;
-		std::string description;
-	};
-
 	enum class ChangeType
 	{
 		add, remove, mutate
+	};
+
+	enum class TextFormat
+	{
+		plain, rich
+	};
+
+	struct Field
+	{
+		std::string label;
+		std::string value;
+		bool quoted = false;
+	};
+
+	struct Change
+	{
+		QDateTime time;
+		std::optional<ChangeType> type;
+		std::string subject;
+		std::vector<Field> fields;
+		std::string message;
+
+		bool isFreeText() const { return subject.empty(); }
+		std::string plainText() const;
 	};
 
 	PendingChangeLog() = default;
@@ -419,18 +437,16 @@ public:
 	void record(ChangeType, const entry::Payment&);
 	void record(ChangeType, const entry::Person&);
 	void record(ChangeType, const entry::ShareSettlement&);
-	void record(const std::string& description);
+	void record(const std::string& description, std::optional<ChangeType> type = std::nullopt);
 
 	bool hasPendingChanges() const;
 	const std::vector<Change>& pendingChanges() const;
-	std::string printPendingChanges() const;
+	std::string printPendingChanges(TextFormat format = TextFormat::plain) const;
 	void clear();
 private:
 	std::vector<Change> log;
 
-	std::map<ChangeType, std::string> actionVerb = { {ChangeType::add, "hinzugefügt"}, {ChangeType::remove, "gelöscht"}, {ChangeType::mutate, "verändert"} };
-
-	void addLogEntry(const std::string& description);
+	void addLogEntry(ChangeType type, std::string subject, std::vector<Field> fields);
 };
 
 struct PriceList

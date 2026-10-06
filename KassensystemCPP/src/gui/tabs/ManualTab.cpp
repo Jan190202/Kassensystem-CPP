@@ -93,17 +93,17 @@ void ManualTab::initialize()
 
 	connect(model, &QSqlTableModel::beforeInsert, this, [&](QSqlRecord& record) // TBD: implement row insertion
 		{
-			log.record("Eintrag in " + model->tableName().toStdString() + " manuell hinzugefügt");
+			log.record("Eintrag in " + model->tableName().toStdString() + " manuell hinzugefügt", PendingChangeLog::ChangeType::add);
 		});
 
 	connect(model, &QSqlTableModel::beforeDelete, this, [&](int row) // TBD: implement row deletion
 		{
-			log.record("Eintrag in " + model->tableName().toStdString() + " manuell gelöscht"); 
+			log.record("Eintrag in " + model->tableName().toStdString() + " manuell gelöscht", PendingChangeLog::ChangeType::remove);
 		});
 
 	connect(model, &QSqlTableModel::beforeUpdate, this, [&](int row, QSqlRecord& record)
 		{
-			log.record("Eintrag in " + model->tableName().toStdString() + " manuell bearbeitet"); 
+			log.record("Eintrag in " + model->tableName().toStdString() + " manuell bearbeitet", PendingChangeLog::ChangeType::mutate);
 		});
 
 	connect(btnAddEntry, &QPushButton::clicked, this, [&]() { addTableEntry(); });

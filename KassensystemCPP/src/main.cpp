@@ -104,18 +104,11 @@ int main(int argc, char* argv[])
 	int returnValue = app.exec();
 	qDebug() << "";
 
-	for (const auto& logEntry : log.pendingChanges())
-		qDebug() << logEntry.time.toString("hh'h'mm'min'ss's'") << ": " << QString::fromStdString(logEntry.description);
-
 	return returnValue;
 }
 
 /*
 * Ideas:
-* - Changelog
-*		- apply button only active when changes were made
-*		- save button only active when applied
-*		- "changes" window to show applied changes for inspection before saving
 * - general architecture:
 *		- predefining cash, foreign cash, savings in state before, previous debts and credits all at the same time is redundant
 *				-> cash at specific time stamp would be enough as database entries from before arent cleared
@@ -125,7 +118,6 @@ int main(int argc, char* argv[])
 *		- remove consumption earnings from earnings table, display them in seperate section with more information
 * - BalanceTab:
 *		- add basic calculator in balanceTab for cash counting
-*		- add info-icons (clickable/tooltip) -> get details on report calculation
 *		- BalanceTabDialog: option for adding any number of people with custom amounts (e.g. for coverage of entry fees for multiple people; currently, multiple entries necessary)
 * - add assets (icons, button icons, ...)
 * - display current player base by pulling from the web for name finding/spelling:
