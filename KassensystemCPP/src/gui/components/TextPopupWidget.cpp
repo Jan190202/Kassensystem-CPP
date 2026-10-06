@@ -26,7 +26,7 @@ TextPopupWidget::TextPopupWidget(PopupPos pos, QWidget* parent)
 
 	connect(this, &QToolButton::clicked, this, &TextPopupWidget::showPopup);
 
-	setPlainText("");
+	setPlainText(QString());
 }
 
 void TextPopupWidget::setRichText(const QString& richText)
@@ -39,6 +39,16 @@ void TextPopupWidget::setPlainText(const QString& plainText)
 {
 	label->setTextFormat(Qt::PlainText);
 	label->setText(plainText);
+}
+
+void TextPopupWidget::setRichText(const std::string& richText)
+{
+	setRichText(QString::fromStdString(richText));
+}
+
+void TextPopupWidget::setPlainText(const std::string& plainText)
+{
+	setPlainText(QString::fromStdString(plainText));
 }
 
 void TextPopupWidget::setPopupPos(PopupPos pos)

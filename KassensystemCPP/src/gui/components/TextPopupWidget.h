@@ -1,6 +1,7 @@
 #pragma once
 #include <QWidget>
 #include <QToolButton>
+#include <string>
 
 class QFrame;
 class QLabel;
@@ -14,6 +15,8 @@ public:
 	explicit TextPopupWidget(QWidget* parent = nullptr);
 	TextPopupWidget(PopupPos pos, QWidget* parent = nullptr);
 
+	void setRichText(const std::string& richText);
+	void setPlainText(const std::string& plainText);
 	void setRichText(const QString& richText);
 	void setPlainText(const QString& plainText);
 	void setPopupPos(PopupPos pos);
