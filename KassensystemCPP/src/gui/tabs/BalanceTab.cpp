@@ -3,7 +3,6 @@
 #include "gui/dialogs/BalanceTabSettlementDialog.h"
 #include "gui/types/GuiTypes.h"
 #include "qtutils/QtConversions.h"
-#include "qtutils/InstantToolTip.h"
 #include <QDate>
 #include <QFormLayout>
 #include <QGroupBox>
@@ -38,11 +37,13 @@ void BalanceTab::initialize()
 	// labels
 	lCashBefore			= new QLabel(qtUtils::toCurrencyFormat(0.0), this);
 	lCashDifference		= new QLabel(qtUtils::toCurrencyFormat(0.0), this);
+	popupCashDifference = new TextPopupWidget(TextPopupWidget::PopupPos::bottomRight, this);
 	lCashAfter			= new QLabel(qtUtils::toCurrencyFormat(0.0), this);
 
 	lSavingsBefore		= new QLabel(qtUtils::toCurrencyFormat(0.0,3), this);
 	lSavingsDifference	= new QLabel(qtUtils::toCurrencyFormat(0.0,3), this);
 	lSavingsAfter		= new QLabel(qtUtils::toCurrencyFormat(0.0,3), this);
+	popupSavingsAfter	= new TextPopupWidget(TextPopupWidget::PopupPos::bottomRight, this);
 
 	lForeignBefore		= new QLabel(qtUtils::toCurrencyFormat(0.0,3), this);
 	lForeignAfter		= new QLabel(qtUtils::toCurrencyFormat(0.0,3), this);
@@ -118,7 +119,13 @@ void BalanceTab::initialize()
 	differenceLayout->setHorizontalSpacing(16);
 	differenceLayout->setVerticalSpacing(7);
 	differenceLayout->addRow(QStringLiteral("Bestand:"), lSavingsDifference);
-	differenceLayout->addRow(QStringLiteral("Bar:"), lCashDifference);
+
+	auto* cashDifferenceLayout = new QHBoxLayout();
+	cashDifferenceLayout->setContentsMargins(0, 0, 0, 0);
+	cashDifferenceLayout->setSpacing(8);
+	cashDifferenceLayout->addWidget(lCashDifference);
+	cashDifferenceLayout->addWidget(popupCashDifference);
+	differenceLayout->addRow(QStringLiteral("Bar:"), cashDifferenceLayout);
 
 	// after
 	auto* btnSettleForeign = new QPushButton("Refresh");
@@ -130,9 +137,16 @@ void BalanceTab::initialize()
 	afterLayout->setContentsMargins(12, 16, 12, 12);
 	afterLayout->setHorizontalSpacing(16);
 	afterLayout->setVerticalSpacing(7);
-	afterLayout->addRow(QStringLiteral("Bestand:"), lSavingsAfter);
-	afterLayout->addRow(QStringLiteral("Bar:"), lCashAfter);
+
+	auto* savingsAfterLayout = new QHBoxLayout();
+	savingsAfterLayout->setContentsMargins(0, 0, 0, 0);
+	savingsAfterLayout->setSpacing(8);
+	savingsAfterLayout->addWidget(lSavingsAfter);
+	savingsAfterLayout->addWidget(popupSavingsAfter);
+	afterLayout->addRow(QStringLiteral("Bestand:"), savingsAfterLayout);
 	
+	afterLayout->addRow(QStringLiteral("Bar:"), lCashAfter);
+
 	auto* foreignAfterLayout = new QHBoxLayout();
 	foreignAfterLayout->setContentsMargins(0, 0, 0, 0);
 	foreignAfterLayout->setSpacing(8);
@@ -325,17 +339,13 @@ void BalanceTab::refreshLables(const registerFinancials::Report& report) const
 
 	lSavingsDifference->setText(qtUtils::toCurrencyFormat(report.savingsDiff, 3));
 	lCashDifference->setText(qtUtils::toCurrencyFormat(report.cashDiff));
-	lCashDifference->setToolTip(cashDiffExplanation);
+	popupCashDifference->setRichText(cashDiffExplanation);
 	
 	afterBox->setTitle(formatHeader(report.stateAfter.date));
 	lSavingsAfter->setText(qtUtils::toCurrencyFormat(report.stateAfter.savings, 3));
-	lSavingsAfter->setToolTip(savingsAfterExplanation);
+	popupSavingsAfter->setRichText(savingsAfterExplanation);
 	lCashAfter->setText(qtUtils::toCurrencyFormat(report.stateAfter.cash));
 	lForeignAfter->setText(qtUtils::toCurrencyFormat(report.stateAfter.foreignCash, 3));
-
-	// enable instant tooltips on hover
-	lCashDifference->installEventFilter(new InstantToolTipFilter(lCashDifference));
-	lSavingsAfter->installEventFilter(new InstantToolTipFilter(lSavingsAfter));
 }
 
 void BalanceTab::apply() {}

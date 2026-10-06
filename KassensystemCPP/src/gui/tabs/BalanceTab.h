@@ -1,6 +1,7 @@
 #pragma once
 #include "gui/interfaces/BaseTab.h"
 #include "gui/types/GuiTypes.h"
+#include "gui/components/TextPopupWidget.h"
 #include "domain/services/BalanceService.h"
 #include "common/Utils.h"
 #include <QDate> 
@@ -31,9 +32,11 @@ private:
 	QLabel* lCashBefore = nullptr;
 	QLabel* lForeignBefore = nullptr;
 	QLabel* lCashDifference = nullptr;
+	TextPopupWidget* popupCashDifference = nullptr;
 	QLabel* lCashAfter = nullptr;
 	QLabel* lSavingsBefore = nullptr;
 	QLabel* lSavingsDifference = nullptr;
+	TextPopupWidget* popupSavingsAfter = nullptr;
 	QLabel* lSavingsAfter = nullptr;
 	QLabel* lForeignAfter = nullptr;
 	QLabel* lEarnings = nullptr;
