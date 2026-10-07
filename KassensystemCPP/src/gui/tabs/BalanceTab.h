@@ -22,11 +22,12 @@ public:
 private:
 	void addEntry(BtnIndex mode);
 	void addSettlement();
+	void startCalculator();
 
 	QString formatHeader(const QDate& date) const;
 	void refreshTables(const registerFinancials::Report& report) const;
 	void refreshLables(const registerFinancials::Report& report) const;
-
+	
 	QTableWidget* tblSpendings = nullptr;
 	QTableWidget* tblEarnings = nullptr;
 	QLabel* lCashBefore = nullptr;

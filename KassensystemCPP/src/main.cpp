@@ -118,7 +118,6 @@ int main(int argc, char* argv[])
 *		- remove consumption earnings from earnings table, display them in seperate section with more information
 * - BalanceTab:
 *		- add basic calculator in balanceTab for cash counting
-* - add assets (icons, button icons, ...)
 */ 
 
 

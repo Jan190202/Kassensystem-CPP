@@ -1,6 +1,7 @@
 #include "gui/tabs/BalanceTab.h"
 #include "gui/dialogs/BalanceTabAddEntryDialog.h"
 #include "gui/dialogs/BalanceTabSettlementDialog.h"
+#include "gui/dialogs/BalanceTabCalculator.h"
 #include "gui/types/GuiTypes.h"
 #include "gui/IconLoader.h"
 #include "qtutils/QtConversions.h"
@@ -133,6 +134,10 @@ void BalanceTab::initialize()
 	btnSettleForeign->setIcon(iconLoader::getIcon("refresh-arrow.png"));
 	btnSettleForeign->setMaximumWidth(30);
 
+	auto* btnCalculator = new QPushButton();
+	btnCalculator->setIcon(iconLoader::getIcon("calculator.png"));
+	btnCalculator->setMaximumWidth(30);
+
 	afterBox = new QGroupBox(this);
 	afterBox->setTitle(formatHeader(QDate()));
 
@@ -147,8 +152,13 @@ void BalanceTab::initialize()
 	savingsAfterLayout->addWidget(lSavingsAfter);
 	savingsAfterLayout->addWidget(popupSavingsAfter);
 	afterLayout->addRow(QStringLiteral("Bestand:"), savingsAfterLayout);
-	
-	afterLayout->addRow(QStringLiteral("Bar:"), lCashAfter);
+
+	auto* cashAfterLayout = new QHBoxLayout();
+	cashAfterLayout->setContentsMargins(0, 0, 0, 0);
+	cashAfterLayout->setSpacing(8);
+	cashAfterLayout->addWidget(lCashAfter);
+	cashAfterLayout->addWidget(btnCalculator);
+	afterLayout->addRow(QStringLiteral("Bar:"), cashAfterLayout);
 
 	auto* foreignAfterLayout = new QHBoxLayout();
 	foreignAfterLayout->setContentsMargins(0, 0, 0, 0);
@@ -182,6 +192,7 @@ void BalanceTab::initialize()
 	connect(btnAddEarning,  &QPushButton::clicked, this, [=]() {BalanceTab::addEntry(BtnIndex::addEarning); });
 	connect(btnAddSpending, &QPushButton::clicked, this, [=]() {BalanceTab::addEntry(BtnIndex::addSpending); });
 	connect(btnSettleForeign, &QPushButton::clicked, this, [=]() {BalanceTab::addSettlement(); });
+	connect(btnCalculator, &QPushButton::clicked, this, [=]() {BalanceTab::startCalculator(); });
 }
 
 void BalanceTab::addEntry(BtnIndex mode)
@@ -390,4 +401,11 @@ void BalanceTab::addSettlement()
 	}
 
 	refresh();
+}
+
+void BalanceTab::startCalculator()
+{
+	auto* calc = new BalanceTabCalculator(this);
+	calc->setAttribute(Qt::WA_DeleteOnClose);
+	calc->show();
 }
