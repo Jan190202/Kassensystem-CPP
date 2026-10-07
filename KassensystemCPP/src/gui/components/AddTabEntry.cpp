@@ -1,5 +1,6 @@
 #include "gui/components/AddTabEntry.h"
 #include "qtutils/QtConversions.h"
+#include "gui/IconLoader.h"
 #include <QComboBox>
 #include <QDoubleSpinBox>
 #include <QGridLayout>
@@ -64,7 +65,9 @@ AddTabEntry::AddTabEntry(std::vector<entry::Person>& personVec, QWidget* parent)
 	lCost->setAlignment(Qt::AlignCenter);
 	lCost->setMinimumWidth(70);
 
-	btnRemove = new QPushButton(QStringLiteral("−"), parent);
+	btnRemove = new QPushButton(parent);
+	btnRemove->setIcon(iconLoader::getIcon("remove.png"));
+
 	btnRemove->setToolTip(QStringLiteral("Eintrag entfernen"));
 	//btnRemove->setFixedWidth(36);
 

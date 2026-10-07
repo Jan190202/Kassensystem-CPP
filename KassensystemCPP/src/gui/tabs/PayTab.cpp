@@ -4,6 +4,7 @@
 #include "gui/dialogs/PayTabExportDialog.h"
 #include "qtutils/QtConversions.h"
 #include "export/Exporter.h"
+#include "gui/IconLoader.h"
 #include <QButtonGroup>
 #include <QCheckBox>
 #include <QComboBox>
@@ -23,6 +24,7 @@
 #include <QMessageBox>
 #include <QCompleter>
 #include <QSignalBlocker>
+#include <QIcon>
 #include <algorithm>
 
 PayTab::PayTab(PaymentService& paymentService, PersonService& personService, PersonRepository* personRepo, ConsumptionRepository* consumptionRepo, DebtRepository* debtRepo, CreditRepository* creditRepo, QWidget* parent) 
@@ -42,9 +44,11 @@ void PayTab::initialize()
 	completer->setFilterMode(Qt::MatchContains);
 	nameSelect->setCompleter(completer);
 
-	btnAddPerson = new QPushButton(QStringLiteral("+"), this);
+	btnAddPerson = new QPushButton(this);
+	btnAddPerson->setIcon(iconLoader::getIcon("add-user.png"));
 
-	btnExport = new QPushButton(QStringLiteral("Exp"), this);
+	btnExport = new QPushButton(this);
+	btnExport->setIcon(iconLoader::getIcon("export.png"));
 
 	// overview
 	auto* totalTextLabel	= new QLabel(QStringLiteral("Gesamt"), this);
@@ -77,7 +81,8 @@ void PayTab::initialize()
 	btnUseCredit = new QPushButton(QStringLiteral("Anwenden"), this);
 	btnUseCredit->setEnabled(false);
 
-	btnAddCredit = new QPushButton(QStringLiteral("+"), this);
+	btnAddCredit = new QPushButton(this);
+	btnAddCredit->setIcon(iconLoader::getIcon("plus.png"));
 
 	btnAllUseCredit = new QPushButton(QStringLiteral("Alle Anwenden"), this);
 
@@ -118,7 +123,7 @@ void PayTab::initialize()
 	customerLayout->addWidget(btnAddPerson);
 	customerLayout->addWidget(btnExport);
 	btnAddPerson->setFixedWidth(30);
-	btnExport->setFixedWidth(40);
+	btnExport->setFixedWidth(30);
 
 	auto* summaryBox = new QGroupBox(QStringLiteral("Übersicht"), this);
 	auto* summaryLayout = new QFormLayout(summaryBox);

@@ -1,6 +1,7 @@
 #include "gui/tabs/AddTab.h"
 #include "gui/components/AddTabEntry.h"
 #include "gui/types/GuiTypes.h"
+#include "gui/IconLoader.h"
 #include "qtutils/QtConversions.h"
 #include <QDate>
 #include <QDateEdit>
@@ -332,6 +333,7 @@ void AddTab::handleInputValidityError(const validityError::Code& errorCode) cons
 		}
 	}
 
-	auto* errorDlg = new QMessageBox(QMessageBox::Warning, QStringLiteral("Fehler"), errorQStr);
+	auto* errorDlg = new QMessageBox(QMessageBox::NoIcon, QStringLiteral("Fehler"), errorQStr);
+	errorDlg->setWindowIcon(iconLoader::getIcon("warning.png"));
 	errorDlg->exec();
 }

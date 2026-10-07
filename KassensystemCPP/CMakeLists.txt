@@ -28,8 +28,16 @@ target_compile_features(KassensystemCPP PRIVATE cxx_std_23)
 add_custom_command(
     TARGET KassensystemCPP POST_BUILD
     COMMAND ${CMAKE_COMMAND} -E copy_directory
-        "${CMAKE_CURRENT_SOURCE_DIR}/appdata"
-        "$<TARGET_FILE_DIR:KassensystemCPP>/data"
+			"${CMAKE_CURRENT_SOURCE_DIR}/appdata"
+			"$<TARGET_FILE_DIR:KassensystemCPP>/data"
+)
+
+# find and copy assets (icons, ...) into build folder
+add_custom_command(
+	TARGET KassensystemCPP POST_BUILD
+    COMMAND ${CMAKE_COMMAND} -E copy_directory
+			"${CMAKE_CURRENT_SOURCE_DIR}/assets"
+			"$<TARGET_FILE_DIR:KassensystemCPP>/assets"
 )
 
 # Qt-Integration

@@ -4,6 +4,7 @@
 #include "gui/tabs/BalanceTab.h"
 #include "gui/tabs/ManualTab.h"
 #include "gui/components/TextPopupWidget.h"
+#include "gui/IconLoader.h"
 #include <QCoreApplication>
 #include <QHBoxLayout>
 #include <QVBoxLayout>
@@ -14,10 +15,12 @@
 #include <QSignalBlocker>
 #include <QMenu>
 #include <QDebug>
+#include <QIcon>
 
 CashRegisterSystemUI::CashRegisterSystemUI(const ServiceBundle& serviceBundle, const RepositoryBundle& repoBundle, const SessionController& controller, QSqlDatabase& db, PendingChangeLog& log, QWidget* parent) : log(log), QMainWindow(parent)
 {
 	setWindowTitle(QStringLiteral("Kassensystem"));
+	setWindowIcon(iconLoader::getIcon("cash-machine.png", false));
 	resize(1000, 600);
 	initUi(serviceBundle, repoBundle, controller, db);
 }

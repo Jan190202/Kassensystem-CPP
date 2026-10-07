@@ -11,5 +11,5 @@ namespace jsonReader
 		openingFileFailed, parsingJsonFailed, missingJsonObject
 	};
 
-	std::expected<QJsonObject, Exception> getQJsonObj(std::string fileName, std::string relPath = "data");
+	std::expected<QJsonObject, Exception> getQJsonObj(const std::string& fileName, const std::string& relPath = "data");
 }

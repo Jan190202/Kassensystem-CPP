@@ -2,6 +2,7 @@
 #include "gui/dialogs/BalanceTabAddEntryDialog.h"
 #include "gui/dialogs/BalanceTabSettlementDialog.h"
 #include "gui/types/GuiTypes.h"
+#include "gui/IconLoader.h"
 #include "qtutils/QtConversions.h"
 #include <QDate>
 #include <QFormLayout>
@@ -128,7 +129,9 @@ void BalanceTab::initialize()
 	differenceLayout->addRow(QStringLiteral("Bar:"), cashDifferenceLayout);
 
 	// after
-	auto* btnSettleForeign = new QPushButton("Refresh");
+	auto* btnSettleForeign = new QPushButton();
+	btnSettleForeign->setIcon(iconLoader::getIcon("refresh-arrow.png"));
+	btnSettleForeign->setMaximumWidth(30);
 
 	afterBox = new QGroupBox(this);
 	afterBox->setTitle(formatHeader(QDate()));

@@ -2,20 +2,23 @@
 
 #include <QCoreApplication>
 #include <QFile>
+#include <QDir>
 #include <QJsonDocument>
 #include <QJsonObject>
 #include <string>
 
 namespace jsonReader
 {
-	std::expected<QJsonObject,Exception> getQJsonObj(std::string fileNameStr, std::string relPath)
+	std::expected<QJsonObject,Exception> getQJsonObj(const std::string& fileNameStr, const std::string& relPathStr)
 	{
-		QString exePath = QCoreApplication::applicationDirPath();
 		QString fileName = QString::fromStdString(fileNameStr);
-		QString subFolderName = QString::fromStdString(relPath);
-		QString filePath = exePath + "/" + subFolderName + "/" + fileName;
+		QString relPath = QString::fromStdString(relPathStr);
 
-		QFile file(filePath);
+		QDir exePath{ QCoreApplication::applicationDirPath() };
+		QDir folderPath{ exePath.filePath(relPath) };
+		QString filePath = folderPath.filePath(fileName);
+
+		QFile file{ filePath };
 		if (!file.open(QIODevice::ReadOnly | QIODevice::Text))
 			return std::unexpected(Exception::openingFileFailed);
 

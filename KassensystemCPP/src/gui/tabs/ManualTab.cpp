@@ -1,5 +1,6 @@
 #pragma once
 #include "gui/tabs/ManualTab.h"
+#include "gui/IconLoader.h"
 #include "qtutils/QtConversions.h"
 #include <QComboBox>
 #include <QCheckBox>
@@ -30,10 +31,12 @@ void ManualTab::initialize()
 	tableSelect->setEditable(false);
 	tableSelect->setMinimumWidth(300);
 
-	btnAddEntry = new QPushButton("+");
+	btnAddEntry = new QPushButton();
+	btnAddEntry->setIcon(iconLoader::getIcon("add-list.png"));
 	btnAddEntry->setMaximumWidth(30);
 
-	btnDeleteEntry = new QPushButton("-");
+	btnDeleteEntry = new QPushButton();
+	btnDeleteEntry->setIcon(iconLoader::getIcon("remove.png"));
 	btnDeleteEntry->setMaximumWidth(30);
 
 	nameSelect = new QComboBox(this);
