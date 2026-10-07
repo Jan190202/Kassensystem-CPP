@@ -11,7 +11,7 @@ set(CMAKE_AUTORCC ON)
 
 file(GLOB_RECURSE SOURCES CONFIGURE_DEPENDS src/*.cpp)
 file(GLOB_RECURSE HEADERS CONFIGURE_DEPENDS src/*.h)
-add_executable(KassensystemCPP ${SOURCES} ${HEADERS})
+add_executable(KassensystemCPP ${SOURCES} ${HEADERS} app.rc)
 
 set_target_properties(KassensystemCPP PROPERTIES
     WIN32_EXECUTABLE $<CONFIG:Release>
