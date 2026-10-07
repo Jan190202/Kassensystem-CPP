@@ -116,11 +116,7 @@ int main(int argc, char* argv[])
 *				-> balance statistics are still displayed from beginning of year (if avaliable) to today
 *				-> currently disabled special date, as "unknown" should be counted as after date of state before -> cleanup after architecture change
 *		- remove consumption earnings from earnings table, display them in seperate section with more information
-* - BalanceTab:
-*		- add basic calculator in balanceTab for cash counting
 */ 
-
-
 
 /*
 * Long-Term Goals

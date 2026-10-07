@@ -28,6 +28,10 @@ void BalanceTab::initialize()
 	// buttons
 	auto* btnAddEarning		= new QPushButton(QStringLiteral("+ Einnahme"), this);
 	auto* btnAddSpending	= new QPushButton(QStringLiteral("+ Ausgabe"), this);
+	auto* btnSettleForeign = new QPushButton();
+	btnSettleForeign->setIcon(iconLoader::getIcon("refresh-arrow.png"));
+	auto* btnCalculator = new QPushButton();
+	btnCalculator->setIcon(iconLoader::getIcon("calculator.png"));
 
 	// tables
 	tblEarnings		= new QTableWidget(this);
@@ -53,10 +57,18 @@ void BalanceTab::initialize()
 	lEarnings			= new QLabel(qtUtils::toCurrencyFormat(0.0,3), this);
 	lSpendings			= new QLabel(qtUtils::toCurrencyFormat(0.0), this);
 
-	const auto configureAmount = [](QLabel* label)
+	constexpr int rowHeight = 30;
+
+	btnSettleForeign->setFixedSize(rowHeight, rowHeight);
+	btnCalculator->setFixedSize(rowHeight, rowHeight);
+	popupCashDifference->setFixedHeight(rowHeight);
+	popupSavingsAfter->setFixedHeight(rowHeight);
+
+	const auto configureAmount = [rowHeight](QLabel* label)
 		{
 			label->setAlignment(Qt::AlignRight | Qt::AlignVCenter);
 			label->setMinimumWidth(90);
+			label->setMinimumHeight(rowHeight); 
 		};
 
 	configureAmount(lCashBefore);
@@ -130,14 +142,6 @@ void BalanceTab::initialize()
 	differenceLayout->addRow(QStringLiteral("Bar:"), cashDifferenceLayout);
 
 	// after
-	auto* btnSettleForeign = new QPushButton();
-	btnSettleForeign->setIcon(iconLoader::getIcon("refresh-arrow.png"));
-	btnSettleForeign->setMaximumWidth(30);
-
-	auto* btnCalculator = new QPushButton();
-	btnCalculator->setIcon(iconLoader::getIcon("calculator.png"));
-	btnCalculator->setMaximumWidth(30);
-
 	afterBox = new QGroupBox(this);
 	afterBox->setTitle(formatHeader(QDate()));
 
