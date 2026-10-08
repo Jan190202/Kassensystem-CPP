@@ -16,6 +16,7 @@ public:
 	std::string getLocalDatabasePath() const;
 	std::string getRemoteDatabasePath() const;
 private:
+	std::string remoteFolderName;
 	std::filesystem::path localDatabasePath;
 	std::filesystem::path remoteDatabasePath;
 	std::filesystem::path remoteBackupDatabasePath;
@@ -25,4 +26,5 @@ private:
 	void pullFromRemote();
 	void pushToRemote();
 	void pushToBackup();
+	bool vacuumInto(const std::filesystem::path& target);
 };
