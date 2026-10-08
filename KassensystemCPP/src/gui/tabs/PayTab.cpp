@@ -16,6 +16,7 @@
 #include <QLabel>
 #include <QPushButton>
 #include <QRadioButton>
+#include <QPlainTextEdit>
 #include <QSizePolicy>
 #include <QTableWidget>
 #include <QVBoxLayout>
@@ -96,6 +97,9 @@ void PayTab::initialize()
 
 	fullPaymentCheckBox = new QCheckBox(QStringLiteral("Ausstand übernehmen"), this);
 
+	// comment
+	edtComment = new QPlainTextEdit(this);
+	
 	// surplus
 	btnSurplusToCredit = new QRadioButton(QStringLiteral("als Guthaben"), this);
 	btnSurplusToCredit->setChecked(true);
@@ -150,6 +154,12 @@ void PayTab::initialize()
 	paymentLayout->addLayout(amountLayout);
 	paymentLayout->addWidget(fullPaymentCheckBox);
 
+	auto* commentBox = new QGroupBox(QStringLiteral("Kommentar"), this);
+	auto* commentLayout = new QHBoxLayout(commentBox);
+	//commentLayout->setContentsMargins(12, 14, 12, 12);
+	//commentLayout->setSpacing(18);
+	commentLayout->addWidget(edtComment);
+
 	auto* surplusBox = new QGroupBox(QStringLiteral("Zahlungsüberschuss behandeln"), this);
 	auto* surplusLayout = new QHBoxLayout(surplusBox);
 	surplusLayout->setContentsMargins(12, 14, 12, 12);
@@ -184,6 +194,7 @@ void PayTab::initialize()
 	leftLayout->addWidget(customerBox);
 	leftLayout->addWidget(summaryBox);
 	leftLayout->addWidget(paymentBox);
+	leftLayout->addWidget(commentBox);
 	leftLayout->addWidget(surplusBox);
 	leftLayout->addWidget(creditBox);
 	leftLayout->addStretch();
@@ -347,7 +358,7 @@ void PayTab::apply()
 	request::Payment request{
 		.person = nameSelect->currentData().value<entry::Person>(),
 		.amount = paymentSpinBox->value(),
-		.comment = "", // TBD: temporary, retrieve through GUI later
+		.comment = edtComment->toPlainText().toStdString(),
 		.overpaymentType = btnSurplusToCredit->isChecked() ? OverpaymentDisposition::credit : OverpaymentDisposition::tip
 	};
 

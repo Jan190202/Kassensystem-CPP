@@ -129,7 +129,6 @@ void CashRegisterSystemUI::changeTab(TabIndex activeTab)
 	tabs.at(activeTabNum)->disconnect();
 	connect(tabs.at(activeTabNum), &BaseTab::temporaryChangesExist, this, [=](bool doExist)
 		{
-			qDebug() << "changesExistEMIT: " << doExist;
 			activeTabHasTemporaryChanges = doExist;
 			refreshButtonBar();
 		});
