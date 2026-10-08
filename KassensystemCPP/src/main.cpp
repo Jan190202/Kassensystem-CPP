@@ -108,14 +108,16 @@ int main(int argc, char* argv[])
 }
 
 /*
-* Ideas:
-* - general architecture:
-*		- predefining cash, foreign cash, savings in state before, previous debts and credits all at the same time is redundant
-*				-> cash at specific time stamp would be enough as database entries from before arent cleared
-*				-> allow cash amount validation at any time, which either: refreshes state before, or, better: create new database saving the validation checks
-*				-> balance statistics are still displayed from beginning of year (if avaliable) to today
-*				-> currently disabled special date, as "unknown" should be counted as after date of state before -> cleanup after architecture change
-*		- remove consumption earnings from earnings table, display them in seperate section with more information
+* Architecture change:
+* - register state only defined by counted cash at the time of a financial review
+* - financial reviews are stored in a database table FinancialReview: ID, dateBooked, cashCounted, cashExpexted, comment
+* - BalanceTab:
+*	- option to switch from period to period between financial reviews (e.g. 1-2, 2-3, 3-today) 
+*	- "State Before" becomes "Begin: Review [Date]" and "State After" becomes "End: Review [Date]" or "End: today [Date]"
+*	- calculator dialog now also accomodates the financial review adding
+*	- "refresh" buttons has a clearer symbol, like "payment"
+*	- difference box also shows the difference in foreign shares
+*	- display consumption earning seperately
 */ 
 
 /*
