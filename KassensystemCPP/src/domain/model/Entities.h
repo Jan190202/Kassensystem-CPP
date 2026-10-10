@@ -358,7 +358,12 @@ namespace registerFinancials
 	struct State
 	{
 		QDate date;
-		double cash, savings, ownCash, foreignCash;
+		double cash = 0.0;			// counted cash (review) or expected cash (current state)
+		double foreignCash = 0.0;	
+		double ownCash = 0.0;		
+		double debt = 0.0;			
+		double credit = 0.0;		
+		double savings = 0.0;		
 
 		friend std::ostream& operator<<(std::ostream& out, const State& state)
 		{
@@ -366,7 +371,9 @@ namespace registerFinancials
 				<< "savings: " << state.savings << ", "
 				<< "cash: " << state.cash << ", "
 				<< "foreignCash: " << state.foreignCash << ", "
-				<< "ownCash: " << state.ownCash;
+				<< "ownCash: " << state.ownCash << ", "
+				<< "debt: " << state.debt << ", "
+				<< "credit: " << state.credit;
 			return out;
 		}
 
@@ -379,21 +386,48 @@ namespace registerFinancials
 		}
 	};
 
-	struct Report
+	// begin + added - removed = end; endDirect is read from the database independently,
+	// so the roll-forward can be checked against it
+	struct RollForwardRow
 	{
-		struct Details
-		{
-			double departmentEarnings, departmentSpendings;
-			double consumptionAllShares, consumptionOwnShare, consumptionForeignShare;
-			double paidDebt, settledValue, depositedCredit;
-			double consumptionAllSharesAllTime, consumptionOwnShareAllTime, consumptionForeignShareAllTime;
-			double paidDebtAllTime, depositedCreditAllTime;
-		};
+		double begin = 0.0;
+		double added = 0.0;
+		double removed = 0.0;
+		double endDirect = 0.0;
+	};
 
-		registerFinancials::State stateBefore, stateAfter;
-		double savingsDiff, cashDiff;
-		double totalEarnings, totalSpendings;
+	struct ConsumptionSummary
+	{
+		double totalConsumption = 0.0;	
+		double departmentShare = 0.0;	
+
+		RollForwardRow debt;			// added: consumption, removed: paid
+		RollForwardRow foreignShare;	// added: club share of consumption, removed: settled with the club
+		RollForwardRow credit;			// added: deposited credit, removed: credit used up
+	};
+
+	// Cash-flow view of the period (journal entries and cash events only)
+	struct Details
+	{
+		double departmentEarnings = 0.0, departmentSpendings = 0.0;
+		double paidDebt = 0.0, settledValue = 0.0, depositedCredit = 0.0;
+		double cashCorrection = 0.0;	// counted - expected cash at the end review; 0 for the current period
+	};
+
+	struct PeriodReport
+	{
+		State start, end;
+
+		QDate periodStart;						// entries are filtered by dateBooked > periodStart ...
+		std::optional<QDate> periodEnd;			// ... and <= periodEnd (nullopt = open end, current period)
+
+		bool isCurrent = false;					// period runs from the last review to now
+		bool changedSinceReview = false;		// recomputed expected cash != expectedCash stored at the end review
+
+		double totalEarnings = 0.0, totalSpendings = 0.0;	// journal entries only
+
 		Details details;
+		ConsumptionSummary consumption;
 	};
 }
 

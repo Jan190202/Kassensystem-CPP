@@ -1,4 +1,4 @@
-#include "gui/dialogs/BalanceTabCalculator.h"
+#include "gui/dialogs/BalanceTabReviewDialog.h"
 #include "gui/IconLoader.h"
 #include "qtutils/QtConversions.h"
 #include <QString>
@@ -10,7 +10,7 @@
 #include <QHBoxLayout>
 #include <QRegularExpression>
 
-BalanceTabCalculator::BalanceTabCalculator(QWidget* parent) : QDialog(parent) 
+BalanceTabReviewDialog::BalanceTabReviewDialog(double expectedCash, QWidget* parent) : QDialog(parent)
 {
 	setWindowIcon(iconLoader::getIcon("calculator.png"));
 	setWindowTitle("Taschenrechner");
@@ -33,12 +33,12 @@ BalanceTabCalculator::BalanceTabCalculator(QWidget* parent) : QDialog(parent)
 	connect(edtText, &QPlainTextEdit::textChanged, this, [=]() {refreshResult(); });
 }
 
-void BalanceTabCalculator::refreshResult()
+void BalanceTabReviewDialog::refreshResult()
 {
 	lResultValue->setText(qtUtils::toCurrencyFormat(calculateResult()));
 }
 
-double BalanceTabCalculator::calculateResult() const
+double BalanceTabReviewDialog::calculateResult() const
 {
 	static const QRegularExpression whitespace(QStringLiteral("\\s+"));
 	static const QRegularExpression numberPattern(QStringLiteral("^(\\d+[.,]?\\d*|[.,]\\d+)$"));
@@ -93,4 +93,13 @@ double BalanceTabCalculator::calculateResult() const
 		return 0.0;                      // input ends with a dangling operator
 
 	return result;
+}
+
+BalanceTabReviewDialog::inputs BalanceTabReviewDialog::getInputs() const
+{
+	return BalanceTabReviewDialog::inputs{
+		.countedCash = 0,
+		.expectedCash = 0,
+		.comment = ""
+	};
 }
