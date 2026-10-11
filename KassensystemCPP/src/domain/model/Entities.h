@@ -10,6 +10,11 @@
 #include <cstdint>
 #include <variant>
 #include <map>
+#include <optional>
+#include <array>
+#include <vector>
+#include <sstream>
+#include <format>
 
 class RegisterDate
 {
@@ -50,6 +55,14 @@ public:
 
 private:
 	std::variant<QDate, Special> data;
+};
+
+struct DateRange
+{
+	std::optional<QDate> afterExclusive;	// nullopt = from the beginning
+	std::optional<QDate> untilInclusive;	// nullopt = open end (up to now)
+
+	static DateRange upTo(const std::optional<QDate>& untilInclusive) { return { std::nullopt, untilInclusive }; }
 };
 
 namespace entry
@@ -342,6 +355,34 @@ namespace entry
 			return debug;
 		}
 	};
+
+	struct FinancialReview
+	{
+		int64_t financialReviewEntryID;
+		QDateTime dateTime;
+		double countedCash;
+		double expectedCash;	// audit only, written by the service
+		std::string comment;
+
+		friend std::ostream& operator<<(std::ostream& out, const FinancialReview& entry)
+		{
+			out << "financialReviewEntryID: " << entry.financialReviewEntryID << ", "
+				<< "dateTime: " << entry.dateTime.toString(Qt::ISODate).toStdString() << ", "
+				<< "countedCash: " << entry.countedCash << ", "
+				<< "expectedCash: " << entry.expectedCash << ", "
+				<< "comment: " << entry.comment;
+
+			return out;
+		}
+
+		friend QDebug operator<<(QDebug debug, const FinancialReview& entry)
+		{
+			std::ostringstream oss;
+			oss << entry;
+			debug.nospace() << QString::fromStdString(oss.str());
+			return debug;
+		}
+	};
 }
 
 namespace exportType
@@ -471,6 +512,7 @@ public:
 	void record(ChangeType, const entry::Payment&);
 	void record(ChangeType, const entry::Person&);
 	void record(ChangeType, const entry::ShareSettlement&);
+	void record(ChangeType, const entry::FinancialReview&);
 	void record(const std::string& description, std::optional<ChangeType> type = std::nullopt);
 
 	bool hasPendingChanges() const;

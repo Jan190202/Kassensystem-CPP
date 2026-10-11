@@ -216,6 +216,16 @@ void PendingChangeLog::record(ChangeType type, const entry::ShareSettlement& ent
 		});
 }
 
+void PendingChangeLog::record(ChangeType type, const entry::FinancialReview& entry)
+{
+	addLogEntry(type, "Kassensturz", {
+		{ "Zeitpunkt", entry.dateTime.toString("dd.MM.yyyy HH:mm").toStdString() },
+		{ "Gezählt",   std::format("{:.2f} {}", entry.countedCash, utils::eurSymbol()) },
+		{ "Erwartet",  std::format("{:.2f} {}", entry.expectedCash, utils::eurSymbol()) },
+		{ "Kommentar", entry.comment, true }
+		});
+}
+
 void PendingChangeLog::record(const std::string& description, std::optional<ChangeType> type)
 {
 	log.push_back(Change{ QDateTime::currentDateTime(), type, {}, {}, description });

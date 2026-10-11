@@ -1,8 +1,21 @@
 #include "BalanceService.h"
+#include <QDateTime>
+#include <algorithm>
+#include <cmath>
 #include <optional>
+#include <stdexcept>
 
-BalanceService::BalanceService(const RepositoryBundle& repoBundle, const registerFinancials::State& stateBefore, PendingChangeLog& log)
-	: balanceRepo(repoBundle.balanceRepo), creditRepo(repoBundle.creditRepo), debtRepo(repoBundle.debtRepo), personRepo(repoBundle.personRepo), shareSettlementRepo(repoBundle.shareSettlementRepo), paymentRepo(repoBundle.paymentRepo), stateBefore(stateBefore), log(log) {}
+namespace
+{
+	constexpr double tolerance = 5e-4; // half of the display resolution (3 decimals)
+}
+
+BalanceService::BalanceService(const RepositoryBundle& repoBundle, PendingChangeLog& log)
+	: balanceRepo(repoBundle.balanceRepo), creditRepo(repoBundle.creditRepo), debtRepo(repoBundle.debtRepo),
+	personRepo(repoBundle.personRepo), shareSettlementRepo(repoBundle.shareSettlementRepo),
+	paymentRepo(repoBundle.paymentRepo), financialReviewRepo(repoBundle.financialReviewRepo), log(log) {}
+
+// ---------------------------------------------------------------- writing
 
 int64_t BalanceService::addBalanceItem(const request::Balance& request)
 {
@@ -21,7 +34,7 @@ int64_t BalanceService::addBalanceItem(const request::Balance& request)
 	{
 		addCredit(entry.person.value(), entry.amount, entry.dateBooked, "Abteilungsausgabe übernommen");
 	}
-	
+
 	log.record(PendingChangeLog::ChangeType::add, entry);
 	return balanceRepo->addBalanceEntry(entry);
 }
@@ -29,7 +42,7 @@ int64_t BalanceService::addBalanceItem(const request::Balance& request)
 int64_t BalanceService::addCredit(const entry::Person& person, double amount, const RegisterDate& date, const std::string& description)
 {
 	// potential validity check here
-	
+
 	auto entry = entry::Credit{
 			.creditEntryID = 0,
 			.person = person,
@@ -43,112 +56,11 @@ int64_t BalanceService::addCredit(const entry::Person& person, double amount, co
 	return creditRepo->addCreditEntry(entry);
 }
 
-std::vector<entry::Balance> BalanceService::getBalanceEntries(BalanceType type, const QDate& minDate) const
-{
-	auto entries = balanceRepo->getBalanceEntries(type, minDate);
-
-	if (hasFlag(type, BalanceType::supplement))
-	{
-		entries.push_back(
-			entry::Balance{
-				.type = BalanceType::earning | BalanceType::supplement,
-				.description = "Einnahmen durch Getränkeverkäufe",
-				.amount = debtRepo->getTotalShare(FinancialShare::own, minDate),
-				.dateBooked = QDate::currentDate()
-			});
-
-		//entries.push_back(
-		//	entry::Balance{
-		//		.type = BalanceType::earning | BalanceType::supplement,
-		//		.description = "Rundungsfehler bei Abrechnung (kum.)",
-		//		.amount = 0, //settlementRepo->getTotalRounding(),
-		//		.dateBooked = QDate::currentDate()
-		//	});
-	}
-	
-	return entries;
-}
-
-registerFinancials::Report BalanceService::getReport() const
-{
-	
-	// savingsDiff = (departmentEarnings - departmentSpendings) + virtual own consumption share
-	double departmentEarnings{}; // includes tips from overpayment
-	double departmentSpendings{};
-	double consumptionAllShares{};
-	double consumptionOwnShare{};
-	double consumptionForeignShare{};
-	
-	for (const auto& entry : getBalanceEntries(BalanceType::earning, stateBefore.date)) departmentEarnings += entry.amount;
-	for (const auto& entry : getBalanceEntries(BalanceType::spending, stateBefore.date)) departmentSpendings += entry.amount;
-	consumptionAllShares = debtRepo->getTotalShare(FinancialShare::all, stateBefore.date);
-	consumptionOwnShare = debtRepo->getTotalShare(FinancialShare::own, stateBefore.date);
-	consumptionForeignShare = consumptionAllShares - consumptionOwnShare;
-
-	double savingsDiff = departmentEarnings - departmentSpendings + consumptionOwnShare;
-
-
-	// cashDiff = (departmentEarnings - departmentSpendings) + (paidDebt (which is totalShare) - settledValue (which is foreignShare)) + depositedCredit
-	double paidDebt{};
-	double settledValue{};
-	double depositedCredit{};
-
-	paidDebt = paymentRepo->getTotalAllocatedPayments(stateBefore.date);
-	settledValue = shareSettlementRepo->getTotalAllocatedShareSettlements(stateBefore.date);
-	depositedCredit = creditRepo->getTotalDepositedCredit(stateBefore.date);
-
-	double cashDiff = departmentEarnings - departmentSpendings + paidDebt - settledValue + depositedCredit;
-	double currentForeignCash = debtRepo->getForeignDue();
-
-	// all-time values for correctness check
-	double consumptionAllSharesAllTime = debtRepo->getTotalShare(FinancialShare::all, QDate(2000,1,1));
-	double consumptionOwnShareAllTime = debtRepo->getTotalShare(FinancialShare::own, QDate(2000, 1, 1));
-	double consumptionForeignShareAllTime = consumptionAllSharesAllTime - consumptionOwnShareAllTime;
-	double paidDebtAllTime = paymentRepo->getTotalAllocatedPayments(QDate(2000, 1, 1));
-	double depositedCreditAllTime = creditRepo->getTotalDepositedCredit(QDate(2000, 1, 1));
-
-
-	// struct construction
-	registerFinancials::State stateAfter{
-	.date = QDate::currentDate(),
-	.cash = stateBefore.cash + cashDiff,
-	.savings = stateBefore.savings + savingsDiff,
-	.ownCash = stateBefore.cash + cashDiff - currentForeignCash,
-	.foreignCash = currentForeignCash
-	};
-
-	registerFinancials::Report report{
-		.stateBefore = stateBefore,
-		.stateAfter = stateAfter,
-		.savingsDiff = savingsDiff,
-		.cashDiff = cashDiff,
-		.totalEarnings = departmentEarnings + consumptionOwnShare,
-		.totalSpendings = departmentSpendings,
-		.details = registerFinancials::Report::Details{
-			.departmentEarnings = departmentEarnings,
-			.departmentSpendings = departmentSpendings,
-			.consumptionAllShares = consumptionAllShares,
-			.consumptionOwnShare = consumptionOwnShare,
-			.consumptionForeignShare = consumptionForeignShare,
-			.paidDebt = paidDebt,
-			.settledValue = settledValue,
-			.depositedCredit = depositedCredit,
-			.consumptionAllSharesAllTime = consumptionAllSharesAllTime,
-			.consumptionOwnShareAllTime = consumptionOwnShareAllTime,
-			.consumptionForeignShareAllTime = consumptionForeignShareAllTime,
-			.paidDebtAllTime = paidDebtAllTime,
-			.depositedCreditAllTime = depositedCreditAllTime
-		}	
-	};
-
-	return report;
-}
-
 AddSettlementException BalanceService::addShareSettlement(request::ShareSettlement request)
 {
-	if (request.amount < 0) 
+	if (request.amount < 0)
 		return AddSettlementException::amountNegative;
-	if (request.amount < 1e-9) 
+	if (request.amount < 1e-9)
 		return AddSettlementException::amountZero;
 	if (request.amount - debtRepo->getForeignDue() > 1e-9)
 		return AddSettlementException::amountGreaterThanTotalForeignShare;
@@ -167,11 +79,9 @@ AddSettlementException BalanceService::addShareSettlement(request::ShareSettleme
 
 	if (overpaymentAmount > 1e-9)
 	{
-		// case currently caught with AddSettlementException::AmountGreaterThantTotalForeignShare
+		// case currently caught with AddSettlementException::amountGreaterThanTotalForeignShare
 		// if settlement in advance (or up-rounding) intended later, implement here
 	}
-
-	debtRepo->getForeignShareOutstandingEntries(FilterType::omitFullyPaid);
 
 	return AddSettlementException::none;
 }
@@ -193,11 +103,198 @@ double BalanceService::addShareSettlementAllocation(int64_t settlementEntryID, d
 			.shareSettlementAllocationEntryID = 0,
 			.debtEntryID = entryRem.debtEntryID,
 			.shareSettlementEntryID = settlementEntryID,
-			.amount = appliedToCurrentEntry 
+			.amount = appliedToCurrentEntry
 		};
 
 		shareSettlementRepo->addShareSettlementAllocationEntry(aEntry);
 	}
 
 	return amountLeft;
+}
+
+int64_t BalanceService::addFinancialReview(const request::FinancialReview& request)
+{
+	// The expected cash is always recomputed here, never taken from the caller: it is an audit value
+	// and must be exactly what the register state predicted at this moment.
+	const size_t count = getPeriodCount();
+	const double expectedCash = count == 0 ? 0.0 : getPeriodReport(count - 1).end.cash;
+
+	entry::FinancialReview entry{
+		.financialReviewEntryID = 0,
+		.dateTime = QDateTime::currentDateTime(),
+		.countedCash = request.countedCash,
+		.expectedCash = expectedCash,
+		.comment = request.comment
+	};
+
+	int64_t id = financialReviewRepo->addFinancialReviewEntry(entry);
+	log.record(PendingChangeLog::ChangeType::add, entry);
+	return id;
+}
+
+int64_t BalanceService::addOpeningReview(const QDate& date, double countedCash)
+{
+	if (!loadReviews().empty())
+		return -1;
+
+	// "count = end of that day": everything booked on `date` belongs to the time before this review
+	entry::FinancialReview entry{
+		.financialReviewEntryID = 0,
+		.dateTime = QDateTime(date, QTime(23, 59, 59)),
+		.countedCash = countedCash,
+		.expectedCash = countedCash,
+		.comment = "Anfangsbestand (aus Konfiguration übernommen)"
+	};
+
+	int64_t id = financialReviewRepo->addFinancialReviewEntry(entry);
+	log.record(PendingChangeLog::ChangeType::add, entry);
+	return id;
+}
+
+// ---------------------------------------------------------------- reading
+
+std::vector<entry::Balance> BalanceService::getBalanceEntries(BalanceType type, const QDate& afterExclusive,
+	const std::optional<QDate>& untilInclusive) const
+{
+	// journal entries only; consumption is reported separately (ConsumptionSummary)
+	return balanceRepo->getBalanceEntries(type, DateRange{ afterExclusive, untilInclusive });
+}
+
+size_t BalanceService::getPeriodCount() const
+{
+	return loadReviews().size();
+}
+
+registerFinancials::PeriodReport BalanceService::getPeriodReport(size_t periodIndex) const
+{
+	const auto reviews = loadReviews();
+	if (periodIndex >= reviews.size())
+		throw std::out_of_range("BalanceService::getPeriodReport: period index out of range");
+
+	const auto& startReview = reviews[periodIndex];
+	const bool isCurrent = periodIndex + 1 == reviews.size();
+
+	const QDate startDate = startReview.dateTime.date();
+	std::optional<QDate> endDate; // nullopt = open end (current period)
+	if (!isCurrent)
+		endDate = reviews[periodIndex + 1].dateTime.date();
+
+	const DateRange range{ startDate, endDate };
+
+	// ---- cash side: counted cash at start + cash events = expected cash at end ----
+	const Flows flows = computeFlows(range);
+	const registerFinancials::State start = buildState(startDate, startReview.countedCash, startDate);
+	const double expectedCashEnd = start.cash + flows.cashChange();
+
+	registerFinancials::State end;
+	double cashCorrection = 0.0;
+	bool changedSinceReview = false;
+
+	if (isCurrent)
+	{
+		end = buildState(QDate::currentDate(), expectedCashEnd, std::nullopt);
+	}
+	else
+	{
+		const auto& endReview = reviews[periodIndex + 1];
+		end = buildState(*endDate, endReview.countedCash, endDate);
+
+		// difference is recomputed so that all identities in the report hold for the current data;
+		// the value stored at review time only serves to detect later changes
+		cashCorrection = endReview.countedCash - expectedCashEnd;
+		changedSinceReview = std::abs(expectedCashEnd - endReview.expectedCash) > tolerance;
+	}
+
+	// ---- assemble ----
+	registerFinancials::PeriodReport report;
+	report.start = start;
+	report.end = end;
+	report.periodStart = startDate;
+	report.periodEnd = endDate;
+	report.isCurrent = isCurrent;
+	report.changedSinceReview = changedSinceReview;
+	report.totalEarnings = flows.earnings;
+	report.totalSpendings = flows.spendings;
+
+	report.details.departmentEarnings = flows.earnings; // includes tips from overpayment
+	report.details.departmentSpendings = flows.spendings;
+	report.details.paidDebt = flows.paidDebt;
+	report.details.settledValue = flows.settled;
+	report.details.depositedCredit = flows.depositedCredit;
+	report.details.cashCorrection = cashCorrection;
+
+	report.consumption = buildConsumption(range, flows, start, end);
+
+	return report;
+}
+
+// ---------------------------------------------------------------- helpers
+
+std::vector<entry::FinancialReview> BalanceService::loadReviews() const
+{
+	auto reviews = financialReviewRepo->getAllFinancialReviewEntries();
+
+	std::sort(reviews.begin(), reviews.end(), [](const entry::FinancialReview& a, const entry::FinancialReview& b)
+		{
+			return a.dateTime < b.dateTime;
+		});
+
+	return reviews;
+}
+
+double BalanceService::sumBalance(BalanceType type, const DateRange& range) const
+{
+	double sum = 0.0;
+	for (const auto& entry : balanceRepo->getBalanceEntries(type, range))
+		sum += entry.amount;
+	return sum;
+}
+
+BalanceService::Flows BalanceService::computeFlows(const DateRange& range) const
+{
+	Flows flows;
+	flows.earnings = sumBalance(BalanceType::earning, range);
+	flows.spendings = sumBalance(BalanceType::spending, range);
+	flows.paidDebt = paymentRepo->getTotalAllocatedPayments(range);
+	flows.settled = shareSettlementRepo->getTotalAllocatedShareSettlements(range);
+	flows.depositedCredit = creditRepo->getTotalDepositedCredit(range);
+	return flows;
+}
+
+// Everything except `cash` is derived from the database as of `asOf` (nullopt = now).
+// The three stocks are read with dedicated "outstanding" queries (per-entry remainders), independent of the
+// flow sums above, so the roll-forward in the report is a real cross-check and not a tautology.
+registerFinancials::State BalanceService::buildState(const QDate& date, double cash, const std::optional<QDate>& asOf) const
+{
+	const DateRange upTo = DateRange::upTo(asOf);
+
+	registerFinancials::State state;
+	state.date = date;
+	state.cash = cash;
+	state.foreignCash = debtRepo->getForeignDue(upTo);
+	state.debt = debtRepo->getOpenDebt(upTo);
+	state.credit = creditRepo->getOpenCredit(upTo);
+	state.ownCash = cash - state.foreignCash;
+	state.savings = cash - state.foreignCash + state.debt - state.credit;
+	return state;
+}
+
+registerFinancials::ConsumptionSummary BalanceService::buildConsumption(const DateRange& range, const Flows& flows,
+	const registerFinancials::State& start,
+	const registerFinancials::State& end) const
+{
+	const double allShares = debtRepo->getTotalShare(FinancialShare::all, range);
+	const double ownShare = debtRepo->getTotalShare(FinancialShare::own, range);
+	const double foreignShare = allShares - ownShare;
+
+	registerFinancials::ConsumptionSummary c;
+	c.totalConsumption = allShares;
+	c.departmentShare = ownShare;
+
+	// begin + added - removed = end; endDirect comes from the independent stock queries in buildState
+	c.debt = { start.debt, allShares, flows.paidDebt, end.debt };
+	c.foreignShare = { start.foreignCash, foreignShare, flows.settled, end.foreignCash };
+	c.credit = { start.credit, flows.depositedCredit, creditRepo->getTotalUsedCredit(range), end.credit };
+
+	return c;
 }
