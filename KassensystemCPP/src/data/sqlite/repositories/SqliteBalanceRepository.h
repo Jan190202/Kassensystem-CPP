@@ -10,7 +10,7 @@ public:
 	virtual int64_t addBalanceEntry(const entry::Balance& entry) override;
 
 	virtual std::expected<entry::Balance, GetEntryException> getBalanceEntry(const std::string& description) const override;
-	virtual std::vector<entry::Balance> getBalanceEntries(BalanceType type, const QDate& minDate) const override;
+	virtual std::vector<entry::Balance> getBalanceEntries(BalanceType type, const DateRange& range) const override;
 
 private:
 	entry::Balance getEntryFromQuery(const QSqlQuery& query) const;

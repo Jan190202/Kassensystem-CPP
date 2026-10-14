@@ -88,11 +88,11 @@ void BalanceTab::initialize()
 	btnAddSpending = new QPushButton(QStringLiteral("+ Ausgabe"), this);
 
 	btnSettleForeign = new QPushButton(this);
-	btnSettleForeign->setIcon(iconLoader::getIcon("refresh-arrow.png"));
+	btnSettleForeign->setIcon(iconLoader::getIcon("payment.png"));
 	btnSettleForeign->setToolTip(QStringLiteral("Fremdanteil abrechnen"));
 
 	btnReview = new QPushButton(this);
-	btnReview->setIcon(iconLoader::getIcon("calculator.png"));
+	btnReview->setIcon(iconLoader::getIcon("check.png"));
 	btnReview->setToolTip(QStringLiteral("Kassensturz durchführen"));
 
 	btnPrevPeriod = new QPushButton(QStringLiteral("\u25C0"), this);
@@ -364,13 +364,11 @@ void BalanceTab::startReview()
 
 	const auto inputs = dialog.getInputs();
 
-	// TBD
-	//balanceService.addFinancialReview(
-	//	request::FinancialReview{
-	//		.countedCash = inputs.countedCash,
-	//		.expectedCash = expectedCash,
-	//		.comment = inputs.comment
-	//	});
+	balanceService.addFinancialReview(
+		request::FinancialReview{
+			.countedCash = inputs.countedCash,
+			.comment = inputs.comment
+		});
 
 	Q_EMIT instantChangesMade();
 

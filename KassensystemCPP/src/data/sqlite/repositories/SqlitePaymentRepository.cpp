@@ -24,7 +24,7 @@ int64_t SqlitePaymentRepository::addPaymentEntry(const entry::Payment& entry)
 	query.bindValue(":amount", entry.amount);
 	query.bindValue(":comment", QString::fromStdString(entry.comment));
 	query.bindValue(":overpaymentType", static_cast<int>(entry.overpaymentType));
-	
+
 	if (query.exec())
 		if (query.next())
 		{
@@ -32,7 +32,8 @@ int64_t SqlitePaymentRepository::addPaymentEntry(const entry::Payment& entry)
 			return query.value(0).toLongLong();
 		}
 
-	deb << "--> failed";
+	deb << "--> failed: " << query.lastError().text();
+	return -1;
 }
 
 int64_t SqlitePaymentRepository::addPaymentAllocationEntry(const entry::PaymentAllocation& entry)
@@ -58,7 +59,8 @@ int64_t SqlitePaymentRepository::addPaymentAllocationEntry(const entry::PaymentA
 			return query.value(0).toLongLong();
 		}
 
-	deb << "--> failed";
+	deb << "--> failed: " << query.lastError().text();
+	return -1;
 }
 
 std::vector<entry::PaymentAllocation> SqlitePaymentRepository::getDebtsEntrysPaymentAllocationEntries(int64_t debtEntryID) const
@@ -72,7 +74,7 @@ std::vector<entry::PaymentAllocation> SqlitePaymentRepository::getDebtsEntrysPay
 		"FROM PaymentAllocation "
 		"WHERE debtID = :debtEntryID "
 	);
-	query.bindValue(":debtID", debtEntryID);
+	query.bindValue(":debtEntryID", debtEntryID); // was ":debtID", which does not exist in the statement
 
 	std::vector<entry::PaymentAllocation> entries;
 	if (query.exec())
@@ -86,24 +88,25 @@ std::vector<entry::PaymentAllocation> SqlitePaymentRepository::getDebtsEntrysPay
 				});
 		}
 	else
-		deb << "--> failed";
+		deb << "--> failed: " << query.lastError().text();
 
 	return entries;
 }
 
-double SqlitePaymentRepository::getTotalAllocatedPayments(const QDate& minDate) const
+double SqlitePaymentRepository::getTotalAllocatedPayments(const DateRange& range) const
 {
 	QDebug deb = qDebug();
 	deb << "-> getTotalAllocatedPayments";
 
+	// the cash moved when the payment was added, so the payment's dateAdded decides the period
 	QSqlQuery query;
 	query.prepare(
 		"SELECT COALESCE(SUM(PaymentAllocation.amount),0) AS total "
 		"FROM PaymentAllocation "
-		"LEFT OUTER JOIN Payment ON PaymentAllocation.paymentID = Payment.ID "
-		"WHERE Payment.dateAdded >= :minDate "
+		"INNER JOIN Payment ON PaymentAllocation.paymentID = Payment.ID "
+		"WHERE " + sqliteUtils::addedRangeClause(range, "Payment.dateAdded", "range") + " "
 	);
-	query.bindValue(":minDate", minDate.toString(Qt::ISODate));
+	sqliteUtils::bindDateRange(query, range, "range");
 
 	if (query.exec())
 		if (query.next())
@@ -112,5 +115,6 @@ double SqlitePaymentRepository::getTotalAllocatedPayments(const QDate& minDate) 
 			return query.value(0).toDouble();
 		}
 
-	deb << "--> failed";
+	deb << "--> failed: " << query.lastError().text();
+	return 0.0;
 }

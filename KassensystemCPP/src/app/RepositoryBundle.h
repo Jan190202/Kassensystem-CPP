@@ -7,6 +7,7 @@
 #include "domain/repointerface/CreditRepository.h"
 #include "domain/repointerface/BalanceRepository.h"
 #include "domain/repointerface/ShareSettlementRepository.h"
+#include "domain/repointerface/FinancialReviewRepository.h"
 
 struct RepositoryBundle
 {
@@ -17,4 +18,5 @@ struct RepositoryBundle
 	CreditRepository*			creditRepo;
 	BalanceRepository*			balanceRepo;
 	ShareSettlementRepository*	shareSettlementRepo;
+	FinancialReviewRepository*	financialReviewRepo;
 };

@@ -15,7 +15,7 @@ BalanceService::BalanceService(const RepositoryBundle& repoBundle, PendingChange
 	personRepo(repoBundle.personRepo), shareSettlementRepo(repoBundle.shareSettlementRepo),
 	paymentRepo(repoBundle.paymentRepo), financialReviewRepo(repoBundle.financialReviewRepo), log(log) {}
 
-// ---------------------------------------------------------------- writing
+// writing
 
 int64_t BalanceService::addBalanceItem(const request::Balance& request)
 {
@@ -114,8 +114,6 @@ double BalanceService::addShareSettlementAllocation(int64_t settlementEntryID, d
 
 int64_t BalanceService::addFinancialReview(const request::FinancialReview& request)
 {
-	// The expected cash is always recomputed here, never taken from the caller: it is an audit value
-	// and must be exactly what the register state predicted at this moment.
 	const size_t count = getPeriodCount();
 	const double expectedCash = count == 0 ? 0.0 : getPeriodReport(count - 1).end.cash;
 
@@ -151,7 +149,7 @@ int64_t BalanceService::addOpeningReview(const QDate& date, double countedCash)
 	return id;
 }
 
-// ---------------------------------------------------------------- reading
+// reading
 
 std::vector<entry::Balance> BalanceService::getBalanceEntries(BalanceType type, const QDate& afterExclusive,
 	const std::optional<QDate>& untilInclusive) const
@@ -171,17 +169,17 @@ registerFinancials::PeriodReport BalanceService::getPeriodReport(size_t periodIn
 	if (periodIndex >= reviews.size())
 		throw std::out_of_range("BalanceService::getPeriodReport: period index out of range");
 
-	const auto& startReview = reviews[periodIndex];
+	const auto& startReview = reviews.at(periodIndex);
 	const bool isCurrent = periodIndex + 1 == reviews.size();
 
 	const QDate startDate = startReview.dateTime.date();
 	std::optional<QDate> endDate; // nullopt = open end (current period)
 	if (!isCurrent)
-		endDate = reviews[periodIndex + 1].dateTime.date();
+		endDate = reviews.at(periodIndex + 1).dateTime.date();
 
 	const DateRange range{ startDate, endDate };
 
-	// ---- cash side: counted cash at start + cash events = expected cash at end ----
+	// cash side: counted cash at start + cash events = expected cash at end
 	const Flows flows = computeFlows(range);
 	const registerFinancials::State start = buildState(startDate, startReview.countedCash, startDate);
 	const double expectedCashEnd = start.cash + flows.cashChange();
@@ -196,7 +194,7 @@ registerFinancials::PeriodReport BalanceService::getPeriodReport(size_t periodIn
 	}
 	else
 	{
-		const auto& endReview = reviews[periodIndex + 1];
+		const auto& endReview = reviews.at(periodIndex + 1);
 		end = buildState(*endDate, endReview.countedCash, endDate);
 
 		// difference is recomputed so that all identities in the report hold for the current data;
@@ -205,7 +203,7 @@ registerFinancials::PeriodReport BalanceService::getPeriodReport(size_t periodIn
 		changedSinceReview = std::abs(expectedCashEnd - endReview.expectedCash) > tolerance;
 	}
 
-	// ---- assemble ----
+	// assemble
 	registerFinancials::PeriodReport report;
 	report.start = start;
 	report.end = end;
@@ -228,7 +226,7 @@ registerFinancials::PeriodReport BalanceService::getPeriodReport(size_t periodIn
 	return report;
 }
 
-// ---------------------------------------------------------------- helpers
+//  helpers
 
 std::vector<entry::FinancialReview> BalanceService::loadReviews() const
 {

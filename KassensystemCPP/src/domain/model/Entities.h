@@ -63,6 +63,20 @@ struct DateRange
 	std::optional<QDate> untilInclusive;	// nullopt = open end (up to now)
 
 	static DateRange upTo(const std::optional<QDate>& untilInclusive) { return { std::nullopt, untilInclusive }; }
+
+	bool contains(const QDate& date) const
+	{
+		return (!afterExclusive || date > *afterExclusive) && (!untilInclusive || date <= *untilInclusive);
+	}
+
+	bool contains(const RegisterDate& booked, const QDate& dateAdded) const
+	{
+		if (!booked.isSpecial())
+			return contains(booked.date());
+		if (booked.special() == RegisterDate::Special::previous)
+			return !afterExclusive.has_value();
+		return contains(dateAdded);
+	}
 };
 
 namespace entry
@@ -427,8 +441,7 @@ namespace registerFinancials
 		}
 	};
 
-	// begin + added - removed = end; endDirect is read from the database independently,
-	// so the roll-forward can be checked against it
+	// begin + added - removed = end; endDirect is read from the database independently, so the roll-forward can be checked against it
 	struct RollForwardRow
 	{
 		double begin = 0.0;
@@ -447,7 +460,7 @@ namespace registerFinancials
 		RollForwardRow credit;			// added: deposited credit, removed: credit used up
 	};
 
-	// Cash-flow view of the period (journal entries and cash events only)
+	// cash-flow view of the period (journal entries and cash events only)
 	struct Details
 	{
 		double departmentEarnings = 0.0, departmentSpendings = 0.0;

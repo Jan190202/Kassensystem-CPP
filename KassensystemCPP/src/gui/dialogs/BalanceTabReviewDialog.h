@@ -3,6 +3,8 @@
 
 class QPlainTextEdit;
 class QLabel;
+class QDoubleSpinBox;
+class QPushButton;
 
 class BalanceTabReviewDialog : public QDialog
 {
@@ -11,7 +13,6 @@ public:
 	struct inputs
 	{
 		double countedCash;
-		double expectedCash;
 		std::string comment;
 	};
 
@@ -23,7 +24,12 @@ private:
 	void refreshResult();
 	double calculateResult() const;
 
-	QPlainTextEdit* edtText;
-	QLabel* lResultText;
-	QLabel* lResultValue;
+	QPlainTextEdit* edtCalculation;
+	QLabel* lblResultText;
+	QLabel* lblResultValue;
+	QDoubleSpinBox* edtCounted;
+	QDoubleSpinBox* edtExpected;
+	QPlainTextEdit* edtComment;
+	QPushButton* btnOK;
+	QPushButton* btnCancel;
 };

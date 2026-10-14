@@ -29,8 +29,9 @@ int64_t SqliteShareSettlementRepository::addShareSettlementEntry(const entry::Sh
 			deb << "--> returns " << query.value(0).toLongLong();
 			return query.value(0).toLongLong();
 		}
-	
-	deb << "--> failed";
+
+	deb << "--> failed: " << query.lastError().text();
+	return -1;
 }
 
 int64_t SqliteShareSettlementRepository::addShareSettlementAllocationEntry(const entry::ShareSettlementAllocation& entry)
@@ -56,7 +57,8 @@ int64_t SqliteShareSettlementRepository::addShareSettlementAllocationEntry(const
 			return query.value(0).toLongLong();
 		}
 
-	deb << "--> failed";
+	deb << "--> failed: " << query.lastError().text();
+	return -1;
 }
 
 std::vector<entry::ShareSettlementAllocation> SqliteShareSettlementRepository::getDebtEntrysShareSettlementAllocationEntries(int64_t debtEntryID) const
@@ -70,7 +72,7 @@ std::vector<entry::ShareSettlementAllocation> SqliteShareSettlementRepository::g
 		"FROM ShareSettlementAllocation "
 		"WHERE debtID = :debtEntryID "
 	);
-	query.bindValue(":debtID", debtEntryID);
+	query.bindValue(":debtEntryID", debtEntryID); // was ":debtID", which does not exist in the statement
 
 	std::vector<entry::ShareSettlementAllocation> entries;
 	if (query.exec())
@@ -84,33 +86,33 @@ std::vector<entry::ShareSettlementAllocation> SqliteShareSettlementRepository::g
 				});
 		}
 	else
-		deb << "--> failed";
+		deb << "--> failed: " << query.lastError().text();
 
 	return entries;
 }
 
-double SqliteShareSettlementRepository::getTotalAllocatedShareSettlements(const QDate& minDate) const
+double SqliteShareSettlementRepository::getTotalAllocatedShareSettlements(const DateRange& range) const
 {
 	QDebug deb = qDebug();
 	deb << "-> getTotalAllocatedShareSettlements";
 
+	// the cash moved when the settlement was added, so the settlement's dateAdded decides the period
 	QSqlQuery query;
-		query.prepare(
+	query.prepare(
 		"SELECT COALESCE(SUM(ShareSettlementAllocation.amount),0) AS total "
 		"FROM ShareSettlementAllocation "
 		"JOIN ShareSettlement ON ShareSettlementAllocation.shareSettlementID = ShareSettlement.ID "
-		"WHERE ShareSettlement.dateAdded >= :minDate "
+		"WHERE " + sqliteUtils::addedRangeClause(range, "ShareSettlement.dateAdded", "range") + " "
 	);
-	query.bindValue(":minDate", minDate.toString(Qt::ISODate));
+	sqliteUtils::bindDateRange(query, range, "range");
 
 	if (query.exec())
-	{
 		if (query.next())
 		{
 			deb << "--> returns " << query.value(0).toDouble();
 			return query.value(0).toDouble();
 		}
-	}
 
-	deb << "--> failed";
+	deb << "--> failed: " << query.lastError().text();
+	return 0.0;
 }

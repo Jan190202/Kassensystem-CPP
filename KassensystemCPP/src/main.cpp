@@ -17,6 +17,7 @@
 #include "data/sqlite/repositories/SqlitePaymentRepository.h";
 #include "data/sqlite/repositories/SqlitePersonRepository.h";
 #include "data/sqlite/repositories/SqliteShareSettlementRepository.h";
+#include "data/sqlite/repositories/SqliteFinancialReviewRepository.h";
 
 #include "data/config/PriceListLoader.h"
 #include "data/config/FinancialStateLoader.h"
@@ -83,9 +84,10 @@ int main(int argc, char* argv[])
 	CreditRepository* crRep				= new SqliteCreditRepository();
 	BalanceRepository* baRep			= new SqliteBalanceRepository();
 	ShareSettlementRepository* seRep	= new SqliteShareSettlementRepository();
-	RepositoryBundle repoBundle{ .personRepo = peRep, .consumptionRepo = coRep, .debtRepo = deRep, .paymentRepo = paRep, .creditRepo = crRep, .balanceRepo = baRep, .shareSettlementRepo = seRep };
+	FinancialReviewRepository* fiRep	= new SqliteFinancialReviewRepository();
+	RepositoryBundle repoBundle{ .personRepo = peRep, .consumptionRepo = coRep, .debtRepo = deRep, .paymentRepo = paRep, .creditRepo = crRep, .balanceRepo = baRep, .shareSettlementRepo = seRep, .financialReviewRepo = fiRep };
 
-	BalanceService			baSer(repoBundle, financialStateBefore, log);
+	BalanceService			baSer(repoBundle, log);
 	PaymentService			paSer(repoBundle, log);
 	PersonService			peSer(repoBundle, log);
 	ConsumptionService		coSer(peSer, repoBundle, priceList, log);
@@ -106,19 +108,6 @@ int main(int argc, char* argv[])
 
 	return returnValue;
 }
-
-/*
-* Architecture change:
-* - register state only defined by counted cash at the time of a financial review
-* - financial reviews are stored in a database table FinancialReview: ID, dateBooked, cashCounted, cashExpexted, comment
-* - BalanceTab:
-*	- option to switch from period to period between financial reviews (e.g. 1-2, 2-3, 3-today) 
-*	- "State Before" becomes "Begin: Review [Date]" and "State After" becomes "End: Review [Date]" or "End: today [Date]"
-*	- calculator dialog now also accomodates the financial review adding
-*	- "refresh" buttons has a clearer symbol, like "payment"
-*	- difference box also shows the difference in foreign shares
-*	- display consumption earning seperately
-*/ 
 
 /*
 * Long-Term Goals

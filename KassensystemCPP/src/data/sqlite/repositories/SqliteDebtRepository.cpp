@@ -6,6 +6,15 @@
 #include <QDebug>
 #include <vector>
 
+namespace
+{
+	// stocks are "as of" a date: only the upper bound of the passed range counts
+	QString debtBookedUpToClause(const DateRange& upTo)
+	{
+		return sqliteUtils::bookedRangeClause(upTo, "Debt.dateBooked", "Debt.dateBookedSpecial", "Debt.dateAdded", "asOf");
+	}
+}
+
 int64_t SqliteDebtRepository::addDebtEntry(const entry::Debt& entry)
 {
 	QDebug deb = qDebug();
@@ -13,10 +22,10 @@ int64_t SqliteDebtRepository::addDebtEntry(const entry::Debt& entry)
 
 	QSqlQuery query;
 	query.prepare(
-		"INSERT INTO Debt"
-		"(personID, dateBooked, dateBookedSpecial, dateAdded, amount, foreignShare)"
-		"VALUES (:personID, :dateBooked, :dateBookedSpecial, :dateAdded, :amount, :foreignShare)"
-		"RETURNING ID"
+		"INSERT INTO Debt "
+		"(personID, dateBooked, dateBookedSpecial, dateAdded, amount, foreignShare) "
+		"VALUES (:personID, :dateBooked, :dateBookedSpecial, :dateAdded, :amount, :foreignShare) "
+		"RETURNING ID "
 	);
 	query.bindValue(":personID", entry.person.personEntryID);
 	query.bindValue(":dateBooked", entry.dateBooked.toSqlDateValue());
@@ -24,7 +33,7 @@ int64_t SqliteDebtRepository::addDebtEntry(const entry::Debt& entry)
 	query.bindValue(":dateAdded", entry.dateAdded.toString(Qt::ISODate));
 	query.bindValue(":amount", entry.amount);
 	query.bindValue(":foreignShare", entry.foreignShare);
-	
+
 	if (query.exec())
 		if (query.next())
 		{
@@ -32,7 +41,8 @@ int64_t SqliteDebtRepository::addDebtEntry(const entry::Debt& entry)
 			return query.value(0).toLongLong();
 		}
 
-	deb << "--> failed";
+	deb << "--> failed: " << query.lastError().text();
+	return -1;
 }
 
 double SqliteDebtRepository::getPersonsTotal(int64_t personEntryID) const
@@ -55,7 +65,8 @@ double SqliteDebtRepository::getPersonsTotal(int64_t personEntryID) const
 			return query.value(0).toDouble();
 		}
 
-	deb << "--> failed";
+	deb << "--> failed: " << query.lastError().text();
+	return 0.0;
 }
 
 double SqliteDebtRepository::getPersonsDue(int64_t personEntryID) const
@@ -66,9 +77,9 @@ double SqliteDebtRepository::getPersonsDue(int64_t personEntryID) const
 	QSqlQuery query;
 	query.prepare(
 		"WITH TotalDebt AS ( "
-			"SELECT COALESCE(SUM(Debt.amount), 0) AS debt "
-			"FROM Debt "
-			"WHERE Debt.personID = :personEntryID "
+		"SELECT COALESCE(SUM(Debt.amount), 0) AS debt "
+		"FROM Debt "
+		"WHERE Debt.personID = :personEntryID "
 		"), "
 		"TotalPaid AS ( "
 		"	SELECT COALESCE(SUM(PaymentAllocation.amount), 0) AS paid "
@@ -88,7 +99,8 @@ double SqliteDebtRepository::getPersonsDue(int64_t personEntryID) const
 			return query.value(0).toDouble();
 		}
 
-	deb << "--> failed";
+	deb << "--> failed: " << query.lastError().text();
+	return 0.0;
 }
 
 double SqliteDebtRepository::getPersonsPaid(int64_t personEntryID) const
@@ -112,10 +124,11 @@ double SqliteDebtRepository::getPersonsPaid(int64_t personEntryID) const
 			return query.value(0).toDouble();
 		}
 
-	deb << "--> failed";
+	deb << "--> failed: " << query.lastError().text();
+	return 0.0;
 }
 
-double SqliteDebtRepository::getTotalShare(FinancialShare share, const QDate& minDate) const
+double SqliteDebtRepository::getTotalShare(FinancialShare share, const DateRange& range) const
 {
 	QDebug deb = qDebug();
 	deb << "-> getTotalShare";
@@ -134,20 +147,20 @@ double SqliteDebtRepository::getTotalShare(FinancialShare share, const QDate& mi
 		break;
 	}
 
-	QString compClause = sqliteUtils::registerDateCompareClause(
-		sqliteUtils::Op::largerOrEq,
-		RegisterDate{ minDate },
+	QString rangeClause = sqliteUtils::bookedRangeClause(
+		range,
 		"Debt.dateBooked",
 		"Debt.dateBookedSpecial",
-		":minDate");
-	
+		"Debt.dateAdded",
+		"range");
+
 	QSqlQuery query;
 	query.prepare(
 		"SELECT COALESCE(SUM(Debt.amount * " + shareString + "),0) AS share "
 		"FROM Debt "
-		"WHERE " + compClause + " "
+		"WHERE " + rangeClause + " "
 	);
-	query.bindValue(":minDate", minDate.toString(Qt::ISODate));
+	sqliteUtils::bindDateRange(query, range, "range");
 
 	if (query.exec())
 		if (query.next())
@@ -156,24 +169,39 @@ double SqliteDebtRepository::getTotalShare(FinancialShare share, const QDate& mi
 			return query.value(0).toDouble();
 		}
 
-	deb << "--> failed";
+	deb << "--> failed: " << query.lastError().text();
+	return 0.0;
 }
 
 double SqliteDebtRepository::getForeignDue() const
 {
-	QDebug deb = qDebug();
-	deb << "-> getForeignDue";
+	return getForeignDue(DateRange{}); // right now: no upper bound
+}
 
+double SqliteDebtRepository::getForeignDue(const DateRange& range) const
+{
+	QDebug deb = qDebug();
+	deb << "-> getForeignDue(range)";
+
+	const DateRange upTo = DateRange::upTo(range.untilInclusive);
+	const QString debtClause = debtBookedUpToClause(upTo);
+	const QString settlementClause = sqliteUtils::addedRangeClause(upTo, "ShareSettlement.dateAdded", "asOf");
+
+	// foreign share of all debts booked up to the date, minus settlement allocations (to those debts)
+	// whose settlement was added up to the date
 	QSqlQuery query;
 	query.prepare(
-		"WITH SettledShares AS ( "
-			"SELECT COALESCE(SUM(ShareSettlement.amount),0) as total "
-			"FROM ShareSettlement "
-		") "
-		"SELECT ROUND(COALESCE(SUM(Debt.amount * Debt.foreignShare),0) - SettledShares.total,3) AS foreignDue "
-		"FROM Debt "
-		"CROSS JOIN SettledShares"
+		"SELECT ROUND( "
+		"COALESCE((SELECT SUM(Debt.amount * Debt.foreignShare) FROM Debt WHERE " + debtClause + "), 0) - "
+		"COALESCE(( "
+		"SELECT SUM(ShareSettlementAllocation.amount) "
+		"FROM ShareSettlementAllocation "
+		"JOIN Debt ON ShareSettlementAllocation.debtID = Debt.ID "
+		"JOIN ShareSettlement ON ShareSettlementAllocation.shareSettlementID = ShareSettlement.ID "
+		"WHERE " + debtClause + " AND " + settlementClause + " "
+		"), 0), 6) AS foreignDue "
 	);
+	sqliteUtils::bindDateRange(query, upTo, "asOf");
 
 	if (query.exec())
 		if (query.next())
@@ -182,7 +210,44 @@ double SqliteDebtRepository::getForeignDue() const
 			return query.value(0).toDouble();
 		}
 
-	deb << "--> failed";
+	deb << "--> failed: " << query.lastError().text();
+	return 0.0;
+}
+
+double SqliteDebtRepository::getOpenDebt(const DateRange& range) const
+{
+	QDebug deb = qDebug();
+	deb << "-> getOpenDebt";
+
+	const DateRange upTo = DateRange::upTo(range.untilInclusive);
+	const QString debtClause = debtBookedUpToClause(upTo);
+	const QString paymentClause = sqliteUtils::addedRangeClause(upTo, "Payment.dateAdded", "asOf");
+
+	// amount of all debts booked up to the date, minus payment allocations (to those debts)
+	// whose payment was added up to the date; overpayment tips are not allocations and stay out
+	QSqlQuery query;
+	query.prepare(
+		"SELECT ROUND( "
+		"COALESCE((SELECT SUM(Debt.amount) FROM Debt WHERE " + debtClause + "), 0) - "
+		"COALESCE(( "
+		"SELECT SUM(PaymentAllocation.amount) "
+		"FROM PaymentAllocation "
+		"JOIN Debt ON PaymentAllocation.debtID = Debt.ID "
+		"JOIN Payment ON PaymentAllocation.paymentID = Payment.ID "
+		"WHERE " + debtClause + " AND " + paymentClause + " "
+		"), 0), 6) AS openDebt "
+	);
+	sqliteUtils::bindDateRange(query, upTo, "asOf");
+
+	if (query.exec())
+		if (query.next())
+		{
+			deb << "--> returns " << query.value(0).toDouble();
+			return query.value(0).toDouble();
+		}
+
+	deb << "--> failed: " << query.lastError().text();
+	return 0.0;
 }
 
 std::vector<entry::Outstanding> SqliteDebtRepository::getPersonsOutstandingEntries(int64_t personEntryID, FilterType type) const
@@ -192,13 +257,13 @@ std::vector<entry::Outstanding> SqliteDebtRepository::getPersonsOutstandingEntri
 
 	QString sqlString;
 	if (type == FilterType::omitFullyPaid) sqlString = " AND (Debt.amount - COALESCE(GroupedPayments.paid,0)) > 0";
-	
+
 	QSqlQuery query;
 	query.prepare(
 		"WITH GroupedPayments AS ( "
-			"SELECT PaymentAllocation.debtID AS debtID, SUM(PaymentAllocation.amount) AS paid "
-			"FROM PaymentAllocation "
-			"GROUP BY PaymentAllocation.debtID "
+		"SELECT PaymentAllocation.debtID AS debtID, SUM(PaymentAllocation.amount) AS paid "
+		"FROM PaymentAllocation "
+		"GROUP BY PaymentAllocation.debtID "
 		") "
 		"SELECT Debt.ID, Debt.dateBooked, Debt.dateBookedSpecial, Debt.amount, Debt.amount - COALESCE(GroupedPayments.paid,0) AS remaining "
 		"FROM Debt "
@@ -212,7 +277,7 @@ std::vector<entry::Outstanding> SqliteDebtRepository::getPersonsOutstandingEntri
 		while (query.next())
 			entries.emplace_back(getOutstandingEntryFromQuery(query));
 	else
-		deb << "--> failed";
+		deb << "--> failed: " << query.lastError().text();
 
 	return entries;
 }
@@ -229,14 +294,14 @@ std::vector<entry::Outstanding> SqliteDebtRepository::getForeignShareOutstanding
 	QSqlQuery query;
 	query.prepare(
 		"WITH GroupedShareSettlements AS ( "
-			"SELECT ShareSettlementAllocation.debtID AS debtID, SUM(ShareSettlementAllocation.amount) AS settled "
-			"FROM ShareSettlementAllocation "
-			"GROUP BY ShareSettlementAllocation.debtID "
+		"SELECT ShareSettlementAllocation.debtID AS debtID, SUM(ShareSettlementAllocation.amount) AS settled "
+		"FROM ShareSettlementAllocation "
+		"GROUP BY ShareSettlementAllocation.debtID "
 		") "
 		"SELECT "
-			"Debt.ID, Debt.dateBooked, Debt.dateBookedSpecial, "
-			"Debt.amount * Debt.foreignShare AS amount, "
-			"Debt.amount * Debt.foreignShare - COALESCE(GroupedShareSettlements.settled, 0) AS remaining "
+		"Debt.ID, Debt.dateBooked, Debt.dateBookedSpecial, "
+		"Debt.amount * Debt.foreignShare AS amount, "
+		"Debt.amount * Debt.foreignShare - COALESCE(GroupedShareSettlements.settled, 0) AS remaining "
 		"FROM Debt "
 		"LEFT OUTER JOIN GroupedShareSettlements ON Debt.ID = GroupedShareSettlements.debtID "
 		"WHERE Debt.foreignShare > 0" + filter
@@ -247,7 +312,7 @@ std::vector<entry::Outstanding> SqliteDebtRepository::getForeignShareOutstanding
 		while (query.next())
 			entries.emplace_back(getOutstandingEntryFromQuery(query));
 	else
-		deb << "--> failed";
+		deb << "--> failed: " << query.lastError().text();
 
 	return entries;
 }
@@ -256,9 +321,9 @@ entry::Outstanding SqliteDebtRepository::getOutstandingEntryFromQuery(const QSql
 {
 	return entry::Outstanding{
 		.debtEntryID = query.value("ID").toLongLong(),
-		.dateBooked = 
-			!query.value("dateBooked").isNull() ? 
-				RegisterDate{query.value("dateBooked").toDate()} : 
+		.dateBooked =
+			!query.value("dateBooked").isNull() ?
+				RegisterDate{query.value("dateBooked").toDate()} :
 				RegisterDate{static_cast<RegisterDate::Special>(query.value("dateBookedSpecial").toInt())},
 		.amount = query.value("amount").toDouble(),
 		.remaining = query.value("remaining").toDouble()
