@@ -68,6 +68,7 @@ void ManualTab::initialize()
 	tableView->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
 	tableView->setSelectionBehavior(QAbstractItemView::SelectRows);
 	tableView->setSelectionMode(QAbstractItemView::SingleSelection);
+	tableView->setItemDelegate(new DoubleDelegate(tableView)); // for >2 decimal editing
 
 	auto* mainLayout = new QVBoxLayout(this);
 	mainLayout->addLayout(filterLayout);
