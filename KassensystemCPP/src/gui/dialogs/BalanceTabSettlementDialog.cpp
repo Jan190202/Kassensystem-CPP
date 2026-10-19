@@ -1,5 +1,6 @@
 #include "gui/dialogs/BalanceTabSettlementDialog.h"
 #include "qtutils/QtConversions.h"
+#include "gui/IconLoader.h"
 #include <QDoubleSpinBox>
 #include <QDateEdit>
 #include <QCheckBox>
@@ -12,6 +13,7 @@
 BalanceTabSettlementDialog::BalanceTabSettlementDialog(QWidget* parent) : QDialog(parent)
 {
 	setWindowTitle("Fremdanteil begleichen");
+	setWindowIcon(iconLoader::getIcon("payment.png"));
 
 	QFont boldFont = font();
 	boldFont.setBold(true);

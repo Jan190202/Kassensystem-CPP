@@ -52,11 +52,12 @@ int64_t BalanceService::addCredit(const entry::Person& person, double amount, co
 			.description = description
 	};
 
+	int64_t id = creditRepo->addCreditEntry(entry);
 	log.record(PendingChangeLog::ChangeType::add, entry);
-	return creditRepo->addCreditEntry(entry);
+	return id;
 }
 
-AddSettlementException BalanceService::addShareSettlement(request::ShareSettlement request)
+AddSettlementException BalanceService::addShareSettlement(const request::ShareSettlement& request)
 {
 	if (request.amount < 0)
 		return AddSettlementException::amountNegative;
@@ -151,8 +152,7 @@ int64_t BalanceService::addOpeningReview(const QDate& date, double countedCash)
 
 // reading
 
-std::vector<entry::Balance> BalanceService::getBalanceEntries(BalanceType type, const QDate& afterExclusive,
-	const std::optional<QDate>& untilInclusive) const
+std::vector<entry::Balance> BalanceService::getBalanceEntries(BalanceType type, const QDate& afterExclusive, const std::optional<QDate>& untilInclusive) const
 {
 	// journal entries only; consumption is reported separately (ConsumptionSummary)
 	return balanceRepo->getBalanceEntries(type, DateRange{ afterExclusive, untilInclusive });
@@ -277,9 +277,7 @@ registerFinancials::State BalanceService::buildState(const QDate& date, double c
 	return state;
 }
 
-registerFinancials::ConsumptionSummary BalanceService::buildConsumption(const DateRange& range, const Flows& flows,
-	const registerFinancials::State& start,
-	const registerFinancials::State& end) const
+registerFinancials::ConsumptionSummary BalanceService::buildConsumption(const DateRange& range, const Flows& flows, const registerFinancials::State& start, const registerFinancials::State& end) const
 {
 	const double allShares = debtRepo->getTotalShare(FinancialShare::all, range);
 	const double ownShare = debtRepo->getTotalShare(FinancialShare::own, range);

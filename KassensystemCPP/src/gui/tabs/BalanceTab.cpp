@@ -16,6 +16,7 @@
 #include <QTableWidget>
 #include <QVBoxLayout>
 #include <QDebug>
+#include <QElapsedTimer>
 #include <string>
 #include <array>
 #include <algorithm>
@@ -51,7 +52,7 @@ namespace
 	QString popupSumRow(double sum, bool consistent, int decimals = 2)
 	{
 		const QString color = consistent ? "#2e8b57" : "#c0392b";
-		const QString text = consistent ? "&#10004; korrekt" : "&#10008; inkorrekt";
+		const QString text = consistent ? "korrekt" : "inkorrekt";
 
 		return QString(
 			"<tr><td colspan=\"3\"><hr></td></tr>"
@@ -95,9 +96,11 @@ void BalanceTab::initialize()
 	btnReview->setIcon(iconLoader::getIcon("check.png"));
 	btnReview->setToolTip(QStringLiteral("Kassensturz durchführen"));
 
-	btnPrevPeriod = new QPushButton(QStringLiteral("\u25C0"), this);
+	btnPrevPeriod = new QPushButton(this);
+	btnPrevPeriod->setIcon(iconLoader::getIcon("arrowLeft.png"));
 	btnPrevPeriod->setToolTip(QStringLiteral("Vorheriger Zeitraum"));
-	btnNextPeriod = new QPushButton(QStringLiteral("\u25B6"), this);
+	btnNextPeriod = new QPushButton(this);
+	btnNextPeriod->setIcon(iconLoader::getIcon("arrowRight.png"));
 	btnNextPeriod->setToolTip(QStringLiteral("Nächster Zeitraum"));
 
 	btnSettleForeign->setFixedSize(rowHeight, rowHeight);
@@ -112,8 +115,7 @@ void BalanceTab::initialize()
 	tblSpendings->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
 
 	tblConsumption = new QTableWidget(3, 5, this);
-	tblConsumption->setHorizontalHeaderLabels(
-		{ QString(), QStringLiteral("Beginn"), QStringLiteral("+ Zugang"), QStringLiteral("- Abgang"), QStringLiteral("Ende") });
+	tblConsumption->setHorizontalHeaderLabels({ QString(), QStringLiteral("Beginn"), QStringLiteral("+ Zugang"), QStringLiteral("- Abgang"), QStringLiteral("Ende") });
 	tblConsumption->verticalHeader()->hide();
 	tblConsumption->verticalHeader()->setDefaultSectionSize(rowHeight);
 	tblConsumption->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
@@ -398,7 +400,7 @@ void BalanceTab::showNextPeriod()
 
 void BalanceTab::refresh()
 {
-	periodCount = 0; // balanceService.getPeriodCount(); // TBD
+	periodCount = balanceService.getPeriodCount(); 
 
 	if (periodCount == 0)
 	{
@@ -409,7 +411,7 @@ void BalanceTab::refresh()
 	if (periodIndex < 0 || static_cast<size_t>(periodIndex) >= periodCount)
 		periodIndex = static_cast<int>(periodCount) - 1;
 
-	report = registerFinancials::PeriodReport{}; // balanceService.getPeriodReport(static_cast<size_t>(periodIndex)); // TBD
+	report = balanceService.getPeriodReport(static_cast<size_t>(periodIndex));
 
 	refreshNavigation();
 	refreshTables();
@@ -453,8 +455,7 @@ void BalanceTab::refreshNavigation()
 
 	lPeriodWarning->setVisible(report.changedSinceReview);
 	if (report.changedSinceReview)
-		lPeriodWarning->setText(QStringLiteral("&#9888; Seit dem Kassensturz wurden Einträge in diesem Zeitraum verändert "
-			"(erwartete Kasse weicht vom damals gespeicherten Wert ab)"));
+		lPeriodWarning->setText(QStringLiteral("Seit dem Kassensturz wurden Einträge in diesem Zeitraum verändert (erwartete Kasse weicht vom damals gespeicherten Wert ab)"));
 }
 
 void BalanceTab::setPeriodActionsEnabled(bool enabled)
@@ -478,7 +479,7 @@ void BalanceTab::refreshTables()
 		table->clearContents();
 
 		// entries booked after the start review, up to and including the end review (or open end for the current period)
-		std::vector<entry::Balance> bEntries = {}; // balanceService.getBalanceEntries(type, report.periodStart, report.periodEnd); // TBD
+		std::vector<entry::Balance> bEntries = balanceService.getBalanceEntries(type, report.periodStart, report.periodEnd);
 
 		std::sort(bEntries.begin(), bEntries.end(), [](const entry::Balance& a, const entry::Balance& b)
 			{
@@ -552,11 +553,11 @@ void BalanceTab::refreshConsumption()
 	if (std::abs(report.details.cashCorrection) > 1e-9)
 		bridgeText += QStringLiteral(" %1 Kassendifferenz %2")
 		.arg(report.details.cashCorrection >= 0 ? "+" : "-", currency(std::abs(report.details.cashCorrection)));
-	bridgeText += QStringLiteral(" = <b>Veränderung Bestand %1</b> <span style=\"color:%2; font-weight:bold;\">%3</span>")
-		.arg(currency(bridge, 3), bridgeOk ? "#2e8b57" : "#c0392b", bridgeOk ? "&#10004;" : "&#10008;");
+	bridgeText += QStringLiteral(" = <b>Veränderung Bestand %1</b> (<span style=\"color:%2; font-weight:bold;\">%3</span>)")
+		.arg(currency(bridge, 3), bridgeOk ? "#2e8b57" : "#c0392b", bridgeOk ? "korrekt" : "inkorrekt");
 
 	lConsumptionSummary->setText(
-		QStringLiteral("Verbrauch gesamt: %1 &middot; davon Abteilungsanteil: %2 &middot; davon Fremdanteil: %3<br>%4")
+		QStringLiteral("Verbrauch gesamt: %1; davon Abteilungsanteil: %2; davon Fremdanteil: %3<br>%4")
 		.arg(currency(c.totalConsumption), currency(c.departmentShare, 3), currency(c.foreignShare.added, 3), bridgeText));
 }
 
