@@ -41,9 +41,10 @@ namespace request
 		std::string description;
 	};
 
-	struct ShareSettlement // specifically no date, as allocation only ever done using the current debt entries, aren't changed afterwards in an earlier settlement comes in
+	struct ShareSettlement // date is for advanced only and has no effect on allocations, its solely a replacer for dateAdded
 	{
 		double amount;
 		std::string comment;
+		std::optional<QDate> dateAddedAdvanced;
 	};
 }

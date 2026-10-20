@@ -155,7 +155,10 @@ AddSettlementException BalanceService::addShareSettlement(request::ShareSettleme
 
 	entry::ShareSettlement entry{
 		.shareSettlementEntryID = 0,
-		.dateAdded = QDate::currentDate(),
+		.dateAdded = 
+			request.dateAddedAdvanced.has_value() ? 
+				request.dateAddedAdvanced.value() : 
+				QDate::currentDate(),
 		.amount = request.amount,
 		.comment = request.comment
 	};

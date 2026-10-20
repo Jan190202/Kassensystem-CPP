@@ -3,12 +3,14 @@
 #include "domain/model/Entities.h"
 #include <QDialog>
 #include <string>
+#include <optional>
 
 class QDoubleSpinBox;
 class QDateEdit;
 class QCheckBox;
 class QComboBox;
 class QPlainTextEdit;
+class QCheckBox;
 
 class BalanceTabSettlementDialog : public QDialog
 {
@@ -18,6 +20,7 @@ public:
 	{
 		double amount;
 		std::string comment;
+		std::optional<QDate> dateAddedAdvanced;
 	};
 
 	BalanceTabSettlementDialog(QWidget* parent);
@@ -27,4 +30,6 @@ public:
 private:
 	QDoubleSpinBox*		edtAmount;
 	QPlainTextEdit*		edtComment;
+	QDateEdit*			edtDate;
+	QCheckBox*			edtIsAdvanced;
 };

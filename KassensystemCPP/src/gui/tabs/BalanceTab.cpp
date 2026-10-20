@@ -391,7 +391,8 @@ void BalanceTab::addSettlement()
 	auto returnMsg = balanceService.addShareSettlement(
 		request::ShareSettlement{
 			.amount = inputs.amount,
-			.comment = inputs.comment 
+			.comment = inputs.comment,
+			.dateAddedAdvanced = inputs.dateAddedAdvanced
 		});
 
 	Q_EMIT instantChangesMade();
