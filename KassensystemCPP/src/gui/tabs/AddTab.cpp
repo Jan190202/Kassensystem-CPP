@@ -40,7 +40,7 @@ void AddTab::initialize()
 
 	specialDateCheck = new QCheckBox("Sonstiger Zeitraum:", this);
 	specialDateCheck->setChecked(false);
-	specialDateCheck->setEnabled(false);
+	specialDateCheck->setEnabled(true);
 
 	std::map<QString, RegisterDate::Special> specialMap = 
 	{
