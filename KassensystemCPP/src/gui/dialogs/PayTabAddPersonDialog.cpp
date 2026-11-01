@@ -1,4 +1,5 @@
 #include "gui/dialogs/PayTabAddPersonDialog.h"
+#include "gui/IconLoader.h"
 #include <QDialog>
 #include <QWidget>
 #include <QPushButton>
@@ -15,6 +16,7 @@
 PayTabAddPersonDialog::PayTabAddPersonDialog(QWidget* parent) : QDialog(parent)
 {
 	setWindowTitle("Eintrag hinzufügen");
+	setWindowIcon(iconLoader::getIcon("add-user.png"));
 	
 	QFont boldFont = font();
 	boldFont.setBold(true);

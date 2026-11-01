@@ -1,5 +1,6 @@
 #include "gui/dialogs/PayTabAddCreditDialog.h"
 #include "qtutils/QtConversions.h"
+#include "gui/IconLoader.h"
 #include <QDialog>
 #include <QWidget>
 #include <QPushButton>
@@ -20,6 +21,7 @@
 PayTabAddCreditDialog::PayTabAddCreditDialog(QWidget* parent) : QDialog(parent)
 {
 	setWindowTitle("Guthaben hinzufügen");
+	setWindowIcon(iconLoader::getIcon("plus.png"));
 
 	QFont boldFont = font();
 	boldFont.setBold(true);

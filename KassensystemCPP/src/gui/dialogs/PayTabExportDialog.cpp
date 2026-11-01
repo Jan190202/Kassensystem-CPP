@@ -1,4 +1,5 @@
 #include "gui/dialogs/PayTabExportDialog.h"
+#include "gui/IconLoader.h"
 #include <QPushButton>
 #include <QRadioButton>
 #include <QButtonGroup>
@@ -12,6 +13,7 @@
 PayTabExportDialog::PayTabExportDialog(QWidget* parent) : QDialog(parent)
 {
 	setWindowTitle("Ausstände exportieren");
+	setWindowIcon(iconLoader::getIcon("export.png"));
 	
 	// export option buttons
 	auto* btnClipboard = new QPushButton("Zwischenablage");
