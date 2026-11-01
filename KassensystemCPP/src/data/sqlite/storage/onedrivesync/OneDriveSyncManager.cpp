@@ -126,7 +126,7 @@ void OneDriveSyncManager::pushToBackup()
 		fs::create_directories(targetRemoteBackup);
 	}
 
-	std::string backupDatabaseFileName = "registerData_" + QDateTime::currentDateTime().toString("yy-MM-dd_hh'h'mm'm'ss's'").toStdString() + ".db"; // e.g. registerData_26-09-13_13h27m03s.db
+	std::string backupDatabaseFileName = "registerData_" + QDateTime::currentDateTime().toString("yy'y'MM'm'dd'd'_hh'h'mm'm'ss's'").toStdString() + ".db"; // e.g. registerData_26y09m13d_13h27m03s.db
 	remoteBackupDatabasePath = (targetRemoteBackup / backupDatabaseFileName).make_preferred();
 
 	if (fs::exists(remoteBackupDatabasePath)) // in the rare case multiple backups are made in the same second, the last one wins
