@@ -17,6 +17,7 @@
 #include "data/sqlite/repositories/SqlitePaymentRepository.h";
 #include "data/sqlite/repositories/SqlitePersonRepository.h";
 #include "data/sqlite/repositories/SqliteShareSettlementRepository.h";
+#include "data/sqlite/repositories/SqliteFinancialReviewRepository.h";
 
 #include "data/config/PriceListLoader.h"
 #include "data/config/FinancialStateLoader.h"
@@ -83,9 +84,10 @@ int main(int argc, char* argv[])
 	CreditRepository* crRep				= new SqliteCreditRepository();
 	BalanceRepository* baRep			= new SqliteBalanceRepository();
 	ShareSettlementRepository* seRep	= new SqliteShareSettlementRepository();
-	RepositoryBundle repoBundle{ .personRepo = peRep, .consumptionRepo = coRep, .debtRepo = deRep, .paymentRepo = paRep, .creditRepo = crRep, .balanceRepo = baRep, .shareSettlementRepo = seRep };
+	FinancialReviewRepository* fiRep	= new SqliteFinancialReviewRepository();
+	RepositoryBundle repoBundle{ .personRepo = peRep, .consumptionRepo = coRep, .debtRepo = deRep, .paymentRepo = paRep, .creditRepo = crRep, .balanceRepo = baRep, .shareSettlementRepo = seRep, .financialReviewRepo = fiRep };
 
-	BalanceService			baSer(repoBundle, financialStateBefore, log);
+	BalanceService			baSer(repoBundle, log);
 	PaymentService			paSer(repoBundle, log);
 	PersonService			peSer(repoBundle, log);
 	ConsumptionService		coSer(peSer, repoBundle, priceList, log);
@@ -106,17 +108,6 @@ int main(int argc, char* argv[])
 
 	return returnValue;
 }
-
-/*
-* Ideas:
-* - general architecture:
-*		- predefining cash, foreign cash, savings in state before, previous debts and credits all at the same time is redundant
-*				-> cash at specific time stamp would be enough as database entries from before arent cleared
-*				-> allow cash amount validation at any time, which either: refreshes state before, or, better: create new database saving the validation checks
-*				-> balance statistics are still displayed from beginning of year (if avaliable) to today
-*				-> currently disabled special date, as "unknown" should be counted as after date of state before -> cleanup after architecture change
-*		- remove consumption earnings from earnings table, display them in seperate section with more information
-*/ 
 
 /*
 * Long-Term Goals

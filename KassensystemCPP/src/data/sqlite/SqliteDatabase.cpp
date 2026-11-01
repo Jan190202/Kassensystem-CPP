@@ -45,6 +45,10 @@ const std::vector<SqliteDatabase::TableDef>& SqliteDatabase::tableDefinitions() 
 		{ "ShareSettlementAllocation",
 			"ID INTEGER PRIMARY KEY, debtID INTEGER NOT NULL REFERENCES Debt(ID), "
 			"shareSettlementID INTEGER NOT NULL REFERENCES ShareSettlement(ID), amount REAL NOT NULL" },
+		{ "FinancialReview",
+			"ID INTEGER PRIMARY KEY, dateTime TEXT NOT NULL, "
+			"countedCash REAL NOT NULL, expectedCash REAL NOT NULL, "
+			"comment TEXT"}
 	};
 
 	return defs;

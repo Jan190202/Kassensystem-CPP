@@ -47,4 +47,10 @@ namespace request
 		std::string comment;
 		std::optional<QDate> dateAddedAdvanced;
 	};
+
+	struct FinancialReview // specifically no date and no expected cash: the service stamps the current time and computes the expectation itself, so neither can be passed in stale or wrong
+	{
+		double countedCash;
+		std::string comment;
+	};
 }

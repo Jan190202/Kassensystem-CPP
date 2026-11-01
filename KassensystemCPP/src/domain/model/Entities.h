@@ -10,6 +10,11 @@
 #include <cstdint>
 #include <variant>
 #include <map>
+#include <optional>
+#include <array>
+#include <vector>
+#include <sstream>
+#include <format>
 
 class RegisterDate
 {
@@ -50,6 +55,29 @@ public:
 
 private:
 	std::variant<QDate, Special> data;
+};
+
+struct DateRange
+{
+	std::optional<QDate> afterExclusive;	// nullopt = from the beginning
+	std::optional<QDate> untilInclusive;	// nullopt = open end (up to now)
+
+	static DateRange upTo(const std::optional<QDate>& untilInclusive) { return { std::nullopt, untilInclusive }; }
+
+	bool contains(const QDate& date) const
+	{
+		return (!afterExclusive || date > *afterExclusive) && (!untilInclusive || date <= *untilInclusive);
+	}
+
+	// attention: data/sqlite/sqliteutils/SqliteUtils.h -> bookedRangeClause() mirrors this date arithmetic; only change both implementations equally
+	bool contains(const RegisterDate& booked, const QDate& dateAdded) const
+	{
+		if (!booked.isSpecial())
+			return contains(booked.date());
+		if (booked.special() == RegisterDate::Special::previous)
+			return !afterExclusive.has_value();
+		return contains(dateAdded);
+	}
 };
 
 namespace entry
@@ -342,6 +370,34 @@ namespace entry
 			return debug;
 		}
 	};
+
+	struct FinancialReview
+	{
+		int64_t financialReviewEntryID;
+		QDateTime dateTime;
+		double countedCash;
+		double expectedCash;	// audit only, written by the service
+		std::string comment;
+
+		friend std::ostream& operator<<(std::ostream& out, const FinancialReview& entry)
+		{
+			out << "financialReviewEntryID: " << entry.financialReviewEntryID << ", "
+				<< "dateTime: " << entry.dateTime.toString(Qt::ISODate).toStdString() << ", "
+				<< "countedCash: " << entry.countedCash << ", "
+				<< "expectedCash: " << entry.expectedCash << ", "
+				<< "comment: " << entry.comment;
+
+			return out;
+		}
+
+		friend QDebug operator<<(QDebug debug, const FinancialReview& entry)
+		{
+			std::ostringstream oss;
+			oss << entry;
+			debug.nospace() << QString::fromStdString(oss.str());
+			return debug;
+		}
+	};
 }
 
 namespace exportType
@@ -358,7 +414,12 @@ namespace registerFinancials
 	struct State
 	{
 		QDate date;
-		double cash, savings, ownCash, foreignCash;
+		double cash = 0.0;			// counted cash (review) or expected cash (current state)
+		double foreignCash = 0.0;	
+		double ownCash = 0.0;		
+		double debt = 0.0;			
+		double credit = 0.0;		
+		double savings = 0.0;		
 
 		friend std::ostream& operator<<(std::ostream& out, const State& state)
 		{
@@ -366,7 +427,9 @@ namespace registerFinancials
 				<< "savings: " << state.savings << ", "
 				<< "cash: " << state.cash << ", "
 				<< "foreignCash: " << state.foreignCash << ", "
-				<< "ownCash: " << state.ownCash;
+				<< "ownCash: " << state.ownCash << ", "
+				<< "debt: " << state.debt << ", "
+				<< "credit: " << state.credit;
 			return out;
 		}
 
@@ -379,21 +442,47 @@ namespace registerFinancials
 		}
 	};
 
-	struct Report
+	// begin + added - removed = end; endDirect is read from the database independently, so the roll-forward can be checked against it
+	struct RollForwardRow
 	{
-		struct Details
-		{
-			double departmentEarnings, departmentSpendings;
-			double consumptionAllShares, consumptionOwnShare, consumptionForeignShare;
-			double paidDebt, settledValue, depositedCredit;
-			double consumptionAllSharesAllTime, consumptionOwnShareAllTime, consumptionForeignShareAllTime;
-			double paidDebtAllTime, depositedCreditAllTime;
-		};
+		double begin = 0.0;
+		double added = 0.0;
+		double removed = 0.0;
+		double endDirect = 0.0;
+	};
 
-		registerFinancials::State stateBefore, stateAfter;
-		double savingsDiff, cashDiff;
-		double totalEarnings, totalSpendings;
+	struct ConsumptionSummary
+	{
+		double totalConsumption = 0.0;	
+		double departmentShare = 0.0;	
+
+		RollForwardRow debt;			// added: consumption, removed: paid
+		RollForwardRow foreignShare;	// added: club share of consumption, removed: settled with the club
+		RollForwardRow credit;			// added: deposited credit, removed: credit used up
+	};
+
+	// cash-flow view of the period (journal entries and cash events only)
+	struct Details
+	{
+		double departmentEarnings = 0.0, departmentSpendings = 0.0;
+		double paidDebt = 0.0, settledValue = 0.0, depositedCredit = 0.0;
+		double cashCorrection = 0.0;	// counted - expected cash at the end review; 0 for the current period
+	};
+
+	struct PeriodReport
+	{
+		State start, end;
+
+		QDate periodStart;						// entries are filtered by dateBooked > periodStart ...
+		std::optional<QDate> periodEnd;			// ... and <= periodEnd (nullopt = open end, current period)
+
+		bool isCurrent = false;					// period runs from the last review to now
+		bool changedSinceReview = false;		// recomputed expected cash != expectedCash stored at the end review
+
+		double totalEarnings = 0.0, totalSpendings = 0.0;	// journal entries only
+
 		Details details;
+		ConsumptionSummary consumption;
 	};
 }
 
@@ -437,6 +526,7 @@ public:
 	void record(ChangeType, const entry::Payment&);
 	void record(ChangeType, const entry::Person&);
 	void record(ChangeType, const entry::ShareSettlement&);
+	void record(ChangeType, const entry::FinancialReview&);
 	void record(const std::string& description, std::optional<ChangeType> type = std::nullopt);
 
 	bool hasPendingChanges() const;

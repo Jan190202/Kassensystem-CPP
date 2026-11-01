@@ -10,13 +10,13 @@
 #include "domain/services/PaymentService.h"
 #include "domain/services/BalanceService.h"
 
-#include "data/sqlite/repositories/SqliteBalanceRepository.h";
-#include "data/sqlite/repositories/SqliteConsumptionRepository.h";
-#include "data/sqlite/repositories/SqliteCreditRepository.h";
-#include "data/sqlite/repositories/SqliteDebtRepository.h";
-#include "data/sqlite/repositories/SqlitePaymentRepository.h";
-#include "data/sqlite/repositories/SqlitePersonRepository.h";
-#include "data/sqlite/repositories/SqliteShareSettlementRepository.h";
+#include "data/sqlite/repositories/SqliteBalanceRepository.h"
+#include "data/sqlite/repositories/SqliteConsumptionRepository.h"
+#include "data/sqlite/repositories/SqliteCreditRepository.h"
+#include "data/sqlite/repositories/SqliteDebtRepository.h"
+#include "data/sqlite/repositories/SqlitePaymentRepository.h"
+#include "data/sqlite/repositories/SqlitePersonRepository.h"
+#include "data/sqlite/repositories/SqliteShareSettlementRepository.h"
 
 #include "data/config/PriceListLoader.h"
 #include "data/config/FinancialStateLoader.h"

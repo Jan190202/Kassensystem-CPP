@@ -23,7 +23,7 @@ public:
 		std::optional<QDate> dateAddedAdvanced;
 	};
 
-	BalanceTabSettlementDialog(QWidget* parent);
+	BalanceTabSettlementDialog(QWidget* parent, double amountSuggestion = 0.0);
 
 	BalanceTabSettlementDialog::inputs getInputs() const;
 

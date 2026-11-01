@@ -1,5 +1,6 @@
 #include "gui/dialogs/BalanceTabSettlementDialog.h"
 #include "qtutils/QtConversions.h"
+#include "gui/IconLoader.h"
 #include <QDoubleSpinBox>
 #include <QDateEdit>
 #include <QCheckBox>
@@ -9,9 +10,10 @@
 #include <QFormLayout>
 #include <QLabel>
 
-BalanceTabSettlementDialog::BalanceTabSettlementDialog(QWidget* parent) : QDialog(parent)
+BalanceTabSettlementDialog::BalanceTabSettlementDialog(QWidget* parent, double amountSuggestion) : QDialog(parent)
 {
 	setWindowTitle("Fremdanteil begleichen");
+	setWindowIcon(iconLoader::getIcon("payment.png"));
 
 	QFont boldFont = font();
 	boldFont.setBold(true);
@@ -22,6 +24,7 @@ BalanceTabSettlementDialog::BalanceTabSettlementDialog(QWidget* parent) : QDialo
 	edtAmount->setSuffix(QStringLiteral(" ") + qtUtils::eurSymbol());
 	edtAmount->setSingleStep(1.0);
 	edtAmount->setAlignment(Qt::AlignLeft | Qt::AlignVCenter);
+	edtAmount->setValue(amountSuggestion);
 
 	edtDate = new QDateEdit(QDate::currentDate());
 	edtDate->setDisplayFormat(QStringLiteral("dd MMMM yy"));
