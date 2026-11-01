@@ -70,6 +70,7 @@ private:
 	QLabel* lCashAfter = nullptr;
 	QLabel* lSavingsAfter = nullptr;
 	QLabel* lForeignAfter = nullptr;
+	TextPopupWidget* popupSavingsDifference = nullptr;
 	TextPopupWidget* popupCashDifference = nullptr;
 	TextPopupWidget* popupSavingsAfter = nullptr;
 	QPushButton* btnSettleForeign = nullptr;

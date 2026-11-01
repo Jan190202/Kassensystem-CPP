@@ -152,8 +152,10 @@ void BalanceTab::initialize()
 	lSpendings = new QLabel(currency(0.0), this);
 
 	popupCashDifference = new TextPopupWidget(TextPopupWidget::PopupPos::bottomRight, this);
+	popupSavingsDifference = new TextPopupWidget(TextPopupWidget::PopupPos::bottomRight, this);
 	popupSavingsAfter = new TextPopupWidget(TextPopupWidget::PopupPos::bottomRight, this);
 	popupCashDifference->setFixedHeight(rowHeight);
+	popupSavingsDifference->setFixedHeight(rowHeight);
 	popupSavingsAfter->setFixedHeight(rowHeight);
 
 	for (QLabel* label : { lCashBefore, lCashDifference, lCashAfter, lSavingsBefore, lSavingsDifference,
@@ -224,7 +226,12 @@ void BalanceTab::initialize()
 	differenceLayout->setContentsMargins(12, 16, 12, 12);
 	differenceLayout->setHorizontalSpacing(16);
 	differenceLayout->setVerticalSpacing(7);
-	differenceLayout->addRow(QStringLiteral("Bestand:"), lSavingsDifference);
+	auto* savingsDifferenceLayout = new QHBoxLayout();
+	savingsDifferenceLayout->setContentsMargins(0, 0, 0, 0);
+	savingsDifferenceLayout->setSpacing(8);
+	savingsDifferenceLayout->addWidget(lSavingsDifference);
+	savingsDifferenceLayout->addWidget(popupSavingsDifference);
+	differenceLayout->addRow(QStringLiteral("Bestand:"), savingsDifferenceLayout);
 
 	auto* cashDifferenceLayout = new QHBoxLayout();
 	cashDifferenceLayout->setContentsMargins(0, 0, 0, 0);
@@ -428,6 +435,7 @@ void BalanceTab::showEmptyState()
 	lPeriod->setText(QStringLiteral("Noch kein Kassensturz vorhanden - bitte zuerst den Anfangsbestand erfassen"));
 	lPeriodWarning->hide();
 	lConsumptionSummary->clear();
+	popupSavingsDifference->setRichText(QString());
 	popupCashDifference->setRichText(QString());
 	popupSavingsAfter->setRichText(QString());
 
@@ -516,9 +524,9 @@ void BalanceTab::refreshConsumption()
 	const std::array<Line, 3> lines
 	{ 
 		{
-			{ QStringLiteral("Offene Verbräuche (Schulden)"),	c.debt },
-			{ QStringLiteral("Fremdanteil"),					c.foreignShare },
-			{ QStringLiteral("Guthaben"),						c.credit }
+			{ QStringLiteral("Offene Schulden"),		c.debt },
+			{ QStringLiteral("Offener Fremdanteil"),	c.foreignShare },
+			{ QStringLiteral("Guthaben"),				c.credit }
 		} 
 	};
 
@@ -542,23 +550,7 @@ void BalanceTab::refreshConsumption()
 		tblConsumption->setItem(i, 4, endItem);
 	}
 
-	// bridge: how journal + consumption share + review difference add up to the change of the savings
-	const double savingsChange = report.end.savings - report.start.savings;
-	const double bridge = report.details.departmentEarnings + c.departmentShare
-		- report.details.departmentSpendings + report.details.cashCorrection;
-	const bool bridgeOk = std::abs(bridge - savingsChange) < tolerance;
-
-	QString bridgeText = QStringLiteral("Einnahmen %1 + Abteilungsanteil Getränke %2 - Ausgaben %3")
-		.arg(currency(report.details.departmentEarnings), currency(c.departmentShare), currency(report.details.departmentSpendings));
-	if (std::abs(report.details.cashCorrection) > 1e-9)
-		bridgeText += QStringLiteral(" %1 Kassendifferenz %2")
-		.arg(report.details.cashCorrection >= 0 ? "+" : "-", currency(std::abs(report.details.cashCorrection)));
-	bridgeText += QStringLiteral(" = <b>Veränderung Bestand %1</b> (<span style=\"color:%2; font-weight:bold;\">%3</span>)")
-		.arg(currency(bridge, 3), bridgeOk ? "#2e8b57" : "#c0392b", bridgeOk ? "korrekt" : "inkorrekt");
-
-	lConsumptionSummary->setText(
-		QStringLiteral("Verbrauch gesamt: %1; davon Abteilungsanteil: %2; davon Fremdanteil: %3<br>%4")
-		.arg(currency(c.totalConsumption), currency(c.departmentShare, 3), currency(c.foreignShare.added, 3), bridgeText));
+	lConsumptionSummary->setText(QStringLiteral("Zusätzliche Abteilungs-Einnahmen durch Getränkeverkäufe im Zeitraum: %1").arg(currency(c.departmentShare, 3)));
 }
 
 void BalanceTab::refreshLabels()
@@ -597,6 +589,19 @@ void BalanceTab::refreshLabels()
 		popupSumRow(compositionSum, savingsMatch, 3) +
 		"</table>";
 
+	// popup: how the savings changed in this period
+	const double savingsChange = report.end.savings - report.start.savings;
+	const bool savingsChangeOk = std::abs(bridge - savingsChange) < tolerance;
+
+	QString savingsDiffExplanation =
+		"<table cellspacing=\"2\" cellpadding=\"0\">" +
+		popupRow(true, d.departmentEarnings, "Einnahmen", 3) +
+		popupRow(true, report.consumption.departmentShare, "Abteilungsanteil Getränke", 3) +
+		popupRow(false, d.departmentSpendings, "Ausgaben", 3);
+	if (std::abs(d.cashCorrection) > 1e-9)
+		savingsDiffExplanation += popupRow(d.cashCorrection >= 0, std::abs(d.cashCorrection), "Kassendifferenz (Kassensturz)", 3);
+	savingsDiffExplanation += popupSumRow(bridge, savingsChangeOk, 3) + "</table>";
+
 	// journal totals (journal entries only)
 	lEarnings->setText(currency(report.totalEarnings));
 	lSpendings->setText(currency(report.totalSpendings));
@@ -608,7 +613,8 @@ void BalanceTab::refreshLabels()
 	lForeignBefore->setText(currency(report.start.foreignCash, 3));
 
 	// change
-	lSavingsDifference->setText(currency(report.end.savings - report.start.savings, 3));
+	lSavingsDifference->setText(currency(savingsChange, 3));
+	popupSavingsDifference->setRichText(savingsDiffExplanation);
 	lCashDifference->setText(currency(cashChange));
 	popupCashDifference->setRichText(cashDiffExplanation);
 
