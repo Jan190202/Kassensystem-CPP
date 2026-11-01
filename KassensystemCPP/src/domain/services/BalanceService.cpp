@@ -63,8 +63,6 @@ AddSettlementException BalanceService::addShareSettlement(const request::ShareSe
 		return AddSettlementException::amountNegative;
 	if (request.amount < 1e-9)
 		return AddSettlementException::amountZero;
-	if (request.amount - debtRepo->getForeignDue() > 1e-9)
-		return AddSettlementException::amountGreaterThanTotalForeignShare;
 
 	entry::ShareSettlement entry{
 		.shareSettlementEntryID = 0,
@@ -80,8 +78,16 @@ AddSettlementException BalanceService::addShareSettlement(const request::ShareSe
 
 	if (overpaymentAmount > 1e-9)
 	{
-		// case currently caught with AddSettlementException::amountGreaterThanTotalForeignShare
-		// if settlement in advance (or up-rounding) intended later, implement here
+		addBalanceItem(
+			request::Balance{
+				.type = BalanceType::spending,
+				.description = "Zuvielzahlung Abteilungsabrechnung",
+				.amount = overpaymentAmount,
+				.dateBooked = QDate::currentDate(),
+				.comment = "",
+				.coveringPerson = std::nullopt
+			}
+		);
 	}
 
 	return AddSettlementException::none;

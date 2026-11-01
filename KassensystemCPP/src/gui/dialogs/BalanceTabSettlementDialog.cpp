@@ -10,7 +10,7 @@
 #include <QFormLayout>
 #include <QLabel>
 
-BalanceTabSettlementDialog::BalanceTabSettlementDialog(QWidget* parent) : QDialog(parent)
+BalanceTabSettlementDialog::BalanceTabSettlementDialog(QWidget* parent, double amountSuggestion) : QDialog(parent)
 {
 	setWindowTitle("Fremdanteil begleichen");
 	setWindowIcon(iconLoader::getIcon("payment.png"));
@@ -24,6 +24,7 @@ BalanceTabSettlementDialog::BalanceTabSettlementDialog(QWidget* parent) : QDialo
 	edtAmount->setSuffix(QStringLiteral(" ") + qtUtils::eurSymbol());
 	edtAmount->setSingleStep(1.0);
 	edtAmount->setAlignment(Qt::AlignLeft | Qt::AlignVCenter);
+	edtAmount->setValue(amountSuggestion);
 
 	//edtDate = new QDateEdit(QDate::currentDate());
 	//edtDate->setDisplayFormat(QStringLiteral("dd MMMM yy"));

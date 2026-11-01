@@ -334,7 +334,7 @@ void BalanceTab::addSettlement()
 {
 	BalanceTabSettlementDialog::inputs inputs;
 
-	auto* inputDialog = new BalanceTabSettlementDialog(this);
+	auto* inputDialog = new BalanceTabSettlementDialog(this, std::round(report.end.foreignCash)); // amount suggestion in dialog: current foreign cash, rounded 
 	if (inputDialog->exec() == QDialog::Accepted)
 	{
 		inputs = inputDialog->getInputs();
@@ -357,7 +357,6 @@ void BalanceTab::addSettlement()
 	case AddSettlementException::none: break;
 	case AddSettlementException::amountZero: break;
 	case AddSettlementException::amountNegative: break;
-	case AddSettlementException::amountGreaterThanTotalForeignShare: break;
 	}
 
 	refresh();
@@ -559,8 +558,7 @@ void BalanceTab::refreshLabels()
 
 	// popup: how the cash changed in this period
 	const double cashChange = report.end.cash - report.start.cash;
-	const double cashFlowSum = d.departmentEarnings - d.departmentSpendings + d.paidDebt - d.settledValue
-		+ d.depositedCredit + d.cashCorrection;
+	const double cashFlowSum = d.departmentEarnings - d.departmentSpendings + d.paidDebt - d.settledValue + d.depositedCredit + d.cashCorrection;
 	const bool cashFlowOk = std::abs(cashFlowSum - cashChange) < tolerance;
 
 	QString cashDiffExplanation =
@@ -576,8 +574,7 @@ void BalanceTab::refreshLabels()
 
 	// popup: what the savings at the end consist of
 	const double compositionSum = report.end.cash - report.end.foreignCash + report.end.debt - report.end.credit;
-	const double bridge = d.departmentEarnings + report.consumption.departmentShare
-		- d.departmentSpendings + d.cashCorrection;
+	const double bridge = d.departmentEarnings + report.consumption.departmentShare - d.departmentSpendings + d.cashCorrection;
 	const bool savingsMatch = std::abs(compositionSum - (report.start.savings + bridge)) < tolerance;
 
 	const QString savingsAfterExplanation =

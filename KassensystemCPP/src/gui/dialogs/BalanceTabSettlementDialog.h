@@ -20,7 +20,7 @@ public:
 		std::string comment;
 	};
 
-	BalanceTabSettlementDialog(QWidget* parent);
+	BalanceTabSettlementDialog(QWidget* parent, double amountSuggestion = 0.0);
 
 	BalanceTabSettlementDialog::inputs getInputs() const;
 

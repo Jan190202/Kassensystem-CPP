@@ -69,6 +69,7 @@ struct DateRange
 		return (!afterExclusive || date > *afterExclusive) && (!untilInclusive || date <= *untilInclusive);
 	}
 
+	// attention: data/sqlite/sqliteutils/SqliteUtils.h -> bookedRangeClause() mirrors this date arithmetic; only change both implementations equally
 	bool contains(const RegisterDate& booked, const QDate& dateAdded) const
 	{
 		if (!booked.isSpecial())
