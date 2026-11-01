@@ -16,7 +16,7 @@ public:
 		std::string comment;
 	};
 
-	BalanceTabReviewDialog(double expectedCash, QWidget* parent);
+	BalanceTabReviewDialog(QWidget* parent, double expectedCash = 0.0);
 
 	BalanceTabReviewDialog::inputs getInputs() const;
 

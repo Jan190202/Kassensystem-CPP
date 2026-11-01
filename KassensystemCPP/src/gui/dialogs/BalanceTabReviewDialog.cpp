@@ -14,7 +14,7 @@
 #include <QRegularExpression>
 #include <QFrame>
 
-BalanceTabReviewDialog::BalanceTabReviewDialog(double expectedCash, QWidget* parent) : QDialog(parent)
+BalanceTabReviewDialog::BalanceTabReviewDialog(QWidget* parent, double expectedCash) : QDialog(parent)
 {
 	setWindowIcon(iconLoader::getIcon("check.png"));
 	setWindowTitle("Kassensturz");
@@ -29,6 +29,7 @@ BalanceTabReviewDialog::BalanceTabReviewDialog(double expectedCash, QWidget* par
 	edtCounted->setSuffix(QStringLiteral(" ") + qtUtils::eurSymbol());
 	edtCounted->setSingleStep(1.0);
 	edtCounted->setAlignment(Qt::AlignLeft | Qt::AlignVCenter);
+	edtCounted->setValue(expectedCash);
 
 	edtExpected = new QDoubleSpinBox();
 	edtExpected->setRange(0.0, 1'000'000.0);

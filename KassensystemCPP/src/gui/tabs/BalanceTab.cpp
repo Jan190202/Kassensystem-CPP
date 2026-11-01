@@ -366,7 +366,7 @@ void BalanceTab::startReview()
 {
 	const double expectedCash = periodCount == 0 ? 0.0 : report.end.cash;
 
-	BalanceTabReviewDialog dialog(expectedCash, this);
+	BalanceTabReviewDialog dialog(this, expectedCash);
 	if (dialog.exec() != QDialog::Accepted)
 		return;
 
