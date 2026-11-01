@@ -43,7 +43,7 @@ BalanceTabSettlementDialog::BalanceTabSettlementDialog(QWidget* parent, double a
 	lblAmount->setFont(boldFont);
 	auto* lblComment = new QLabel(QStringLiteral("Kommentar:"));
 	lblComment->setFont(boldFont);
-	auto* lblDate = new QLabel(QStringLiteral("Datum (erweitert, kein Effekt auf Allokation):"));
+	auto* lblDate = new QLabel(QStringLiteral("Datum (erweiterte Einstellung, kein Effekt auf Allokationsreihenfolge):"));
 	lblDate->setFont(boldFont);
 
 	auto* form = new QFormLayout;
